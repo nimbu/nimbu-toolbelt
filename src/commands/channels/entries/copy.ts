@@ -150,7 +150,7 @@ export default class CopyChannels extends Command {
 
     // first count the entries
     let baseUrl = `/channels/${ctx.fromChannel}/entries`
-    let queryParts: string[] = ['include_slugs=1']
+    let queryParts: string[] = ['include_slugs=1', 'x-cdn-expires=600']
     let queryFromCtx: string | undefined = ctx.query
     if (queryFromCtx !== undefined && queryFromCtx.trim() !== '') {
       queryParts.push(queryFromCtx.trim())
@@ -238,7 +238,8 @@ export default class CopyChannels extends Command {
     let pathFinder = require('path')
 
     if (fileObject != null && fileObject !== null && fileObject.url != null) {
-      let url = fileObject.url.replace('http://', 'https://') + '?' + generateRandom(6)
+      let url =
+        fileObject.url.replace('http://', 'https://') + (fileObject.url.includes('?') ? '&' : '?') + generateRandom(6)
       const { path, cleanup } = await tmp.file({ prefix: `${fieldName}-` })
       let filename = pathFinder.basename(url)
 
