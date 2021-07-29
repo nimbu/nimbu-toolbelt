@@ -1,6 +1,7 @@
 import Command from '../../command'
 import * as Nimbu from '../../nimbu/types'
 
+import { flags } from '@oclif/command'
 import fs from 'fs-extra'
 import ux from 'cli-ux'
 import yaml from 'js-yaml'
@@ -8,8 +9,19 @@ import yaml from 'js-yaml'
 export default class PullMails extends Command {
   static description = 'download all notification templates'
 
+  static flags = {
+    only: flags.string({
+      char: 'o',
+      description: 'the names of the templates to pull from Nimbu',
+      multiple: true,
+      required: false,
+    }),
+  }
+
   async execute() {
     const Listr = require('listr')
+
+    const { flags } = this.parse(PullMails)
 
     const tasks = new Listr([
       {
@@ -18,7 +30,7 @@ export default class PullMails extends Command {
       },
       {
         title: 'Writing all templates to disk',
-        task: (ctx) => this.writeAll(ctx),
+        task: (ctx) => this.writeAll(ctx, flags),
       },
     ])
 
@@ -31,7 +43,7 @@ export default class PullMails extends Command {
     ctx.notifications = await this.nimbu.get<Nimbu.Notification[]>('/notifications')
   }
 
-  private async writeAll(ctx: any) {
+  private async writeAll(ctx: any, flags: any) {
     const { Observable } = require('rxjs')
     const notifications: Nimbu.Notification[] = ctx.notifications
     const mailsPath = this.nimbuConfig.projectPath + '/content/notifications/'
@@ -40,6 +52,10 @@ export default class PullMails extends Command {
 
     return new Observable((observer) => {
       notifications.forEach((notification) => {
+        if (flags.only && flags.only.length > 0 && flags.only.indexOf(notification.slug) === -1) {
+          return
+        }
+
         let filename = `${notification.slug}.txt`
         observer.next(filename)
 
