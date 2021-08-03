@@ -22,27 +22,32 @@ export default class Build extends Command {
   }
 
   async execute() {
-    process.env.NODE_ENV = 'production'
+    try {
+      process.env.NODE_ENV = 'production'
 
-    cli.action.start('building for production')
-    const webpackConfig = projectWebpack.customize(defaultWebpackConfig(), getConfig())
-    const stats = await this.webpack(webpackConfig)
-    cli.action.stop()
-    this.log(
-      stats.toString({
-        colors: true,
-        modules: false,
-        children: false,
-        chunks: false,
-        chunkModules: false,
-      }) + '\n\n',
-    )
-    this.log(chalk.cyan('  Build complete.\n'))
-    this.log(
-      chalk.yellow(
-        '  Tip: built files are meant to be served over an HTTP server.\n' +
-          "  Opening index.html over file:// won't work.\n",
-      ),
-    )
+      cli.action.start('building for production')
+      const webpackConfig = projectWebpack.customize(defaultWebpackConfig(), getConfig())
+      const stats = await this.webpack(webpackConfig)
+      cli.action.stop()
+      this.log(
+        stats.toString({
+          colors: true,
+          modules: false,
+          children: false,
+          chunks: false,
+          chunkModules: false,
+        }) + '\n\n',
+      )
+      this.log(chalk.cyan('  Build complete.\n'))
+      this.log(
+        chalk.yellow(
+          '  Tip: built files are meant to be served over an HTTP server.\n' +
+            "  Opening index.html over file:// won't work.\n",
+        ),
+      )
+    } catch (error) {
+      this.log(chalk.red('There was a problem while building your project:'))
+      this.log(error)
+    }
   }
 }
