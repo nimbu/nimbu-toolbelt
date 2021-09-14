@@ -60,22 +60,49 @@ function babelLoader(loaderOptions = {}) {
 }
 
 function codeLoaders(options) {
-  const loaders = [
-    {
+  const loaders = []
+
+  if (hasOptional('coffee-loader')) {
+    loaders.push({
       exclude: /node_modules/,
       test: /\.coffee$/,
       use: [babelLoader(options), 'coffee-loader'],
-    },
-    {
+    })
+  }
+
+  if (hasOptional('esbuild-loader') || process.env.USE_ESBUILD_LOADER) {
+    loaders.push({
+      test: /\.jsx?$/,
+      loader: 'esbuild-loader',
+      exclude: /node_modules(?!.*nimbu-toolbelt\/polyfills\.js)/,
+      options: {
+        loader: 'jsx', // Remove this if you're not using JSX
+        target: 'es2015', // Syntax to compile to (see options below for possible values)
+      },
+    })
+
+    loaders.push({
+      test: /\.tsx?$/,
+      loader: 'esbuild-loader',
+      exclude: /node_modules/,
+      options: {
+        loader: 'tsx', // Remove this if you're not using JSX
+        target: 'es2015', // Syntax to compile to (see options below for possible values)
+      },
+    })
+  } else {
+    // use the regular babel-loader
+    loaders.push({
       // Application JS
       // exclude node modules, except our own polyfills
       exclude: /node_modules(?!.*nimbu-toolbelt\/polyfills\.js)/,
       test: /\.jsx?$/,
       use: [babelLoader(options)],
-    },
+    })
+
     // Process any JS outside of the app with Babel.
     // Unlike the application JS, we only compile the standard ES features.
-    {
+    loaders.push({
       exclude: /@babel(?:\/|\\{1,2})runtime/,
       loader: require.resolve('babel-loader'),
       /* tslint:disable:object-literal-sort-keys */
@@ -101,25 +128,27 @@ function codeLoaders(options) {
       },
       /* tslint:enable:object-literal-sort-keys */
       test: /\.(js|mjs)$/,
-    },
-  ]
-  if (hasOptional('ts-loader')) {
-    loaders.push({
-      exclude: /node_modules/,
-      test: /\.tsx?$/,
-      use: [
-        babelLoader(options),
-        {
-          loader: getOptional('ts-loader'),
-          options: {
-            compilerOptions: {
-              noEmit: false,
+    })
+
+    if (hasOptional('ts-loader')) {
+      loaders.push({
+        exclude: /node_modules/,
+        test: /\.tsx?$/,
+        use: [
+          babelLoader(options),
+          {
+            loader: getOptional('ts-loader'),
+            options: {
+              compilerOptions: {
+                noEmit: false,
+              },
             },
           },
-        },
-      ],
-    })
+        ],
+      })
+    }
   }
+
   return loaders
 }
 

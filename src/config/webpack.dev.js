@@ -37,7 +37,7 @@ const webpackConfig = () => {
       enableReactRefresh: true,
       shouldUseSourceMap,
     })
-    .concat(styleConfig.loaders)
+    // .concat(styleConfig.loaders)
     .concat(
       utils.fileLoaders({
         cachePrefix: 'development',
