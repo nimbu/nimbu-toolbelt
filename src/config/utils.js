@@ -74,7 +74,6 @@ function codeLoaders(options) {
     loaders.push({
       test: /\.jsx?$/,
       loader: 'esbuild-loader',
-      exclude: /node_modules(?!.*nimbu-toolbelt\/polyfills\.js)/,
       options: {
         loader: 'jsx', // Remove this if you're not using JSX
         target: 'es2015', // Syntax to compile to (see options below for possible values)
@@ -84,7 +83,6 @@ function codeLoaders(options) {
     loaders.push({
       test: /\.tsx?$/,
       loader: 'esbuild-loader',
-      exclude: /node_modules/,
       options: {
         loader: 'tsx', // Remove this if you're not using JSX
         target: 'es2015', // Syntax to compile to (see options below for possible values)
@@ -175,7 +173,7 @@ function fileLoaders(options = {}) {
       // it's runtime that would otherwise processed through "file" loader.
       // Also exclude `html` and `json` extensions so they get processed
       // by webpacks internal loaders.
-      exclude: [/\.jsx?$/, /\.html$/, /\.json$/, /\.ejs$/, /\.tsx?$/],
+      exclude: [/\.m?jsx?$/, /\.html$/, /\.json$/, /\.ejs$/, /\.tsx?$/],
       loader: fileloader,
       options: {
         name: 'images/[name].[ext]?h=[hash:8]',
