@@ -7,11 +7,9 @@
     "noImplicitAny": false,
     "importHelpers": true,
     "module": "commonjs",
-    "outDir": "./lib",
     "pretty": true,
-    "rootDirs": ["./src"],
     "strict": true,
-    "target": "es2017"
+    "target": "es2017",
+    "declaration": true,
   },
-  "include": ["./src/**/*"]
 }
