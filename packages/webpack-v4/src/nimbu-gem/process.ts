@@ -1,6 +1,6 @@
 import { spawn, ChildProcess, StdioOptions } from 'child_process'
-const paths = require('../config/paths')
-const path = require('path')
+import * as path from 'path'
+import * as paths from '../config/paths'
 
 export default function (
   site: string,

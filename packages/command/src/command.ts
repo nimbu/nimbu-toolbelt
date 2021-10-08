@@ -1,12 +1,12 @@
 import Command from '@oclif/command'
 import Client from './nimbu/client'
-import buildConfig = require('./config/config')
-import NimbuConfig from './nimbu/config'
+import * as buildConfig from './config/config'
+import { Config } from './nimbu/config'
 
 export default abstract class extends Command {
   private _client?: Client
   private _buildConfig?: any
-  private _nimbuConfig?: NimbuConfig
+  private _nimbuConfig?: Config
 
   get initialized() {
     return this._buildConfig !== undefined && this._nimbuConfig !== undefined && this._client !== undefined
@@ -15,7 +15,7 @@ export default abstract class extends Command {
   async initialize() {
     if (!this.initialized) {
       this._buildConfig = await buildConfig.initialize()
-      this._nimbuConfig = new NimbuConfig(this._buildConfig)
+      this._nimbuConfig = new Config(this._buildConfig)
       this._client = new Client(this.config, this.nimbuConfig)
     }
   }

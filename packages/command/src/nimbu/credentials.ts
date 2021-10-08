@@ -6,7 +6,7 @@ import Netrc from 'netrc-parser'
 import Nimbu from 'nimbu-client'
 import * as os from 'os'
 
-import { default as Client, APIError } from './client'
+import { default as Client, APIError, HTTPError } from './client'
 
 const debug = require('debug')('nimbu-toolbelt')
 const hostname = os.hostname()
@@ -93,12 +93,16 @@ export class Credentials {
           Netrc.saveSync()
         }
       } catch (err) {
-        ux.warn(err)
+        if (err instanceof Error) {
+          ux.warn(err)
+        }
       }
       let auth = await this.interactive(previousToken && previousToken.login, opts.expiresIn)
       await this.saveToken(auth)
     } catch (err) {
-      throw new APIError(err)
+      if (err instanceof HTTPError) {
+        throw new APIError(err)
+      }
     } finally {
       loggedIn = true
     }
@@ -119,7 +123,9 @@ export class Credentials {
     try {
       auth = await this.createOAuthToken(login!, password, { expiresIn })
     } catch (err) {
-      if (!err.body || err.body.code !== 210) throw err
+      if (err instanceof HTTPError) {
+        if (!err.body || err.body.code !== 210) throw err
+      }
       let secondFactor = await ux.prompt('Two-factor code', { type: 'mask' })
       auth = await this.createOAuthToken(login!, password, { expiresIn, secondFactor })
     }

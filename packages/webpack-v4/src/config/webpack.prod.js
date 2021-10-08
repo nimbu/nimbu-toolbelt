@@ -5,8 +5,8 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const getBaseWebpackConfig = require('./webpack.base.js')
 const utils = require('./utils')
 const {
-  config: { get: getProjectConfig },
-} = require('nimbu')
+  buildConfig: { get: getProjectConfig },
+} = require('@nimbu-cli/command')
 
 const webpackConfig = () => {
   const config = getProjectConfig()

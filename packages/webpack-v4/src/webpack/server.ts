@@ -5,8 +5,8 @@ import paths = require('../config/paths')
 import defaultConfig = require('../config/webpack.dev.js')
 import projectWebpack = require('../config/webpack.project.js')
 const {
-  config: { get: getProjectConfig },
-} = require('nimbu')
+  buildConfig: { get: getProjectConfig },
+} = require('@nimbu-cli/command')
 
 const { choosePort, createCompiler, prepareUrls } = require('react-dev-utils/WebpackDevServerUtils')
 const createDevServerConfig = require('../config/webpackDevServer.config.js')

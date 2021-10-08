@@ -5,7 +5,7 @@ import Nimbu from 'nimbu-client'
 import ux from 'cli-ux'
 
 import { Credentials } from './credentials'
-import Config from './config'
+import { Config } from './config'
 import { User } from './types'
 
 export namespace Client {
@@ -29,7 +29,7 @@ export interface IAPIErrorOptions {
   errors?: string[]
 }
 
-interface HTTPError extends Error {
+export class HTTPError extends Error {
   body?: any
   statusCode?: number
 }
@@ -105,7 +105,9 @@ export default class Client {
     try {
       await this.credentials.logout()
     } catch (err) {
-      ux.warn(err)
+      if (err instanceof Error) {
+        ux.warn(err)
+      }
     }
     delete Netrc.machines[this.config.apiHost]
     await Netrc.save()
@@ -138,21 +140,25 @@ export default class Client {
       let result = (await this.client.request<T>(Object.assign({}, options, { method, path }))) as T
       return result
     } catch (error) {
-      if (!error.statusCode) {
-        // this is no regular http client error
+      if (error instanceof HTTPError) {
+        if (!error.statusCode) {
+          // this is no regular http client error
+          throw error
+        }
+        if (retries > 0) {
+          if (options.retryAuth !== false && error.statusCode === 401) {
+            await this.login()
+            if (!options.headers) {
+              options.headers = {}
+            }
+            options.headers.authorization = `Bearer ${this.token}`
+            return this.request<T>(method, path, options, retries)
+          }
+        }
+        throw new APIError(error)
+      } else {
         throw error
       }
-      if (retries > 0) {
-        if (options.retryAuth !== false && error.statusCode === 401) {
-          await this.login()
-          if (!options.headers) {
-            options.headers = {}
-          }
-          options.headers.authorization = `Bearer ${this.token}`
-          return this.request<T>(method, path, options, retries)
-        }
-      }
-      throw new APIError(error)
     }
   }
 

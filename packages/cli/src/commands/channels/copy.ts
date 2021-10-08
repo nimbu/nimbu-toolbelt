@@ -1,4 +1,4 @@
-import Command from '../../command'
+import Command, { HTTPError } from '@nimbu-cli/command'
 
 import { flags } from '@oclif/command'
 import ux from 'cli-ux'
@@ -92,10 +92,12 @@ export default class CopyChannels extends Command {
     try {
       ctx.channel = await this.nimbu.get(`/channels/${ctx.fromChannel}`, options)
     } catch (error) {
-      if (error.body != null && error.body.code === 101) {
-        throw new Error(`could not find channel ${chalk.bold(ctx.fromChannel)}`)
-      } else {
-        throw new Error(error.message)
+      if (error instanceof HTTPError) {
+        if (error.body != null && error.body.code === 101) {
+          throw new Error(`could not find channel ${chalk.bold(ctx.fromChannel)}`)
+        } else {
+          throw new Error(error.message)
+        }
       }
     }
   }
@@ -112,8 +114,10 @@ export default class CopyChannels extends Command {
     try {
       targetChannel = await this.nimbu.get(`/channels/${ctx.toChannel}`, options)
     } catch (error) {
-      if (error.body === undefined || error.body.code !== 101) {
-        throw new Error(error.message)
+      if (error instanceof HTTPError) {
+        if (error.body === undefined || error.body.code !== 101) {
+          throw new Error(error.message)
+        }
       }
     }
 
@@ -151,10 +155,12 @@ export default class CopyChannels extends Command {
     try {
       return this.nimbu.patch(`/channels/${ctx.toChannel}?replace=1`, options)
     } catch (error) {
-      if (error.body === undefined || error.body.code !== 101) {
-        throw new Error(JSON.stringify(error.message))
-      } else {
-        throw new Error(JSON.stringify(error))
+      if (error instanceof HTTPError) {
+        if (error.body === undefined || error.body.code !== 101) {
+          throw new Error(JSON.stringify(error.message))
+        } else {
+          throw new Error(JSON.stringify(error))
+        }
       }
     }
   }

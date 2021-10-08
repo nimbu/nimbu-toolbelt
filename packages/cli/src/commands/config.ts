@@ -1,4 +1,4 @@
-import Command from '../command'
+import Command from '@nimbu-cli/command'
 import chalk from 'chalk'
 
 export default class Config extends Command {

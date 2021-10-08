@@ -1,6 +1,4 @@
-import Command from '../../command'
-import * as Nimbu from '../../nimbu/types'
-import { color } from '../../nimbu/color'
+import Command, { APITypes as Nimbu, color } from '@nimbu-cli/command'
 
 import { flags } from '@oclif/command'
 

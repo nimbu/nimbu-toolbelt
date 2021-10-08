@@ -1,7 +1,4 @@
-import Command from '../../command'
-import * as Nimbu from '../../nimbu/types'
-import { color } from '../../nimbu/color'
-import { SiteSubdomainCompletion } from '../../flags/completions'
+import Command, { APITypes as Nimbu, color, completions } from '@nimbu-cli/command'
 
 import { flags } from '@oclif/command'
 import cli from 'cli-ux'
@@ -26,7 +23,7 @@ export default class Init extends Command {
     }),
     site: flags.string({
       char: 's',
-      completion: SiteSubdomainCompletion,
+      completion: completions.SiteSubdomainCompletion,
       description: 'The site (use the Nimbu subdomain) to link to this project.',
       env: 'NIMBU_SITE',
     }),

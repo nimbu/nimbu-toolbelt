@@ -1,15 +1,11 @@
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "noImplicitAny": false,
-    "importHelpers": true,
-    "module": "commonjs",
-    "pretty": true,
-    "strict": true,
-    "target": "es2017",
-    "declaration": true,
-  },
+  "references": [
+    {
+      "path": "./packages/command"
+    },
+    {
+      "path": "./packages/cli"
+    }
+  ],
+  "files": [],
 }

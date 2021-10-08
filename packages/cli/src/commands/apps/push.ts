@@ -1,7 +1,5 @@
-import Command from '../../command'
+import Command, { APITypes as Nimbu, AppConfig } from '@nimbu-cli/command'
 import { flags } from '@oclif/command'
-import { ConfigApp } from '../../nimbu/config'
-import * as Nimbu from '../../nimbu/types'
 import { findMatchingFiles } from '../../utils/files'
 
 import cli from 'cli-ux'
@@ -28,11 +26,11 @@ export default class AppsPush extends Command {
     },
   ]
 
-  private _app?: ConfigApp
+  private _app?: AppConfig
   private _files?: string[]
   private _code?: Nimbu.AppFile[]
 
-  get app(): ConfigApp {
+  get app(): AppConfig {
     if (!this._app) {
       const { flags } = this.parse(AppsPush)
       if (flags.app) {
@@ -81,7 +79,9 @@ export default class AppsPush extends Command {
         await this.pushFile(file)
       }
     } catch (error) {
-      cli.error(error.message)
+      if (error instanceof Error) {
+        cli.error(error.message)
+      }
     }
   }
 

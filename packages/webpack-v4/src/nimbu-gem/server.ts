@@ -1,5 +1,5 @@
 import { ChildProcess } from 'child_process'
-import { Client } from 'nimbu'
+import { APIClient } from '@nimbu-cli/command'
 import spawn from './process'
 
 export interface NimbuGemServerOptions {
@@ -11,9 +11,9 @@ export default class NimbuGemServer {
   private process?: ChildProcess
   private readonly logger?: (message: string) => void
   private readonly errorLogger?: (message: string) => void
-  private readonly nimbu: Client
+  private readonly nimbu: APIClient
 
-  constructor(nimbuClient: Client, logger?: (message: string) => void, errorLogger?: (message: string) => void) {
+  constructor(nimbuClient: APIClient, logger?: (message: string) => void, errorLogger?: (message: string) => void) {
     this.logger = logger
     this.errorLogger = errorLogger
     this.nimbu = nimbuClient

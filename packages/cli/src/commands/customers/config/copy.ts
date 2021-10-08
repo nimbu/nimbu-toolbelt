@@ -1,4 +1,4 @@
-import Command from '../../../command'
+import Command, { HTTPError } from '@nimbu-cli/command'
 
 import { flags } from '@oclif/command'
 import ux from 'cli-ux'
@@ -63,7 +63,9 @@ export default class CopyCustomerConfig extends Command {
     try {
       ctx.customizations = await this.nimbu.get(`/customers/customizations`, options)
     } catch (error) {
-      throw new Error(error.message)
+      if (error instanceof HTTPError) {
+        throw new Error(error.message)
+      }
     }
   }
 
@@ -75,9 +77,9 @@ export default class CopyCustomerConfig extends Command {
     try {
       targetCustomizations = await this.nimbu.get(`/customers/customizations`, options)
     } catch (error) {
-      // if (error.body === undefined || error.body.code !== 101) {
-      throw new Error(error.message)
-      // }
+      if (error instanceof HTTPError) {
+        throw new Error(error.message)
+      }
     }
 
     if (targetCustomizations.length > 0) {

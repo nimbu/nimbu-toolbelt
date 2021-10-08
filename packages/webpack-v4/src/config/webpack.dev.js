@@ -5,8 +5,8 @@ const utils = require('./utils')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin')
 const {
-  config: { get: getProjectConfig },
-} = require('nimbu')
+  buildConfig: { get: getProjectConfig },
+} = require('@nimbu-cli/command')
 
 let ReactRefreshWebpackPlugin
 

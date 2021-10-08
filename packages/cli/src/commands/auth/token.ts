@@ -1,6 +1,4 @@
-import Command from '../../command'
-import * as Nimbu from '../../nimbu/types'
-import { color } from '../../nimbu/color'
+import Command, { APITypes as Nimbu, color } from '@nimbu-cli/command'
 
 import { flags } from '@oclif/command'
 import { formatRelative } from 'date-fns'
@@ -33,7 +31,9 @@ By default, the CLI auth token is only valid for 1 year. To generate a long-live
         )
       }
     } catch (err) {
-      this.warn(err)
+      if (err instanceof Error) {
+        this.warn(err.message)
+      }
     }
 
     this.log(this.nimbu.token)

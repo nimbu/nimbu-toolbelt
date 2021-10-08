@@ -2,7 +2,8 @@ const { readSync, write } = require('node-yaml')
 import { pathExistsSync } from 'fs-extra'
 import { resolve as resolvePath } from 'path'
 import paths = require('../config/paths')
-export interface ConfigApp {
+
+export type AppConfig = {
   name: string
   id: string
   dir: string
@@ -13,10 +14,10 @@ export interface ConfigApp {
 interface ConfigFile {
   site?: string
   theme?: string
-  apps?: ConfigApp[]
+  apps?: AppConfig[]
 }
 
-export default class Config {
+export class Config {
   static defaultHost = 'nimbu.io'
 
   private _config?: ConfigFile
@@ -64,7 +65,7 @@ export default class Config {
   }
 
   // Nimbu Cloud Code Config
-  get apps(): ConfigApp[] {
+  get apps(): AppConfig[] {
     if (this.config.apps !== undefined) {
       return this.config.apps.filter((a) => a.host === this.apiHost || (!a.host && this.isDefaultHost))
     } else {
@@ -72,7 +73,7 @@ export default class Config {
     }
   }
 
-  async addApp(app: ConfigApp): Promise<void> {
+  async addApp(app: AppConfig): Promise<void> {
     if (this.config.apps !== undefined) {
       this.config.apps.push(
         Object.assign({}, app, {

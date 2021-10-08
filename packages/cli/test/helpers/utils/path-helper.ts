@@ -430,7 +430,9 @@ export class AbsPath {
     try {
       this.parent.mkdirs()
     } catch (e) {
-      throw new Error(`can't save ${this.toString()} - ${e.message}`)
+      if (e instanceof Error) {
+        throw new Error(`can't save ${this.toString()} - ${e.message}`)
+      }
     }
     fs.writeFileSync(this._abspath, contents)
   }
@@ -608,7 +610,7 @@ export class AbsPath {
       return parseInt(matches[1], 10)
     })
 
-    let nums: number[] = _.filter(matching, e => {
+    let nums: number[] = _.filter(matching, (e) => {
       return e !== null
     }) as number[]
 

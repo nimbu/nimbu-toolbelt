@@ -1,5 +1,4 @@
-import Command from '../../command'
-import * as Nimbu from '../../nimbu/types'
+import Command, { APITypes as Nimbu } from '@nimbu-cli/command'
 
 import { flags } from '@oclif/command'
 import fs from 'fs-extra'

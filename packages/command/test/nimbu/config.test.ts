@@ -1,6 +1,6 @@
 import test, { expect } from 'fancy-test'
 
-import Config from '../../src/nimbu/config'
+import { Config } from '../../src/nimbu/config'
 
 describe('cli client configuration', () => {
   test.it('sets vars by default', () => {

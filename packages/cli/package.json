@@ -1,23 +1,34 @@
 {
   "name": "nimbu",
   "description": "Tools for Nimbu projects",
-  "version": "4.1.6",
+  "version": "5.0.0",
   "author": "Zenjoy Engineering",
   "bin": {
     "nimbu": "./bin/run"
   },
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "dependencies": {
-    "@nimbu-cli/plugin-webpack-v4": "0.0.0",
-    "@oclif/command": "^1",
-    "@oclif/config": "^1",
-    "@oclif/errors": "^1.3.5",
+    "@nimbu-cli/command": "^1",
     "@oclif/plugin-autocomplete": "^0.3.0",
     "@oclif/plugin-help": "^3",
-    "@oclif/plugin-not-found": "^2.2.0",
-    "tslib": "^1",
-    "chalk": "^2.4.1",
-    "cli-ux": "^5.2.0"
+    "@oclif/plugin-not-found": "^1.2.4",
+    "deep-object-diff": "^1.1.0",
+    "front-matter": "^3.0.2",
+    "date-fns": "^2",
+    "fuzzy": "^0.1.3",
+    "hyperlinker": "^1",
+    "inquirer": "^6.2.2",
+    "inquirer-autocomplete-prompt": "^1.0.1",
+    "js-yaml": "^3.13.1",
+    "listr": "^0.14.3",
+    "lodash": "^4.17.11",
+    "lodash.clonedeep": "^4.5.0",
+    "log-symbols": "^3.0.0",
+    "pretty-bytes": "^5.3.0",
+    "rxjs": "^6.5.2",
+    "supports-hyperlinks": "^1.0.1",
+    "tmp-promise": "^2.0.2",
+    "through": "^2.3.8"
   },
   "devDependencies": {},
   "engines": {
@@ -27,12 +38,8 @@
     "/bin",
     "/lib",
     "/oclif.manifest.json",
-    "/Gemfile",
-    "/Gemfile.lock",
     "/polyfills.js",
-    "/template",
-    "/README.md",
-    "/.bundle/config"
+    "/README.md"
   ],
   "homepage": "https://github.com/zenjoy/nimbu-toolbelt",
   "keywords": [
@@ -46,7 +53,6 @@
     "commands": "./lib/commands",
     "bin": "nimbu",
     "plugins": [
-      "@nimbu-cli/plugin-webpack-v4",
       "@oclif/plugin-help",
       "@oclif/plugin-not-found",
       "@oclif/plugin-autocomplete"
@@ -92,8 +98,8 @@
   },
   "repository": "zenjoy/nimbu-toolbelt",
   "scripts": {
-    "build": "rm -rf lib && tsc",
-    "lint": "tsc -p test --noEmit && tslint -p test -t stylish",
+    "build": "rm -rf lib && rm -f tsconfig.tsbuildinfo && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",
     "prepack": "tsc && oclif-dev manifest && oclif-dev readme",

@@ -1,6 +1,4 @@
-import Command from '../../command'
-import * as Nimbu from '../../nimbu/types'
-import { ConfigApp } from '../../nimbu/config'
+import Command, { APITypes as Nimbu, AppConfig } from '@nimbu-cli/command'
 import { groupBy } from 'lodash'
 import chalk from 'chalk'
 
@@ -12,7 +10,7 @@ const enum Status {
 export default class AppsList extends Command {
   static description = 'List the applications registered in Nimbu'
 
-  printConfiguredApp(app: Nimbu.App, configured: ConfigApp) {
+  printConfiguredApp(app: Nimbu.App, configured: AppConfig) {
     this.log(chalk.bold(`- ${configured.name}`))
     this.log(`  - id: ${configured.id}`)
     this.log(`  - name in nimbu: ${app.name}`)
@@ -32,7 +30,7 @@ export default class AppsList extends Command {
     }
   }
 
-  async printConfiguredApps(apps: Nimbu.App[], configured: ConfigApp[]) {
+  async printConfiguredApps(apps: Nimbu.App[], configured: AppConfig[]) {
     if (apps && apps.length > 0) {
       this.log(chalk.greenBright('Configured applications:'))
       apps.forEach((a) => {

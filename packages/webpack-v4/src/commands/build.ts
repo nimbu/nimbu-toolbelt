@@ -1,10 +1,9 @@
-import { Command } from 'nimbu'
+import Command from '@nimbu-cli/command'
 import defaultWebpackConfig = require('../config/webpack.prod')
 import projectWebpack = require('../config/webpack.project')
 
-const {
-  config: { get: getProjectConfig },
-} = require('nimbu')
+import { buildConfig } from '@nimbu-cli/command'
+const { get: getProjectConfig } = buildConfig
 
 import webpack = require('webpack')
 import cli from 'cli-ux'
@@ -51,7 +50,10 @@ export default class Build extends Command {
       )
     } catch (error) {
       this.log(chalk.red('There was a problem while building your project:'))
-      this.log(error)
+
+      if (error instanceof Error) {
+        this.log(error.message)
+      }
     }
   }
 }

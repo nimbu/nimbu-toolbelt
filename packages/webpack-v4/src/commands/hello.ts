@@ -1,4 +1,4 @@
-import { Command } from 'nimbu'
+import Command from '@nimbu-cli/command'
 import { flags } from '@oclif/command'
 
 export default class Hello extends Command {

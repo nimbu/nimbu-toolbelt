@@ -2,11 +2,11 @@ import { flags } from '@oclif/command'
 import * as Config from '@oclif/config'
 import Client from '../nimbu/client'
 import buildConfig = require('../config/config')
-import NimbuConfig from '../nimbu/config'
+import { Config as NimbuConfig } from '../nimbu/config'
 
-export const day = 60 * 60 * 24
+const day = 60 * 60 * 24
 
-export const fetchFromNimbu = async (
+const fetchFromNimbu = async (
   resource: string,
   ctx: { config: Config.IConfig },
   sortParam = 'name',

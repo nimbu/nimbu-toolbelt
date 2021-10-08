@@ -3,9 +3,10 @@ const _ = require('lodash')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssoWebpackPlugin = require('csso-webpack-plugin').default
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+
 const {
-  config: { get: getProjectConfig },
-} = require('nimbu')
+  buildConfig: { get: getProjectConfig },
+} = require('@nimbu-cli/command')
 
 const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier')
 

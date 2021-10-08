@@ -1,4 +1,4 @@
-import { Command } from 'nimbu'
+import Command from '@nimbu-cli/command'
 import proxy from '../../nimbu-gem/command'
 
 export default class ThemesList extends Command {

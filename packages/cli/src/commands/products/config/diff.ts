@@ -1,4 +1,4 @@
-import Command from '../../../command'
+import Command from '@nimbu-cli/command'
 import { convertChangesToTree, addFieldNames, cleanUpIds } from '../../../utils/diff'
 
 import { flags } from '@oclif/command'
@@ -44,7 +44,10 @@ export default class ProductsConfigDiff extends Command {
       })
     } catch (error) {
       ux.action.stop()
-      throw new Error(error.message)
+
+      if (error instanceof Error) {
+        throw new Error(error.message)
+      }
     }
 
     try {
@@ -54,7 +57,10 @@ export default class ProductsConfigDiff extends Command {
       })
     } catch (error) {
       ux.action.stop()
-      throw new Error(error.message)
+
+      if (error instanceof Error) {
+        throw new Error(error.message)
+      }
     }
 
     ux.action.stop()

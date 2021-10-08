@@ -1,6 +1,4 @@
-import Command from '../../command'
-import * as Nimbu from '../../nimbu/types'
-import { color } from '../../nimbu/color'
+import Command, { APITypes as Nimbu, color, HTTPError } from '@nimbu-cli/command'
 
 export default class Whoami extends Command {
   static description = 'display the current logged in user'
@@ -13,7 +11,9 @@ export default class Whoami extends Command {
       let { email, name } = await this.nimbu.get<Nimbu.User>('/user', { retryAuth: false })
       this.log(`Logged in as ${color.green(email!)} (${name})`)
     } catch (err) {
-      if (err.statusCode === 401) this.notloggedin()
+      if (err instanceof HTTPError) {
+        if (err.statusCode === 401) this.notloggedin()
+      }
       throw err
     }
   }

@@ -7,3 +7,4 @@
 /yarn.lock
 /tmp
 node_modules
+tsconfig.tsbuildinfo

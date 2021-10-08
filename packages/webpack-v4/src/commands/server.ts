@@ -1,4 +1,4 @@
-import { Command } from 'nimbu'
+import Command from '@nimbu-cli/command'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
 import NimbuServer from '../nimbu-gem/server'

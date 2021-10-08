@@ -3,8 +3,8 @@ const webpack = require('webpack')
 
 const paths = require('./paths')
 const {
-  config: { get: getProjectConfig },
-} = require('nimbu')
+  buildConfig: { get: getProjectConfig },
+} = require('@nimbu-cli/command')
 
 // the order for entries is important: first load javascript, next load the css - as you probably want to cascadingly override stuff from libraries
 const config = () => {

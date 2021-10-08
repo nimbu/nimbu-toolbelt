@@ -3,15 +3,7 @@
   "compilerOptions": {
       "outDir": "./lib",
       "rootDir": "./src",
-      "paths": {
-          "@nimbu-cli/command": ["../command"]
-      },
   },
-  "references": [
-      {
-          "path": "../command"
-      }
-  ],
   "include": [
     "./src/**/*"
   ]

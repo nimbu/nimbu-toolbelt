@@ -1,4 +1,4 @@
-import Command from '../../command'
+import Command from '@nimbu-cli/command'
 import { download } from '../../utils/files'
 
 import { flags } from '@oclif/command'
@@ -101,7 +101,9 @@ export default class PullThemes extends Command {
           ctx.currentStep++
         }
       } catch (error) {
-        throw new Error(error.message)
+        if (error instanceof Error) {
+          throw new Error(error.message)
+        }
       }
     }
 

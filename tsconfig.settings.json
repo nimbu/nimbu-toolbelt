@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "composite": true /* Enable project compilation */,
+    "declaration": true /* Generates corresponding '.d.ts' file. */,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true /* Import emit helpers from 'tslib'. */,
+    "incremental": true /* Enable incremental compilation */,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "pretty": true,
+    "resolveJsonModule": true,
+    "sourceMap": false,
+    "strict": true /* Enable all strict type-checking options. */,
+    "target": "es2017",
+    "skipLibCheck": true,
+  },
+}

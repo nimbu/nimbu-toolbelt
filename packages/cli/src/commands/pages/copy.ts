@@ -1,4 +1,4 @@
-import Command from '../../command'
+import Command, { HTTPError } from '@nimbu-cli/command'
 import { download, generateRandom } from '../../utils/files'
 
 import { flags } from '@oclif/command'
@@ -104,10 +104,12 @@ export default class CopyPages extends Command {
       }
       ctx.pages = await this.nimbu.get(`/pages${query}`, options)
     } catch (error) {
-      if (error.body != null && error.body.code === 101) {
-        throw new Error(`could not find page matching ${chalk.bold(ctx.query)}`)
-      } else {
-        throw new Error(error.message)
+      if (error instanceof HTTPError) {
+        if (error.body != null && error.body.code === 101) {
+          throw new Error(`could not find page matching ${chalk.bold(ctx.query)}`)
+        } else {
+          throw new Error(error.message)
+        }
       }
     }
   }
@@ -132,8 +134,10 @@ export default class CopyPages extends Command {
             observer.next(`[${crntIndex}/${nbPages}] Check if page ${page.fullpath} exists in site ${ctx.toSite}`)
             targetPage = await this.nimbu.get(`/pages/${page.fullpath}`, { site: ctx.toSite, host: ctx.toHost })
           } catch (error) {
-            if (error.body === undefined || error.body.code !== 101) {
-              throw new Error(`Error checking page ${chalk.bold(ctx.currentPage.fullpath)}: ${error.message}`)
+            if (error instanceof HTTPError) {
+              if (error.body === undefined || error.body.code !== 101) {
+                throw new Error(`Error checking page ${chalk.bold(ctx.currentPage.fullpath)}: ${error.message}`)
+              }
             }
           }
 
@@ -156,7 +160,9 @@ export default class CopyPages extends Command {
               })
             }
           } catch (error) {
-            throw new Error(`Error for page ${chalk.bold(ctx.currentPage.fullpath)}: ${error.message}`)
+            if (error instanceof Error) {
+              throw new Error(`Error for page ${chalk.bold(ctx.currentPage.fullpath)}: ${error.message}`)
+            }
           }
 
           crntIndex++

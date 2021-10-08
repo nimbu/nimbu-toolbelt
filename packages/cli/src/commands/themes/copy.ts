@@ -1,4 +1,4 @@
-import Command from '../../command'
+import Command from '@nimbu-cli/command'
 import { download } from '../../utils/files'
 
 import { flags } from '@oclif/command'
@@ -131,7 +131,9 @@ export default class CopyThemes extends Command {
           ctx.currentStep++
         }
       } catch (error) {
-        throw new Error(error.message)
+        if (error instanceof Error) {
+          throw new Error(error.message)
+        }
       }
     }
 
@@ -177,7 +179,9 @@ export default class CopyThemes extends Command {
             })
           }
         } catch (error) {
-          throw new Error(`Error with ${chalk.bold(item.name)}: ${error.message}`)
+          if (error instanceof Error) {
+            throw new Error(`Error with ${chalk.bold(item.name)}: ${error.message}`)
+          }
         }
 
         crntIndex++

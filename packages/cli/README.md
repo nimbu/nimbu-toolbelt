@@ -68,7 +68,6 @@ Make sure that include is there and that you push the snippet to nimbu!
 * [`nimbu apps:config`](#nimbu-appsconfig)
 * [`nimbu apps:list`](#nimbu-appslist)
 * [`nimbu apps:push [FILES]`](#nimbu-appspush-files)
-* [`nimbu apps:transpile SOURCE TARGET`](#nimbu-appstranspile-source-target)
 * [`nimbu auth:login`](#nimbu-authlogin)
 * [`nimbu auth:logout`](#nimbu-authlogout)
 * [`nimbu auth:token`](#nimbu-authtoken)
@@ -76,7 +75,6 @@ Make sure that include is there and that you push the snippet to nimbu!
 * [`nimbu autocomplete [SHELL]`](#nimbu-autocomplete-shell)
 * [`nimbu browse:admin`](#nimbu-browseadmin)
 * [`nimbu browse:simulator`](#nimbu-browsesimulator)
-* [`nimbu build`](#nimbu-build)
 * [`nimbu channels:copy`](#nimbu-channelscopy)
 * [`nimbu channels:diff`](#nimbu-channelsdiff)
 * [`nimbu channels:entries:copy`](#nimbu-channelsentriescopy)
@@ -91,13 +89,9 @@ Make sure that include is there and that you push the snippet to nimbu!
 * [`nimbu pages:copy [FULLPATH]`](#nimbu-pagescopy-fullpath)
 * [`nimbu products:config:copy`](#nimbu-productsconfigcopy)
 * [`nimbu products:config:diff`](#nimbu-productsconfigdiff)
-* [`nimbu server`](#nimbu-server)
 * [`nimbu sites:list`](#nimbu-siteslist)
 * [`nimbu themes:copy`](#nimbu-themescopy)
-* [`nimbu themes:diff [THEME]`](#nimbu-themesdiff-theme)
-* [`nimbu themes:list [THEME]`](#nimbu-themeslist-theme)
 * [`nimbu themes:pull`](#nimbu-themespull)
-* [`nimbu themes:push [FILES]`](#nimbu-themespush-files)
 * [`nimbu translations:copy [QUERY]`](#nimbu-translationscopy-query)
 
 ## `nimbu apps:config`
@@ -105,34 +99,28 @@ Make sure that include is there and that you push the snippet to nimbu!
 Add an app to the local configuration
 
 ```
-Add an app to the local configuration
-
 USAGE
   $ nimbu apps:config
 ```
 
-_See code: [src/commands/apps/config.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/apps/config.ts)_
+_See code: [lib/commands/apps/config.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/apps/config.js)_
 
 ## `nimbu apps:list`
 
 List the applications registered in Nimbu
 
 ```
-List the applications registered in Nimbu
-
 USAGE
   $ nimbu apps:list
 ```
 
-_See code: [src/commands/apps/list.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/apps/list.ts)_
+_See code: [lib/commands/apps/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/apps/list.js)_
 
 ## `nimbu apps:push [FILES]`
 
 Push your cloud code files to nimbu
 
 ```
-Push your cloud code files to nimbu
-
 USAGE
   $ nimbu apps:push [FILES]
 
@@ -143,28 +131,13 @@ OPTIONS
   -a, --app=app  The (local) name of the application to push to (see apps:list and apps:config).
 ```
 
-_See code: [src/commands/apps/push.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/apps/push.ts)_
-
-## `nimbu apps:transpile SOURCE TARGET`
-
-Transpile a file from ES6 to ES5 for compatiblity with Nimbu Cloud applications
-
-```
-Transpile a file from ES6 to ES5 for compatiblity with Nimbu Cloud applications
-
-USAGE
-  $ nimbu apps:transpile SOURCE TARGET
-```
-
-_See code: [src/commands/apps/transpile.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/apps/transpile.ts)_
+_See code: [lib/commands/apps/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/apps/push.js)_
 
 ## `nimbu auth:login`
 
 login with your nimbu credentials
 
 ```
-login with your nimbu credentials
-
 USAGE
   $ nimbu auth:login
 
@@ -175,15 +148,13 @@ ALIASES
   $ nimbu login
 ```
 
-_See code: [src/commands/auth/login.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/auth/login.ts)_
+_See code: [lib/commands/auth/login.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/auth/login.js)_
 
 ## `nimbu auth:logout`
 
 clears local login credentials and invalidates API session
 
 ```
-clears local login credentials and invalidates API session
-
 USAGE
   $ nimbu auth:logout
 
@@ -191,16 +162,13 @@ ALIASES
   $ nimbu logout
 ```
 
-_See code: [src/commands/auth/logout.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/auth/logout.ts)_
+_See code: [lib/commands/auth/logout.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/auth/logout.js)_
 
 ## `nimbu auth:token`
 
 outputs current CLI authentication token.
 
 ```
-outputs current CLI authentication token.
-By default, the CLI auth token is only valid for 1 year. To generate a long-lived token, use nimbu authorizations:create
-
 USAGE
   $ nimbu auth:token
 
@@ -212,15 +180,13 @@ DESCRIPTION
   authorizations:create
 ```
 
-_See code: [src/commands/auth/token.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/auth/token.ts)_
+_See code: [lib/commands/auth/token.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/auth/token.js)_
 
 ## `nimbu auth:whoami`
 
 display the current logged in user
 
 ```
-display the current logged in user
-
 USAGE
   $ nimbu auth:whoami
 
@@ -228,15 +194,13 @@ ALIASES
   $ nimbu whoami
 ```
 
-_See code: [src/commands/auth/whoami.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/auth/whoami.ts)_
+_See code: [lib/commands/auth/whoami.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/auth/whoami.js)_
 
 ## `nimbu autocomplete [SHELL]`
 
 display autocomplete installation instructions
 
 ```
-display autocomplete installation instructions
-
 USAGE
   $ nimbu autocomplete [SHELL]
 
@@ -253,54 +217,35 @@ EXAMPLES
   $ nimbu autocomplete --refresh-cache
 ```
 
-_See code: [@oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete/blob/v0.1.5/src/commands/autocomplete/index.ts)_
+_See code: [@oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete/blob/v0.3.0/src/commands/autocomplete/index.ts)_
 
 ## `nimbu browse:admin`
 
 open the admin area for your current site
 
 ```
-open the admin area for your current site
-
 USAGE
   $ nimbu browse:admin
 ```
 
-_See code: [src/commands/browse/admin.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/browse/admin.ts)_
+_See code: [lib/commands/browse/admin.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/browse/admin.js)_
 
 ## `nimbu browse:simulator`
 
 open the simulator for your current site
 
 ```
-open the simulator for your current site
-
 USAGE
   $ nimbu browse:simulator
 ```
 
-_See code: [src/commands/browse/simulator.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/browse/simulator.ts)_
-
-## `nimbu build`
-
-build a production version of your javascript and CSS
-
-```
-build a production version of your javascript and CSS
-
-USAGE
-  $ nimbu build
-```
-
-_See code: [src/commands/build.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/build.ts)_
+_See code: [lib/commands/browse/simulator.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/browse/simulator.js)_
 
 ## `nimbu channels:copy`
 
 copy channel configuration from one to another
 
 ```
-copy channel configuration from one to another
-
 USAGE
   $ nimbu channels:copy
 
@@ -309,15 +254,13 @@ OPTIONS
   -t, --to=to      (required) slug of the target channel
 ```
 
-_See code: [src/commands/channels/copy.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/channels/copy.ts)_
+_See code: [lib/commands/channels/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/channels/copy.js)_
 
 ## `nimbu channels:diff`
 
 check differences between channel settings from one to another
 
 ```
-check differences between channel settings from one to another
-
 USAGE
   $ nimbu channels:diff
 
@@ -326,15 +269,13 @@ OPTIONS
   -t, --to=to      (required) slug of the target channel
 ```
 
-_See code: [src/commands/channels/diff.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/channels/diff.ts)_
+_See code: [lib/commands/channels/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/channels/diff.js)_
 
 ## `nimbu channels:entries:copy`
 
 copy channel entries from one to another
 
 ```
-copy channel entries from one to another
-
 USAGE
   $ nimbu channels:entries:copy
 
@@ -346,28 +287,24 @@ OPTIONS
   -u, --upsert=upsert      name of parameter to use for matching existing documents
 ```
 
-_See code: [src/commands/channels/entries/copy.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/channels/entries/copy.ts)_
+_See code: [lib/commands/channels/entries/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/channels/entries/copy.js)_
 
 ## `nimbu config`
 
 Show resolved configuration
 
 ```
-Show resolved configuration
-
 USAGE
   $ nimbu config
 ```
 
-_See code: [src/commands/config.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/config.ts)_
+_See code: [lib/commands/config.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/config.js)_
 
 ## `nimbu customers:config:copy`
 
 copy customer customizations from one to another
 
 ```
-copy customer customizations from one to another
-
 USAGE
   $ nimbu customers:config:copy
 
@@ -376,15 +313,13 @@ OPTIONS
   -t, --to=to      subdomain of the destination site
 ```
 
-_See code: [src/commands/customers/config/copy.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/customers/config/copy.ts)_
+_See code: [lib/commands/customers/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/customers/config/copy.js)_
 
 ## `nimbu customers:config:diff`
 
 check differences between customer customizations from one to another
 
 ```
-check differences between customer customizations from one to another
-
 USAGE
   $ nimbu customers:config:diff
 
@@ -393,15 +328,13 @@ OPTIONS
   -t, --to=to      (required) slug of the target channel
 ```
 
-_See code: [src/commands/customers/config/diff.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/customers/config/diff.ts)_
+_See code: [lib/commands/customers/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/customers/config/diff.js)_
 
 ## `nimbu help [COMMAND]`
 
 display help for nimbu
 
 ```
-display help for <%= config.bin %>
-
 USAGE
   $ nimbu help [COMMAND]
 
@@ -412,15 +345,13 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
 
 ## `nimbu init`
 
 initialize your working directory to code a selected theme
 
 ```
-initialize your working directory to code a selected theme
-
 USAGE
   $ nimbu init
 
@@ -430,28 +361,27 @@ OPTIONS
   -s, --site=site  The site (use the Nimbu subdomain) to link to this project.
 ```
 
-_See code: [src/commands/init/index.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/init/index.ts)_
+_See code: [lib/commands/init/index.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/init/index.js)_
 
 ## `nimbu mails:pull`
 
 download all notification templates
 
 ```
-download all notification templates
-
 USAGE
   $ nimbu mails:pull
+
+OPTIONS
+  -o, --only=only  the names of the templates to pull from Nimbu
 ```
 
-_See code: [src/commands/mails/pull.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/mails/pull.ts)_
+_See code: [lib/commands/mails/pull.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/mails/pull.js)_
 
 ## `nimbu mails:push`
 
 upload all notification templates
 
 ```
-upload all notification templates
-
 USAGE
   $ nimbu mails:push
 
@@ -459,15 +389,13 @@ OPTIONS
   -o, --only=only  the names of the templates to push online
 ```
 
-_See code: [src/commands/mails/push.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/mails/push.ts)_
+_See code: [lib/commands/mails/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/mails/push.js)_
 
 ## `nimbu menus:copy [SLUG]`
 
 copy menus from one site to another
 
 ```
-copy menus from one site to another
-
 USAGE
   $ nimbu menus:copy [SLUG]
 
@@ -479,15 +407,13 @@ OPTIONS
   -t, --to=to      subdomain of the destination site
 ```
 
-_See code: [src/commands/menus/copy.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/menus/copy.ts)_
+_See code: [lib/commands/menus/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/menus/copy.js)_
 
 ## `nimbu pages:copy [FULLPATH]`
 
 copy page from one site to another
 
 ```
-copy page from one site to another
-
 USAGE
   $ nimbu pages:copy [FULLPATH]
 
@@ -501,15 +427,13 @@ OPTIONS
   --toHost=toHost      hostname of target Nimbu API
 ```
 
-_See code: [src/commands/pages/copy.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/pages/copy.ts)_
+_See code: [lib/commands/pages/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/pages/copy.js)_
 
 ## `nimbu products:config:copy`
 
 copy product customizations from one to another
 
 ```
-copy product customizations from one to another
-
 USAGE
   $ nimbu products:config:copy
 
@@ -518,15 +442,13 @@ OPTIONS
   -t, --to=to      subdomain of the destination site
 ```
 
-_See code: [src/commands/products/config/copy.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/products/config/copy.ts)_
+_See code: [lib/commands/products/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/products/config/copy.js)_
 
 ## `nimbu products:config:diff`
 
 check differences between product customizations from one to another
 
 ```
-check differences between product customizations from one to another
-
 USAGE
   $ nimbu products:config:diff
 
@@ -535,38 +457,13 @@ OPTIONS
   -t, --to=to      (required) slug of the target channel
 ```
 
-_See code: [src/commands/products/config/diff.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/products/config/diff.ts)_
-
-## `nimbu server`
-
-run the development server
-
-```
-run the development server
-
-USAGE
-  $ nimbu server
-
-OPTIONS
-  --compass                Use legacy ruby SASS compilation.
-  --host=host              [default: 0.0.0.0] The hostname/ip-address to bind on.
-  --nimbu-port=nimbu-port  [default: 4568] The port for the ruby nimbu server to listen on.
-  --nocookies              Leave cookies untouched i.s.o. clearing them.
-  --noopen                 Don't open/reload browser
-  --nowebpack              Do not use webpack.
-  --poll                   Tell webpack dev server to use polling
-  --port=port              [default: 4567] The port to listen on.
-```
-
-_See code: [src/commands/server.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/server.ts)_
+_See code: [lib/commands/products/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/products/config/diff.js)_
 
 ## `nimbu sites:list`
 
 list sites you can edit
 
 ```
-list sites you can edit
-
 USAGE
   $ nimbu sites:list
 
@@ -577,15 +474,13 @@ ALIASES
   $ nimbu sites
 ```
 
-_See code: [src/commands/sites/list.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/sites/list.ts)_
+_See code: [lib/commands/sites/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/sites/list.js)_
 
 ## `nimbu themes:copy`
 
 copy themes from one site to another
 
 ```
-copy themes from one site to another
-
 USAGE
   $ nimbu themes:copy
 
@@ -596,47 +491,13 @@ OPTIONS
   --toHost=toHost      hostname of target Nimbu API
 ```
 
-_See code: [src/commands/themes/copy.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/themes/copy.ts)_
-
-## `nimbu themes:diff [THEME]`
-
-describe the command here
-
-```
-describe the command here
-
-USAGE
-  $ nimbu themes:diff [THEME]
-
-ARGUMENTS
-  THEME  The name of the theme to list
-```
-
-_See code: [src/commands/themes/diff.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/themes/diff.ts)_
-
-## `nimbu themes:list [THEME]`
-
-list all layouts, templates and assets
-
-```
-list all layouts, templates and assets
-
-USAGE
-  $ nimbu themes:list [THEME]
-
-ARGUMENTS
-  THEME  The name of the theme to list
-```
-
-_See code: [src/commands/themes/list.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/themes/list.ts)_
+_See code: [lib/commands/themes/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/themes/copy.js)_
 
 ## `nimbu themes:pull`
 
 download all code and assets for a theme
 
 ```
-download all code and assets for a theme
-
 USAGE
   $ nimbu themes:pull
 
@@ -646,40 +507,13 @@ OPTIONS
   --liquid-only      only download template files
 ```
 
-_See code: [src/commands/themes/pull.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/themes/pull.ts)_
-
-## `nimbu themes:push [FILES]`
-
-push the theme code online
-
-```
-push the theme code online
-
-USAGE
-  $ nimbu themes:push [FILES]
-
-ARGUMENTS
-  FILES  The files to push with --only
-
-OPTIONS
-  --css-only     only push css
-  --fonts-only   only push fonts
-  --force        skip the usage check and upload anyway
-  --images-only  only push new images
-  --js-only      only push javascript
-  --liquid-only  only push template code
-  --only         only push the files given on the command line
-```
-
-_See code: [src/commands/themes/push.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/themes/push.ts)_
+_See code: [lib/commands/themes/pull.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/themes/pull.js)_
 
 ## `nimbu translations:copy [QUERY]`
 
 copy translations from one site to another
 
 ```
-copy translations from one site to another
-
 USAGE
   $ nimbu translations:copy [QUERY]
 
@@ -693,7 +527,7 @@ OPTIONS
   --toHost=toHost      hostname of target Nimbu API
 ```
 
-_See code: [src/commands/translations/copy.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v4.1.6/src/commands/translations/copy.ts)_
+_See code: [lib/commands/translations/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/translations/copy.js)_
 <!-- commandsstop -->
 
 # Features

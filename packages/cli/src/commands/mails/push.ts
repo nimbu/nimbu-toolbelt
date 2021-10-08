@@ -1,4 +1,4 @@
-import Command from '../../command'
+import Command, { HTTPError } from '@nimbu-cli/command'
 
 import { findMatchingFiles } from '../../utils/files'
 
@@ -126,7 +126,9 @@ export default class PushMails extends Command {
       try {
         await this.nimbu.post('/notifications', { body })
       } catch (error) {
-        ux.action.stop(chalk.red(`${logSymbols.error} ${error.message}`))
+        if (error instanceof HTTPError) {
+          ux.action.stop(chalk.red(`${logSymbols.error} ${error.message}`))
+        }
       }
 
       ux.action.stop(chalk.green(`${logSymbols.success} done!`))
