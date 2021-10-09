@@ -72,10 +72,14 @@
     "node": ">=8.0.0"
   },
   "files": [
+    "/bin",
     "/lib",
-    "/npm-shrinkwrap.json",
     "/oclif.manifest.json",
-    "/yarn.lock"
+    "/Gemfile",
+    "/Gemfile.lock",
+    "/template",
+    "/README.md",
+    "/.bundle/config"
   ],
   "homepage": "https://github.com/zenjoy/nimbu-toolbelt",
   "keywords": [
