@@ -10,6 +10,7 @@
   "dependencies": {
     "@nimbu-cli/command": "^1",
     "@oclif/config": "^1",
+    "@oclif/plugin-autocomplete": "^0.3.0",
     "@oclif/plugin-commands": "^1.2.2",
     "@oclif/plugin-help": "^3.0",
     "@oclif/plugin-legacy": "^1.2",
