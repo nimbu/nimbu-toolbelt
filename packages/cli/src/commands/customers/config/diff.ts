@@ -1,4 +1,4 @@
-import Command, { HTTPError } from '@nimbu-cli/command'
+import Command, { APIError } from '@nimbu-cli/command'
 import { convertChangesToTree, addFieldNames, cleanUpIds } from '../../../utils/diff'
 
 import { flags } from '@oclif/command'
@@ -45,7 +45,7 @@ export default class CustomerConfigDiff extends Command {
     } catch (error) {
       ux.action.stop()
 
-      if (error instanceof HTTPError) {
+      if (error instanceof APIError) {
         throw new Error(error.message)
       }
     }
@@ -58,7 +58,7 @@ export default class CustomerConfigDiff extends Command {
     } catch (error) {
       ux.action.stop()
 
-      if (error instanceof HTTPError) {
+      if (error instanceof APIError) {
         throw new Error(error.message)
       }
     }

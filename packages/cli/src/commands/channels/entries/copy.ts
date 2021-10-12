@@ -1,4 +1,4 @@
-import Command, { APITypes as Nimbu, HTTPError } from '@nimbu-cli/command'
+import Command, { APITypes as Nimbu, APIError } from '@nimbu-cli/command'
 import { download, generateRandom } from '../../../utils/files'
 
 import { flags } from '@oclif/command'
@@ -133,7 +133,7 @@ export default class CopyChannels extends Command {
         (f) => (f.type === 'belongs_to' || f.type === 'belongs_to_many') && f.reference === ctx.channel.slug,
       )
     } catch (error) {
-      if (error instanceof HTTPError) {
+      if (error instanceof APIError) {
         if (error.body != null && error.body.code === 101) {
           throw new Error(`could not find channel ${chalk.bold(ctx.fromChannel)}`)
         } else {
@@ -328,7 +328,7 @@ export default class CopyChannels extends Command {
             // store id for second pass in case of self-references
             original.id = created.id
           } catch (error) {
-            if (error instanceof HTTPError) {
+            if (error instanceof APIError) {
               observer.error(
                 new Error(
                   `[${i}/${nbEntries}] creating entry #${entry.id} failed: ${error.body.message} => ${JSON.stringify(
@@ -378,7 +378,7 @@ export default class CopyChannels extends Command {
             try {
               await this.nimbu.patch(`/channels/${ctx.toChannel}/entries/${entry.id}`, options)
             } catch (error) {
-              if (error instanceof HTTPError) {
+              if (error instanceof APIError) {
                 observer.error(
                   new Error(
                     `[${i}/${nbEntries}] updating entry #${entry.id} failed: ${error.body.message} => ${JSON.stringify(

@@ -3,22 +3,23 @@ import { CLIError } from '@oclif/errors'
 import Netrc from 'netrc-parser'
 import Nimbu from 'nimbu-client'
 import ux from 'cli-ux'
+import { HTTPError } from 'nimbu-client'
 
 import { Credentials } from './credentials'
 import { Config } from './config'
 import { User } from './types'
 
-export namespace Client {
-  export interface Options {
-    retryAuth?: boolean
-    fetchAll?: boolean
-    headers?: any
-    formData?: any
-    site?: string
-    host?: string
-    body?: object
-    auth?: string
-  }
+type HTTPVerbs = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS'
+
+export interface IOptions {
+  retryAuth?: boolean
+  fetchAll?: boolean
+  headers?: any
+  formData?: any
+  site?: string
+  host?: string
+  body?: object
+  auth?: string
 }
 
 export interface IAPIErrorOptions {
@@ -27,11 +28,6 @@ export interface IAPIErrorOptions {
   message?: string
   code?: number
   errors?: string[]
-}
-
-export class HTTPError extends Error {
-  body?: any
-  statusCode?: number
 }
 
 export class APIError extends CLIError {
@@ -68,7 +64,7 @@ export class APIError extends CLIError {
 export default class Client {
   public readonly config: Config
   private readonly credentials: Credentials
-  private client: typeof Nimbu
+  private client: Nimbu
 
   constructor(protected oclifConfig: IConfig, config: Config) {
     this.oclifConfig = oclifConfig
@@ -113,27 +109,27 @@ export default class Client {
     await Netrc.save()
   }
 
-  get<T>(path: string, options: Client.Options = {}) {
+  get<T>(path: string, options: IOptions = {}) {
     return this.request<T>('GET', path, options)
   }
 
-  post<T>(path: string, options: Client.Options = {}) {
+  post<T>(path: string, options: IOptions = {}) {
     return this.request<T>('POST', path, options)
   }
 
-  put<T>(path: string, options: Client.Options = {}) {
+  put<T>(path: string, options: IOptions = {}) {
     return this.request<T>('PUT', path, options)
   }
 
-  patch<T>(path: string, options: Client.Options = {}) {
+  patch<T>(path: string, options: IOptions = {}) {
     return this.request<T>('PATCH', path, options)
   }
 
-  delete<T>(path: string, options: Client.Options = {}) {
+  delete<T>(path: string, options: IOptions = {}) {
     return this.request<T>('DELETE', path, options)
   }
 
-  async request<T>(method: string, path: string, options: Client.Options = {}, retries = 3): Promise<T> {
+  async request<T>(method: HTTPVerbs, path: string, options: IOptions = {}, retries = 3): Promise<T> {
     retries--
 
     try {

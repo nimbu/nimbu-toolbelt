@@ -15,14 +15,18 @@ const token = 'YTljNzExMjYwNzAyYWQ2MmZjNDA4Yzdi'
 const netrc = require('netrc-parser').default
 netrc.loadSync = function (this: typeof netrc) {
   netrc.machines = {
-    'api.nimbu.io': { password: token },
-    'api.nimbu.dev': { password: token },
+    'api.nimbu.io': { login: 'nimbu', password: token },
+    'api.nimbu.dev': { login: 'nimbu', password: token },
   }
 }
 
 let api: nock.Scope
 
 describe('cli api client', () => {
+  before(() => {
+    nock.disableNetConnect()
+  })
+
   test.it('makes an HTTP request', async (ctx) => {
     api = nock('https://api.nimbu.io', {
       reqheaders: {

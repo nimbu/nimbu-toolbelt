@@ -2,7 +2,7 @@ import * as Config from '@oclif/config'
 
 import base, { expect } from '@oclif/test'
 import { loadConfig } from '@oclif/test/lib/load-config'
-import nock from 'nock'
+import Nock from 'nock'
 import mockfs from 'mock-fs'
 
 import { AbsPath, MockFSHelper } from './utils'
@@ -51,10 +51,10 @@ let test = base
   .register('disableNetConnect', () => {
     return {
       run() {
-        nock.disableNetConnect()
+        Nock.disableNetConnect()
       },
       finally() {
-        nock.enableNetConnect()
+        Nock.enableNetConnect()
       },
     }
   })

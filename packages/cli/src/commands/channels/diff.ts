@@ -1,4 +1,4 @@
-import Command, { HTTPError } from '@nimbu-cli/command'
+import Command, { APIError } from '@nimbu-cli/command'
 import { convertChangesToTree, addFieldNames, cleanUpIds } from '../../utils/diff'
 
 import { flags } from '@oclif/command'
@@ -89,7 +89,7 @@ export default class DiffChannels extends Command {
       try {
         detailedFrom = await this.nimbu.get(`/channels/${channel.slug}`, { site: fromSite })
       } catch (error) {
-        if (error instanceof HTTPError) {
+        if (error instanceof APIError) {
           if (error.body === undefined || error.body.code !== 101) {
             throw new Error(error.message)
           }
@@ -99,7 +99,7 @@ export default class DiffChannels extends Command {
       try {
         detailedTo = await this.nimbu.get(`/channels/${channel.slug}`, { site: toSite })
       } catch (error) {
-        if (error instanceof HTTPError) {
+        if (error instanceof APIError) {
           if (error.body === undefined || error.body.code !== 101) {
             throw new Error(error.message)
           }

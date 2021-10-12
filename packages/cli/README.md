@@ -78,6 +78,7 @@ Make sure that include is there and that you push the snippet to nimbu!
 * [`nimbu channels:copy`](#nimbu-channelscopy)
 * [`nimbu channels:diff`](#nimbu-channelsdiff)
 * [`nimbu channels:entries:copy`](#nimbu-channelsentriescopy)
+* [`nimbu commands`](#nimbu-commands)
 * [`nimbu config`](#nimbu-config)
 * [`nimbu customers:config:copy`](#nimbu-customersconfigcopy)
 * [`nimbu customers:config:diff`](#nimbu-customersconfigdiff)
@@ -87,12 +88,20 @@ Make sure that include is there and that you push the snippet to nimbu!
 * [`nimbu mails:push`](#nimbu-mailspush)
 * [`nimbu menus:copy [SLUG]`](#nimbu-menuscopy-slug)
 * [`nimbu pages:copy [FULLPATH]`](#nimbu-pagescopy-fullpath)
+* [`nimbu plugins`](#nimbu-plugins)
+* [`nimbu plugins:inspect PLUGIN...`](#nimbu-pluginsinspect-plugin)
+* [`nimbu plugins:install PLUGIN...`](#nimbu-pluginsinstall-plugin)
+* [`nimbu plugins:link PLUGIN`](#nimbu-pluginslink-plugin)
+* [`nimbu plugins:uninstall PLUGIN...`](#nimbu-pluginsuninstall-plugin)
+* [`nimbu plugins:update`](#nimbu-pluginsupdate)
 * [`nimbu products:config:copy`](#nimbu-productsconfigcopy)
 * [`nimbu products:config:diff`](#nimbu-productsconfigdiff)
 * [`nimbu sites:list`](#nimbu-siteslist)
 * [`nimbu themes:copy`](#nimbu-themescopy)
 * [`nimbu themes:pull`](#nimbu-themespull)
 * [`nimbu translations:copy [QUERY]`](#nimbu-translationscopy-query)
+* [`nimbu update [CHANNEL]`](#nimbu-update-channel)
+* [`nimbu which COMMAND`](#nimbu-which-command)
 
 ## `nimbu apps:config`
 
@@ -289,6 +298,30 @@ OPTIONS
 
 _See code: [lib/commands/channels/entries/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/channels/entries/copy.js)_
 
+## `nimbu commands`
+
+list all the commands
+
+```
+USAGE
+  $ nimbu commands
+
+OPTIONS
+  -h, --help              show CLI help
+  -j, --json              display unfiltered api data in json format
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --hidden                show hidden commands
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
+```
+
+_See code: [@oclif/plugin-commands](https://github.com/oclif/plugin-commands/blob/v1.3.0/src/commands/commands.ts)_
+
 ## `nimbu config`
 
 Show resolved configuration
@@ -429,6 +462,144 @@ OPTIONS
 
 _See code: [lib/commands/pages/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/pages/copy.js)_
 
+## `nimbu plugins`
+
+list installed plugins
+
+```
+USAGE
+  $ nimbu plugins
+
+OPTIONS
+  --core  show core plugins
+
+EXAMPLE
+  $ nimbu plugins
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.1/src/commands/plugins/index.ts)_
+
+## `nimbu plugins:inspect PLUGIN...`
+
+displays installation properties of a plugin
+
+```
+USAGE
+  $ nimbu plugins:inspect PLUGIN...
+
+ARGUMENTS
+  PLUGIN  [default: .] plugin to inspect
+
+OPTIONS
+  -h, --help     show CLI help
+  -v, --verbose
+
+EXAMPLE
+  $ nimbu plugins:inspect myplugin
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.1/src/commands/plugins/inspect.ts)_
+
+## `nimbu plugins:install PLUGIN...`
+
+installs a plugin into the CLI
+
+```
+USAGE
+  $ nimbu plugins:install PLUGIN...
+
+ARGUMENTS
+  PLUGIN  plugin to install
+
+OPTIONS
+  -f, --force    yarn install with force flag
+  -h, --help     show CLI help
+  -v, --verbose
+
+DESCRIPTION
+  Can be installed from npm or a git url.
+
+  Installation of a user-installed plugin will override a core plugin.
+
+  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command 
+  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in 
+  the CLI without the need to patch and update the whole CLI.
+
+ALIASES
+  $ nimbu plugins:add
+
+EXAMPLES
+  $ nimbu plugins:install myplugin 
+  $ nimbu plugins:install https://github.com/someuser/someplugin
+  $ nimbu plugins:install someuser/someplugin
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.1/src/commands/plugins/install.ts)_
+
+## `nimbu plugins:link PLUGIN`
+
+links a plugin into the CLI for development
+
+```
+USAGE
+  $ nimbu plugins:link PLUGIN
+
+ARGUMENTS
+  PATH  [default: .] path to plugin
+
+OPTIONS
+  -h, --help     show CLI help
+  -v, --verbose
+
+DESCRIPTION
+  Installation of a linked plugin will override a user-installed or core plugin.
+
+  e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello' 
+  command will override the user-installed or core plugin implementation. This is useful for development work.
+
+EXAMPLE
+  $ nimbu plugins:link myplugin
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.1/src/commands/plugins/link.ts)_
+
+## `nimbu plugins:uninstall PLUGIN...`
+
+removes a plugin from the CLI
+
+```
+USAGE
+  $ nimbu plugins:uninstall PLUGIN...
+
+ARGUMENTS
+  PLUGIN  plugin to uninstall
+
+OPTIONS
+  -h, --help     show CLI help
+  -v, --verbose
+
+ALIASES
+  $ nimbu plugins:unlink
+  $ nimbu plugins:remove
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.1/src/commands/plugins/uninstall.ts)_
+
+## `nimbu plugins:update`
+
+update installed plugins
+
+```
+USAGE
+  $ nimbu plugins:update
+
+OPTIONS
+  -h, --help     show CLI help
+  -v, --verbose
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.1/src/commands/plugins/update.ts)_
+
 ## `nimbu products:config:copy`
 
 copy product customizations from one to another
@@ -528,6 +699,31 @@ OPTIONS
 ```
 
 _See code: [lib/commands/translations/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0/lib/commands/translations/copy.js)_
+
+## `nimbu update [CHANNEL]`
+
+update the nimbu CLI
+
+```
+USAGE
+  $ nimbu update [CHANNEL]
+
+OPTIONS
+  --from-local  interactively choose an already installed version
+```
+
+_See code: [@oclif/plugin-update](https://github.com/oclif/plugin-update/blob/v1.5.0/src/commands/update.ts)_
+
+## `nimbu which COMMAND`
+
+show which plugin a command is in
+
+```
+USAGE
+  $ nimbu which COMMAND
+```
+
+_See code: [@oclif/plugin-which](https://github.com/oclif/plugin-which/blob/v1.0.3/src/commands/which.ts)_
 <!-- commandsstop -->
 
 # Features

@@ -1,4 +1,4 @@
-import Command, { HTTPError } from '@nimbu-cli/command'
+import Command, { APIError } from '@nimbu-cli/command'
 import { download, generateRandom } from '../../utils/files'
 
 import { flags } from '@oclif/command'
@@ -104,7 +104,7 @@ export default class CopyPages extends Command {
       }
       ctx.pages = await this.nimbu.get(`/pages${query}`, options)
     } catch (error) {
-      if (error instanceof HTTPError) {
+      if (error instanceof APIError) {
         if (error.body != null && error.body.code === 101) {
           throw new Error(`could not find page matching ${chalk.bold(ctx.query)}`)
         } else {
@@ -134,7 +134,7 @@ export default class CopyPages extends Command {
             observer.next(`[${crntIndex}/${nbPages}] Check if page ${page.fullpath} exists in site ${ctx.toSite}`)
             targetPage = await this.nimbu.get(`/pages/${page.fullpath}`, { site: ctx.toSite, host: ctx.toHost })
           } catch (error) {
-            if (error instanceof HTTPError) {
+            if (error instanceof APIError) {
               if (error.body === undefined || error.body.code !== 101) {
                 throw new Error(`Error checking page ${chalk.bold(ctx.currentPage.fullpath)}: ${error.message}`)
               }

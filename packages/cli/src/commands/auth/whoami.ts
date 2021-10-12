@@ -13,8 +13,9 @@ export default class Whoami extends Command {
     } catch (err) {
       if (err instanceof HTTPError) {
         if (err.statusCode === 401) this.notloggedin()
+      } else {
+        throw err
       }
-      throw err
     }
   }
 

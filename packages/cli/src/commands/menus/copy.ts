@@ -1,4 +1,4 @@
-import Command, { HTTPError } from '@nimbu-cli/command'
+import Command, { APIError } from '@nimbu-cli/command'
 
 import { flags } from '@oclif/command'
 import ux from 'cli-ux'
@@ -84,7 +84,7 @@ export default class CopyMenus extends Command {
         throw new Error(`could not find menu matching ${chalk.bold(ctx.query)}`)
       }
     } catch (error) {
-      if (error instanceof HTTPError) {
+      if (error instanceof APIError) {
         if (error.body != null && error.body.code === 101) {
           throw new Error(`could not find menu matching ${chalk.bold(ctx.query)}`)
         } else {
@@ -108,7 +108,7 @@ export default class CopyMenus extends Command {
         try {
           targetMenu = await this.nimbu.get(`/menus/${slug}`, options)
         } catch (error) {
-          if (error instanceof HTTPError) {
+          if (error instanceof APIError) {
             if (error.body === undefined || error.body.code !== 101) {
               throw new Error(error.message)
             }
@@ -155,7 +155,7 @@ export default class CopyMenus extends Command {
     try {
       return this.nimbu.patch(`/menus/${menu.slug}?replace=1`, options)
     } catch (error) {
-      if (error instanceof HTTPError && (error.body === undefined || error.body.code !== 101)) {
+      if (error instanceof APIError && (error.body === undefined || error.body.code !== 101)) {
         throw new Error(JSON.stringify(error.message))
       } else {
         throw new Error(JSON.stringify(error))

@@ -5,8 +5,8 @@ import urlencode from 'urlencode'
 import Netrc from 'netrc-parser'
 import Nimbu from 'nimbu-client'
 import * as os from 'os'
-
-import { default as Client, APIError, HTTPError } from './client'
+import { HTTPError } from 'nimbu-client'
+import { default as Client, APIError } from './client'
 
 const debug = require('debug')('nimbu-toolbelt')
 const hostname = os.hostname()

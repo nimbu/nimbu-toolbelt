@@ -1,4 +1,4 @@
-import Command, { HTTPError } from '@nimbu-cli/command'
+import Command, { APIError } from '@nimbu-cli/command'
 
 import { flags } from '@oclif/command'
 import ux from 'cli-ux'
@@ -92,7 +92,7 @@ export default class CopyTranslations extends Command {
       }
       ctx.translations = await this.nimbu.get(`/translations${query}`, options)
     } catch (error) {
-      if (error instanceof HTTPError && error.body != null && error.body.code === 101) {
+      if (error instanceof APIError && error.body != null && error.body.code === 101) {
         throw new Error(`could not find any translations matching ${chalk.bold(ctx.query)}`)
       } else if (error instanceof Error) {
         throw new Error(error.message)
@@ -114,7 +114,7 @@ export default class CopyTranslations extends Command {
             host: ctx.toHost,
           })
         } catch (error) {
-          if (error instanceof HTTPError) {
+          if (error instanceof APIError) {
             throw new Error(`Error for translations ${chalk.bold(translation.key)}: ${error.message}`)
           }
         }
