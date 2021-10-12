@@ -1,14 +1,14 @@
 {
   "name": "nimbu",
   "description": "Tools for Nimbu projects",
-  "version": "4.1.7",
+  "version": "5.0.0-alpha.0",
   "author": "Zenjoy Engineering",
   "bin": {
     "nimbu": "./bin/run"
   },
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "dependencies": {
-    "@nimbu-cli/command": "^1",
+    "@nimbu-cli/command": "^5.0.0-alpha.0",
     "@oclif/config": "^1",
     "@oclif/plugin-autocomplete": "^0.3.0",
     "@oclif/plugin-commands": "^1.2.2",
@@ -119,7 +119,7 @@
     "lint": "eslint . --ext .ts --config .eslintrc",
     "build": "rm -rf lib && tsc",
     "postpublish": "rm -f oclif.manifest.json",
-    "prepack": "yarn run build && oclif-dev manifest",
+    "prepack": "yarn run build && yarn oclif-dev manifest",
     "pretest": "tsc -p test --noEmit",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "posttest": "yarn lint",
@@ -156,5 +156,6 @@
     ],
     "sourceMap": true,
     "instrument": true
-  }
+  },
+  "gitHead": "555bca2e890ba5e3e9a42ed34118ec82b12cff03"
 }
