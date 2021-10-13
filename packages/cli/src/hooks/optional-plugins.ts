@@ -22,6 +22,9 @@ function hasOptional(moduleName) {
 }
 
 const hook: Hook<'init'> = async function (options) {
+  // do not load optional plugins while testing
+  if (process.env.NODE_ENV === 'test') return
+
   // use any as the optionalPlugins key is something we added and not in the interface
   const oclifConfig = options.config.pjson.oclif as any
 

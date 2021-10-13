@@ -63,7 +63,7 @@
     "lint": "eslint . --ext .ts --config .eslintrc",
     "posttest": "yarn run lint",
     "prepublishOnly": "yarn run build",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\""
+    "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 10000"
   },
   "types": "./lib/index.d.ts",
   "gitHead": "555bca2e890ba5e3e9a42ed34118ec82b12cff03"
