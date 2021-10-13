@@ -1,4 +1,5 @@
 import { Hook, Plugin } from '@oclif/config'
+import Debug from 'debug'
 
 const optionals = {}
 
@@ -22,6 +23,8 @@ function hasOptional(moduleName) {
 }
 
 const hook: Hook<'init'> = async function (options) {
+  const debug = Debug('nimbu')
+
   // do not load optional plugins while testing
   if (process.env.NODE_ENV === 'test') return
 
@@ -30,6 +33,7 @@ const hook: Hook<'init'> = async function (options) {
 
   for (const plugin of oclifConfig.optionalPlugins) {
     if (hasOptional(plugin)) {
+      debug(`Loading ${plugin}...`)
       // the optional plugin is present in this project, let's load it!
 
       const instance = new Plugin({ root: options.config.root, type: 'user', name: plugin })

@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.settings.json",
+  "compilerOptions": {
+      "allowJs": true,
+      "outDir": "./lib",
+      "rootDir": "./src",
+      "paths": {
+          "nimbu": ["../cli"]
+      },
+  },
+  "references": [
+      {
+          "path": "../cli"
+      }
+  ],
+  "include": [
+    "./src/**/*"
+  ]
+}

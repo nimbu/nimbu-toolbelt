@@ -8,7 +8,7 @@ import * as os from 'os'
 import { HTTPError } from 'nimbu-client'
 import { default as Client, APIError } from './client'
 
-const debug = require('debug')('nimbu-toolbelt')
+const debug = require('debug')('nimbu')
 const hostname = os.hostname()
 
 export namespace Credentials {

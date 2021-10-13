@@ -76,7 +76,7 @@
       "@oclif/plugin-autocomplete"
     ],
     "optionalPlugins": [
-      "@nimbu-cli/plugin-webpack-v4"
+      "@nimbu-cli/plugin-webpack-v5"
     ],
     "hooks": {
       "init": "./lib/hooks/optional-plugins"

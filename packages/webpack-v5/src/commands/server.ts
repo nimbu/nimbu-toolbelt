@@ -5,7 +5,7 @@ import NimbuServer from '../nimbu-gem/server'
 import WebpackDevServer from '../webpack/server'
 
 export default class Server extends Command {
-  static description = 'run the development server (webpack 4)'
+  static description = 'run the development server (webpack 5)'
 
   static flags = {
     nocookies: flags.boolean({
@@ -69,7 +69,7 @@ export default class Server extends Command {
     open: boolean,
     options?: { poll?: boolean },
   ) {
-    this.log(chalk.cyan('Starting the webpack-dev-server (Webpack 4)...\n'))
+    this.log(chalk.cyan('Starting the webpack-dev-server (Webpack 5)...\n'))
     await this.webpackServer.start(host, defaultPort, nimbuPort, 'http', open, options)
   }
 
