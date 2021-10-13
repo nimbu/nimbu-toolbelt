@@ -75,6 +75,12 @@
       "@oclif/plugin-which",
       "@oclif/plugin-autocomplete"
     ],
+    "optionalPlugins": [
+      "@nimbu-cli/plugin-webpack-v4"
+    ],
+    "hooks": {
+      "init": "./lib/hooks/optional-plugins"
+    },
     "topics": {
       "auth": {
         "description": "authenticate, display token and current user"

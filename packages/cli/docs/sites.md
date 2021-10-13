@@ -19,5 +19,3 @@ OPTIONS
 ALIASES
   $ nimbu sites
 ```
-
-_See code: [lib/commands/sites/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/sites/list.js)_

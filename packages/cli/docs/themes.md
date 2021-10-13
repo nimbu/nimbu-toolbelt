@@ -21,8 +21,6 @@ OPTIONS
   --toHost=toHost      hostname of target Nimbu API
 ```
 
-_See code: [lib/commands/themes/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/themes/copy.js)_
-
 ## `nimbu themes:pull`
 
 download all code and assets for a theme
@@ -36,5 +34,3 @@ OPTIONS
   -t, --theme=theme  [default: default-theme] slug of the theme
   --liquid-only      only download template files
 ```
-
-_See code: [lib/commands/themes/pull.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/themes/pull.js)_

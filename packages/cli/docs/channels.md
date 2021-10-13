@@ -16,11 +16,10 @@ USAGE
   $ nimbu channels:copy
 
 OPTIONS
+  -a, --all        copy all channels from source to target
   -f, --from=from  (required) slug of the source channel
   -t, --to=to      (required) slug of the target channel
 ```
-
-_See code: [lib/commands/channels/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/channels/copy.js)_
 
 ## `nimbu channels:diff`
 
@@ -34,8 +33,6 @@ OPTIONS
   -f, --from=from  (required) slug of the source channel
   -t, --to=to      (required) slug of the target channel
 ```
-
-_See code: [lib/commands/channels/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/channels/diff.js)_
 
 ## `nimbu channels:entries:copy`
 
@@ -52,5 +49,3 @@ OPTIONS
   -t, --to=to              (required) slug of the target channel
   -u, --upsert=upsert      name of parameter to use for matching existing documents
 ```
-
-_See code: [lib/commands/channels/entries/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/channels/entries/copy.js)_

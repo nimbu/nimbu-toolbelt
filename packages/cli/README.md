@@ -10,20 +10,12 @@ Toolbelt for Nimbu projects
 [![License](https://img.shields.io/npm/l/nimbu-toolbelt.svg)](https://github.com/zenjoy/nimbu-toolbelt/blob/master/package.json)
 
 <!-- toc -->
-
-- [Nimbu CLI](#nimbu-cli)
-- [Usage](#usage)
-  - [Prerequisites](#prerequisites)
-  - [Getting started](#getting-started)
-  - [Development server](#development-server)
-  - [Pushing to nimbu](#pushing-to-nimbu)
-- [Commands](#commands)
-- [Command Topics](#command-topics)
-- [Features](#features)
-  - [Coffeescript/Javascript](#coffeescriptjavascript)
-  - [(S)CSS](#scss)
-  - [Using the webpack output in your layout](#using-the-webpack-output-in-your-layout)
-  <!-- tocstop -->
+* [Nimbu CLI](#nimbu-cli)
+* [Usage](#usage)
+* [Commands](#commands)
+* [Command Topics](#command-topics)
+* [Features](#features)
+<!-- tocstop -->
 
 # Usage
 
@@ -74,29 +66,28 @@ Make sure that include is there and that you push the snippet to nimbu!
 # Commands
 
 <!-- commands -->
-
 # Command Topics
 
-- [`nimbu apps`](docs/apps.md) - manage (cloud code) applications
-- [`nimbu auth`](docs/auth.md) - authenticate, display token and current user
-- [`nimbu autocomplete`](docs/autocomplete.md) - display autocomplete installation instructions
-- [`nimbu browse`](docs/browse.md) - open the current site in your browser (simulator, admin)
-- [`nimbu channels`](docs/channels.md) - working with channels
-- [`nimbu commands`](docs/commands.md) - list all the commands
-- [`nimbu config`](docs/config.md) - Show resolved configuration
-- [`nimbu customers`](docs/customers.md) - working with customers
-- [`nimbu help`](docs/help.md) - display help for nimbu
-- [`nimbu init`](docs/init.md) - working directory initialization
-- [`nimbu mails`](docs/mails.md) - manage your notification templates
-- [`nimbu menus`](docs/menus.md) - copy menus from one site to another
-- [`nimbu pages`](docs/pages.md) - copy page from one site to another
-- [`nimbu plugins`](docs/plugins.md) - list installed plugins
-- [`nimbu products`](docs/products.md) - working with products
-- [`nimbu sites`](docs/sites.md) - interacting with your sites (list, create)
-- [`nimbu themes`](docs/themes.md) - working with themes (upload / download)
-- [`nimbu translations`](docs/translations.md) - working with translations
-- [`nimbu update`](docs/update.md) - update the nimbu CLI
-- [`nimbu which`](docs/which.md) - show which plugin a command is in
+* [`nimbu apps`](docs/apps.md) - manage (cloud code) applications
+* [`nimbu auth`](docs/auth.md) - authenticate, display token and current user
+* [`nimbu autocomplete`](docs/autocomplete.md) - display autocomplete installation instructions
+* [`nimbu browse`](docs/browse.md) - open the current site in your browser (simulator, admin)
+* [`nimbu channels`](docs/channels.md) - working with channels
+* [`nimbu commands`](docs/commands.md) - list all the commands
+* [`nimbu config`](docs/config.md) - Show resolved configuration
+* [`nimbu customers`](docs/customers.md) - working with customers
+* [`nimbu help`](docs/help.md) - display help for nimbu
+* [`nimbu init`](docs/init.md) - working directory initialization
+* [`nimbu mails`](docs/mails.md) - manage your notification templates
+* [`nimbu menus`](docs/menus.md) - copy menus from one site to another
+* [`nimbu pages`](docs/pages.md) - copy page from one site to another
+* [`nimbu plugins`](docs/plugins.md) - list installed plugins
+* [`nimbu products`](docs/products.md) - working with products
+* [`nimbu sites`](docs/sites.md) - interacting with your sites (list, create)
+* [`nimbu themes`](docs/themes.md) - working with themes (upload / download)
+* [`nimbu translations`](docs/translations.md) - working with translations
+* [`nimbu update`](docs/update.md) - update the nimbu CLI
+* [`nimbu which`](docs/which.md) - show which plugin a command is in
 
 <!-- commandsstop -->
 

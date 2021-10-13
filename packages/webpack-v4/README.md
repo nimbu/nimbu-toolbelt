@@ -19,7 +19,7 @@ $ npm install -g @nimbu-cli/plugin-webpack-v4
 $ nimbu COMMAND
 running command...
 $ nimbu (-v|--version|version)
-@nimbu-cli/plugin-webpack-v4/5.0.0-alpha.0 darwin-x64 node-v14.17.5
+@nimbu-cli/plugin-webpack-v4/5.0.0-alpha.1 darwin-x64 node-v14.17.5
 $ nimbu --help [COMMAND]
 USAGE
   $ nimbu COMMAND
@@ -45,7 +45,7 @@ USAGE
   $ nimbu apps:transpile SOURCE TARGET
 ```
 
-_See code: [lib/commands/apps/transpile.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/apps/transpile.js)_
+_See code: [lib/commands/apps/transpile.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/apps/transpile.js)_
 
 ## `nimbu build`
 
@@ -56,7 +56,7 @@ USAGE
   $ nimbu build
 ```
 
-_See code: [lib/commands/build.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/build.js)_
+_See code: [lib/commands/build.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/build.js)_
 
 ## `nimbu hello [FILE]`
 
@@ -76,7 +76,7 @@ EXAMPLE
   hello world from ./src/hello.ts!
 ```
 
-_See code: [lib/commands/hello.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/hello.js)_
+_See code: [lib/commands/hello.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/hello.js)_
 
 ## `nimbu server`
 
@@ -97,7 +97,7 @@ OPTIONS
   --port=port              [default: 4567] The port to listen on.
 ```
 
-_See code: [lib/commands/server.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/server.js)_
+_See code: [lib/commands/server.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/server.js)_
 
 ## `nimbu themes:diff [THEME]`
 
@@ -111,7 +111,7 @@ ARGUMENTS
   THEME  The name of the theme to list
 ```
 
-_See code: [lib/commands/themes/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/themes/diff.js)_
+_See code: [lib/commands/themes/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/themes/diff.js)_
 
 ## `nimbu themes:list [THEME]`
 
@@ -125,7 +125,7 @@ ARGUMENTS
   THEME  The name of the theme to list
 ```
 
-_See code: [lib/commands/themes/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/themes/list.js)_
+_See code: [lib/commands/themes/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/themes/list.js)_
 
 ## `nimbu themes:push [FILES]`
 
@@ -148,5 +148,5 @@ OPTIONS
   --only         only push the files given on the command line
 ```
 
-_See code: [lib/commands/themes/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.0/lib/commands/themes/push.js)_
+_See code: [lib/commands/themes/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/themes/push.js)_
 <!-- commandsstop -->
