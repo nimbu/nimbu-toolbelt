@@ -1,5 +1,5 @@
 import * as Config from '@oclif/config'
-
+import Debug from 'debug'
 import base, { expect } from '@oclif/test'
 import { loadConfig } from '@oclif/test/lib/load-config'
 import Nock from 'nock'
@@ -7,12 +7,14 @@ import mockfs from 'mock-fs'
 
 import { AbsPath, MockFSHelper } from './utils'
 
+export { expect } from '@oclif/test'
+
 const castArray = <T>(input?: T | T[]): T[] => {
   if (input === undefined) return []
   return Array.isArray(input) ? input : [input]
 }
 
-let test = base
+export const test = base
   .register('fs', (memfs: any) => {
     return {
       run(ctx: { fs: any }) {
@@ -58,7 +60,6 @@ let test = base
       },
     }
   })
+  .disableNetConnect()
 
-test = test.disableNetConnect()
-
-export { test as default, expect }
+export default test
