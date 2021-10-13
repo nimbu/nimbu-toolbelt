@@ -16,75 +16,54 @@ Webpack Plugin for the Nimbu toolbelt
 <!-- usage -->
 ```sh-session
 $ npm install -g @nimbu-cli/plugin-webpack-v4
-$ nimbu COMMAND
+$ @nimbu-cli/plugin-webpack-v4 COMMAND
 running command...
-$ nimbu (-v|--version|version)
-@nimbu-cli/plugin-webpack-v4/5.0.0-alpha.1 darwin-x64 node-v14.17.5
-$ nimbu --help [COMMAND]
+$ @nimbu-cli/plugin-webpack-v4 (-v|--version|version)
+@nimbu-cli/plugin-webpack-v4/5.0.0-alpha.2 darwin-x64 node-v14.17.5
+$ @nimbu-cli/plugin-webpack-v4 --help [COMMAND]
 USAGE
-  $ nimbu COMMAND
+  $ @nimbu-cli/plugin-webpack-v4 COMMAND
 ...
 ```
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`nimbu apps:transpile SOURCE TARGET`](#nimbu-appstranspile-source-target)
-* [`nimbu build`](#nimbu-build)
-* [`nimbu hello [FILE]`](#nimbu-hello-file)
-* [`nimbu server`](#nimbu-server)
-* [`nimbu themes:diff [THEME]`](#nimbu-themesdiff-theme)
-* [`nimbu themes:list [THEME]`](#nimbu-themeslist-theme)
-* [`nimbu themes:push [FILES]`](#nimbu-themespush-files)
+* [`@nimbu-cli/plugin-webpack-v4 apps:transpile SOURCE TARGET`](#nimbu-cliplugin-webpack-v4-appstranspile-source-target)
+* [`@nimbu-cli/plugin-webpack-v4 build`](#nimbu-cliplugin-webpack-v4-build)
+* [`@nimbu-cli/plugin-webpack-v4 server`](#nimbu-cliplugin-webpack-v4-server)
+* [`@nimbu-cli/plugin-webpack-v4 themes:diff [THEME]`](#nimbu-cliplugin-webpack-v4-themesdiff-theme)
+* [`@nimbu-cli/plugin-webpack-v4 themes:list [THEME]`](#nimbu-cliplugin-webpack-v4-themeslist-theme)
+* [`@nimbu-cli/plugin-webpack-v4 themes:push [FILES]`](#nimbu-cliplugin-webpack-v4-themespush-files)
 
-## `nimbu apps:transpile SOURCE TARGET`
+## `@nimbu-cli/plugin-webpack-v4 apps:transpile SOURCE TARGET`
 
 Transpile a file from ES6 to ES5 for compatiblity with Nimbu Cloud applications
 
 ```
 USAGE
-  $ nimbu apps:transpile SOURCE TARGET
+  $ @nimbu-cli/plugin-webpack-v4 apps:transpile SOURCE TARGET
 ```
 
-_See code: [lib/commands/apps/transpile.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/apps/transpile.js)_
+_See code: [lib/commands/apps/transpile.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.2/lib/commands/apps/transpile.js)_
 
-## `nimbu build`
+## `@nimbu-cli/plugin-webpack-v4 build`
 
 build a production version of your javascript and CSS
 
 ```
 USAGE
-  $ nimbu build
+  $ @nimbu-cli/plugin-webpack-v4 build
 ```
 
-_See code: [lib/commands/build.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/build.js)_
+_See code: [lib/commands/build.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.2/lib/commands/build.js)_
 
-## `nimbu hello [FILE]`
-
-describe the command here
-
-```
-USAGE
-  $ nimbu hello [FILE]
-
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
-
-EXAMPLE
-  $ oclif-example hello
-  hello world from ./src/hello.ts!
-```
-
-_See code: [lib/commands/hello.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/hello.js)_
-
-## `nimbu server`
+## `@nimbu-cli/plugin-webpack-v4 server`
 
 run the development server
 
 ```
 USAGE
-  $ nimbu server
+  $ @nimbu-cli/plugin-webpack-v4 server
 
 OPTIONS
   --compass                Use legacy ruby SASS compilation.
@@ -97,43 +76,43 @@ OPTIONS
   --port=port              [default: 4567] The port to listen on.
 ```
 
-_See code: [lib/commands/server.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/server.js)_
+_See code: [lib/commands/server.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.2/lib/commands/server.js)_
 
-## `nimbu themes:diff [THEME]`
+## `@nimbu-cli/plugin-webpack-v4 themes:diff [THEME]`
 
 describe the command here
 
 ```
 USAGE
-  $ nimbu themes:diff [THEME]
+  $ @nimbu-cli/plugin-webpack-v4 themes:diff [THEME]
 
 ARGUMENTS
   THEME  The name of the theme to list
 ```
 
-_See code: [lib/commands/themes/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/themes/diff.js)_
+_See code: [lib/commands/themes/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.2/lib/commands/themes/diff.js)_
 
-## `nimbu themes:list [THEME]`
+## `@nimbu-cli/plugin-webpack-v4 themes:list [THEME]`
 
 list all layouts, templates and assets
 
 ```
 USAGE
-  $ nimbu themes:list [THEME]
+  $ @nimbu-cli/plugin-webpack-v4 themes:list [THEME]
 
 ARGUMENTS
   THEME  The name of the theme to list
 ```
 
-_See code: [lib/commands/themes/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/themes/list.js)_
+_See code: [lib/commands/themes/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.2/lib/commands/themes/list.js)_
 
-## `nimbu themes:push [FILES]`
+## `@nimbu-cli/plugin-webpack-v4 themes:push [FILES]`
 
 push the theme code online
 
 ```
 USAGE
-  $ nimbu themes:push [FILES]
+  $ @nimbu-cli/plugin-webpack-v4 themes:push [FILES]
 
 ARGUMENTS
   FILES  The files to push with --only
@@ -148,5 +127,5 @@ OPTIONS
   --only         only push the files given on the command line
 ```
 
-_See code: [lib/commands/themes/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.1/lib/commands/themes/push.js)_
+_See code: [lib/commands/themes/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.2/lib/commands/themes/push.js)_
 <!-- commandsstop -->
