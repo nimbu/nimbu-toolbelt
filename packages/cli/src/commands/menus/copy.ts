@@ -6,7 +6,7 @@ import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import through from 'through'
 import inquirer from 'inquirer'
-import clonedeep from 'lodash.clonedeep'
+import { cloneDeep } from 'lodash'
 
 export default class CopyMenus extends Command {
   static description = 'copy menus from one site to another'
@@ -63,7 +63,7 @@ export default class CopyMenus extends Command {
         toSite,
         query: args.slug,
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
   }
 
   private async fetchMenus(ctx: any) {
@@ -90,6 +90,8 @@ export default class CopyMenus extends Command {
         } else {
           throw new Error(error.message)
         }
+      } else {
+        throw error
       }
     }
   }
@@ -112,6 +114,8 @@ export default class CopyMenus extends Command {
             if (error.body === undefined || error.body.code !== 101) {
               throw new Error(error.message)
             }
+          } else {
+            throw error
           }
         }
 
@@ -166,7 +170,7 @@ export default class CopyMenus extends Command {
   private askOverwrite(menu: any, ctx: any, observer: any) {
     let buffer = ''
 
-    const outputStream = through((data) => {
+    const outputStream: any = through((data) => {
       if (/\u001b\[.*?(D|C)$/.test(data)) {
         if (buffer.length > 0) {
           observer.next(buffer)
@@ -207,7 +211,7 @@ export default class CopyMenus extends Command {
   }
 
   private cleanupMenu(original) {
-    let menu = clonedeep(original)
+    let menu = cloneDeep(original)
 
     const cleanupItems = (items) => {
       for (let item of items) {

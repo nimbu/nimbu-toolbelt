@@ -72,7 +72,7 @@ export default class CopyTranslations extends Command {
         files: {},
         query: args.query,
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
   }
 
   private async fetchTranslations(ctx: any) {
@@ -116,6 +116,8 @@ export default class CopyTranslations extends Command {
         } catch (error) {
           if (error instanceof APIError) {
             throw new Error(`Error for translations ${chalk.bold(translation.key)}: ${error.message}`)
+          } else {
+            throw error
           }
         }
 

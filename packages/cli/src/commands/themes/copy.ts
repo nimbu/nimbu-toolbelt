@@ -4,8 +4,9 @@ import { download } from '../../utils/files'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 import pathFinder from 'path'
+import { capitalize } from 'lodash'
 
 export default class CopyThemes extends Command {
   static description = 'copy themes from one site to another'
@@ -26,6 +27,9 @@ export default class CopyThemes extends Command {
     }),
     fromHost: flags.string({
       description: 'hostname of origin Nimbu API',
+    }),
+    'liquid-only': flags.boolean({
+      description: 'only copy the templates',
     }),
   }
 
@@ -57,26 +61,40 @@ export default class CopyThemes extends Command {
       toTheme = 'default-theme'
     }
 
-    let types = ['assets', 'snippets', 'layouts', 'templates']
+    let types = ['snippets', 'layouts', 'templates']
+    if (!flags['liquid-only']) {
+      types.unshift('assets')
+    }
     let taskList: any[] = []
+    this.log(
+      `Copying theme ${chalk.bold(fromTheme)} from ${chalk.bold(fromSite)} to ${
+        toTheme !== fromTheme ? `theme ${chalk.bold(toTheme)} in ` : ''
+      }site ${chalk.bold(toSite)}:\n`,
+    )
 
     for (let type of types) {
       taskList.push({
-        title: `Downloading ${type} from theme ${chalk.bold(fromTheme)} in site ${chalk.bold(fromSite)}`,
-        task: (ctx) => this.fetchType(type, ctx),
-        enabled: (ctx) => ctx[type] != null || types.indexOf(type) === ctx.currentStep,
-      })
-      taskList.push({
-        title: `Uploading ${type} to theme ${chalk.bold(toTheme)} to site ${chalk.bold(toSite)}`,
-        task: (ctx) => this.uploadType(type, ctx),
-        skip: (ctx) => ctx[type].length === 0,
-        enabled: (ctx) => ctx[type] != null,
+        title: capitalize(type),
+        task: (ctx, task) =>
+          new Listr([
+            {
+              title: `Downloading ${type}`,
+              task: (ctx) => this.fetchType(type, ctx),
+              enabled: (ctx) => ctx[type] != null || types.indexOf(type) === ctx.currentStep,
+            },
+            {
+              title: `Uploading ${type}`,
+              task: (ctx) => this.uploadType(type, ctx),
+              skip: (ctx) => ctx[type].length === 0,
+              enabled: (ctx) => ctx[type] != null,
+            },
+          ]),
       })
     }
 
     const tasks = new Listr(taskList)
 
-    tasks
+    await tasks
       .run({
         fromSite,
         toSite,
@@ -87,7 +105,9 @@ export default class CopyThemes extends Command {
         currentStep: 0,
         files: {},
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
+
+    this.log('\n★ Done!')
   }
 
   private async fetchType(type: string, ctx: any) {

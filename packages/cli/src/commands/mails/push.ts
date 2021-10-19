@@ -3,7 +3,7 @@ import Command, { APIError } from '@nimbu-cli/command'
 import { findMatchingFiles } from '../../utils/files'
 
 import { flags } from '@oclif/command'
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 import ux from 'cli-ux'
 import chalk from 'chalk'
 import path from 'path'
@@ -128,6 +128,8 @@ export default class PushMails extends Command {
       } catch (error) {
         if (error instanceof APIError) {
           ux.action.stop(chalk.red(`${logSymbols.error} ${error.message}`))
+        } else {
+          throw error
         }
       }
 

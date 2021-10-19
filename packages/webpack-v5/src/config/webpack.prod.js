@@ -1,6 +1,5 @@
 const webpack = require('webpack')
 const merge = require('webpack-merge')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const getBaseWebpackConfig = require('./webpack.base.js')
 const utils = require('./utils')
@@ -39,23 +38,6 @@ const webpackConfig = () => {
       ],
     },
     optimization: {
-      minimizer: [
-        new UglifyJsPlugin({
-          sourceMap: shouldUseSourceMap,
-          uglifyOptions: {
-            compress: {
-              comparisons: false,
-              drop_console: true,
-            },
-            mangle: true,
-            output: {
-              ascii_only: true,
-              comments: false,
-            },
-            warnings: false,
-          },
-        }),
-      ],
       removeEmptyChunks: true,
       splitChunks: {
         cacheGroups: {

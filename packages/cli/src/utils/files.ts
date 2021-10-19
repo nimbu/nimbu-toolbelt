@@ -1,6 +1,6 @@
-import http from 'http'
-import https from 'https'
-import fs from 'fs-extra'
+import * as http from 'http'
+import * as https from 'https'
+import * as fs from 'fs-extra'
 import { basename } from 'path'
 import glob from 'glob'
 

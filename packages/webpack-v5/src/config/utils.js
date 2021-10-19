@@ -1,9 +1,8 @@
-const autoprefixer = require('autoprefixer')
 const _ = require('lodash')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssoWebpackPlugin = require('csso-webpack-plugin').default
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-
+const debug = require('debug')('nimbu')
 const {
   buildConfig: { get: getProjectConfig },
 } = require('@nimbu-cli/command')
@@ -242,13 +241,17 @@ function styleConfig(options) {
 function htmlWebPackPlugins(entries, options = {}) {
   const template = require.resolve('../../template/webpack.liquid.ejs')
   return entries.map((entry) => {
+    debug(`Using HtmlWebpackPlugin for entry ${entry}`)
     const name = entry.toLowerCase()
     return new HtmlWebpackPlugin({
       alwaysWriteToDisk: options.alwaysWriteToDisk,
+      cache: false,
       chunks: [entry],
       chunksSortMode: 'auto',
       filename: `snippets/webpack_${name}.liquid`,
       inject: false,
+      meta: false,
+      scriptLoading: 'defer',
       template: template,
       templateParameters: {
         prefix: `${name}_`,

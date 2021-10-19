@@ -5,8 +5,8 @@ import { flags } from '@oclif/command'
 import ux from 'cli-ux'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
-import fs from 'fs-extra'
-import clonedeep from 'lodash.clonedeep'
+import * as fs from 'fs-extra'
+import { cloneDeep } from 'lodash'
 
 export default class CopyChannels extends Command {
   static description = 'copy channel entries from one to another'
@@ -115,7 +115,7 @@ export default class CopyChannels extends Command {
         per_page: flags.per_page,
         upsert: flags.upsert,
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
   }
 
   private async fetchChannel(ctx: any) {
@@ -139,6 +139,8 @@ export default class CopyChannels extends Command {
         } else {
           throw new Error(error.message)
         }
+      } else {
+        throw error
       }
     }
   }
@@ -267,7 +269,7 @@ export default class CopyChannels extends Command {
         let nbEntries = ctx.entries.length
 
         for (let original of ctx.entries) {
-          let entry = clonedeep(original)
+          let entry = cloneDeep(original)
 
           for (let field of ctx.fileFields) {
             let file = entry[field.name]
@@ -336,6 +338,8 @@ export default class CopyChannels extends Command {
                   )}`,
                 ),
               )
+            } else {
+              throw error
             }
           }
 
@@ -386,6 +390,8 @@ export default class CopyChannels extends Command {
                     )}`,
                   ),
                 )
+              } else {
+                throw error
               }
             }
           }

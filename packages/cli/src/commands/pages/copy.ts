@@ -5,8 +5,8 @@ import { flags } from '@oclif/command'
 import ux from 'cli-ux'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
-import fs from 'fs-extra'
-import clonedeep from 'lodash.clonedeep'
+import * as fs from 'fs-extra'
+import { cloneDeep } from 'lodash'
 
 export default class CopyPages extends Command {
   static description = 'copy page from one site to another'
@@ -81,7 +81,7 @@ export default class CopyPages extends Command {
         files: {},
         query: args.fullpath,
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
   }
 
   private async fetchPages(ctx: any) {
@@ -110,6 +110,8 @@ export default class CopyPages extends Command {
         } else {
           throw new Error(error.message)
         }
+      } else {
+        throw error
       }
     }
   }
@@ -138,6 +140,8 @@ export default class CopyPages extends Command {
               if (error.body === undefined || error.body.code !== 101) {
                 throw new Error(`Error checking page ${chalk.bold(ctx.currentPage.fullpath)}: ${error.message}`)
               }
+            } else {
+              throw error
             }
           }
 
@@ -236,7 +240,7 @@ export default class CopyPages extends Command {
   }
 
   private async prepareUpload(i: number, ctx: any, page: any) {
-    let data = clonedeep(page)
+    let data = cloneDeep(page)
     data.parent = data.parent_path
 
     const scanEditables = async (i, ctx, editables) => {

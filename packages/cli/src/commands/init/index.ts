@@ -5,7 +5,7 @@ import cli from 'cli-ux'
 import { orderBy } from 'lodash'
 import inquirer from 'inquirer'
 import logSymbols from 'log-symbols'
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 
 export default class Init extends Command {
   static description = 'initialize your working directory to code a selected theme'

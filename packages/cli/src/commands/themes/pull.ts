@@ -4,7 +4,7 @@ import { download } from '../../utils/files'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 import pathFinder from 'path'
 
 export default class PullThemes extends Command {
@@ -55,7 +55,7 @@ export default class PullThemes extends Command {
         currentStep: 0,
         files: {},
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
   }
 
   private async fetchType(type: string, ctx: any) {

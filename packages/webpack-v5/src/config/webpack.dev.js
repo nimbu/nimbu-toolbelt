@@ -16,6 +16,19 @@ try {
   // ILB
 }
 
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+class IsDonePlugin {
+  apply(compiler) {
+    compiler.hooks.afterEmit.tap('IsDonePlugin', () => {
+      console.log('Compilation afterEmit', new Date())
+    })
+    compiler.hooks.done.tap('IsDonePlugin', () => {
+      console.log('Compilation is done', new Date())
+    })
+  }
+}
+
 const debug = require('debug')('nimbu')
 
 const webpackConfig = () => {
@@ -59,10 +72,10 @@ const webpackConfig = () => {
     ...styleConfig.plugins,
     new webpack.NoEmitOnErrorsPlugin(),
     new FriendlyErrorsPlugin(),
-    ...utils.htmlWebPackPlugins(Object.keys(baseWebpackConfig.entry), { alwaysWriteToDisk: true }),
     new HtmlWebpackHarddiskPlugin({
       outputPath: '/Users/peter/Development/Zenjoy/Projects/theme-starterskit/',
     }),
+    ...utils.htmlWebPackPlugins(Object.keys(baseWebpackConfig.entry), { alwaysWriteToDisk: true }),
   ]
 
   if (ReactRefreshWebpackPlugin != null) {

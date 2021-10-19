@@ -93,6 +93,8 @@ export default class DiffChannels extends Command {
           if (error.body === undefined || error.body.code !== 101) {
             throw new Error(error.message)
           }
+        } else {
+          throw error
         }
       }
 
@@ -103,6 +105,8 @@ export default class DiffChannels extends Command {
           if (error.body === undefined || error.body.code !== 101) {
             throw new Error(error.message)
           }
+        } else {
+          throw error
         }
       }
 

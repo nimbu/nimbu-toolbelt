@@ -47,6 +47,8 @@ export default class CustomerConfigDiff extends Command {
 
       if (error instanceof APIError) {
         throw new Error(error.message)
+      } else {
+        throw error
       }
     }
 
@@ -60,6 +62,8 @@ export default class CustomerConfigDiff extends Command {
 
       if (error instanceof APIError) {
         throw new Error(error.message)
+      } else {
+        throw error
       }
     }
 

@@ -53,7 +53,7 @@ export default class CopyCustomerConfig extends Command {
         fromSite,
         toSite,
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
   }
 
   private async fetch(ctx: any) {
@@ -65,6 +65,8 @@ export default class CopyCustomerConfig extends Command {
     } catch (error) {
       if (error instanceof APIError) {
         throw new Error(error.message)
+      } else {
+        throw error
       }
     }
   }
@@ -79,6 +81,8 @@ export default class CopyCustomerConfig extends Command {
     } catch (error) {
       if (error instanceof APIError) {
         throw new Error(error.message)
+      } else {
+        throw error
       }
     }
 
@@ -115,7 +119,7 @@ export default class CopyCustomerConfig extends Command {
     return new Observable((observer) => {
       let buffer = ''
 
-      const outputStream = through((data) => {
+      const outputStream: any = through((data) => {
         if (/\u001b\[.*?(D|C)$/.test(data)) {
           if (buffer.length > 0) {
             observer.next(buffer)

@@ -53,7 +53,7 @@ export default class CopyProductsConfig extends Command {
         fromSite,
         toSite,
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
   }
 
   private async fetch(ctx: any) {
@@ -115,7 +115,7 @@ export default class CopyProductsConfig extends Command {
     return new Observable((observer) => {
       let buffer = ''
 
-      const outputStream = through((data) => {
+      const outputStream: any = through((data) => {
         if (/\u001b\[.*?(D|C)$/.test(data)) {
           if (buffer.length > 0) {
             observer.next(buffer)

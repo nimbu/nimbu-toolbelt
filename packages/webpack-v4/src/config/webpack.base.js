@@ -1,7 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
-
 const paths = require('./paths')
+
 const {
   buildConfig: { get: getProjectConfig },
 } = require('@nimbu-cli/command')

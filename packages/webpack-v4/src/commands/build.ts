@@ -15,7 +15,7 @@ export default class Build extends Command {
   webpack(config: webpack.Configuration): Promise<webpack.Stats> {
     return new Promise((resolve, reject) => {
       webpack(config, (err, stats) => {
-        if (err) {
+        if (err || stats == null) {
           reject(err)
         } else {
           resolve(stats)

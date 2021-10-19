@@ -1,7 +1,7 @@
 import Command, { APITypes as Nimbu } from '@nimbu-cli/command'
 
 import { flags } from '@oclif/command'
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 import ux from 'cli-ux'
 import yaml from 'js-yaml'
 

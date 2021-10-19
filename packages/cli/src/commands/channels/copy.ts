@@ -3,10 +3,10 @@ import Debug from 'debug'
 import { flags } from '@oclif/command'
 import ux from 'cli-ux'
 import chalk from 'chalk'
-import through from 'through'
-import inquirer from 'inquirer'
 import { Observable } from 'rxjs'
 import { Channel, FieldType, RelationalField } from '../../nimbu/types'
+const through = require('through')
+const inquirer = require('inquirer')
 const Listr = require('listr')
 
 const debug = Debug('nimbu')
@@ -15,6 +15,8 @@ type CopyAll = {
   fromSite: string
   toSite: string
   channels?: Channel[]
+  circularDependencies?: string[]
+  overwrite: boolean
 }
 
 type CopyAllChannelsKnown = CopyAll & {
@@ -27,6 +29,7 @@ type CopySingle = {
   fromSite: string
   toSite: string
   channel?: Channel
+  overwrite: boolean
 }
 
 type CopySingleChannelKnown = CopySingle & {
@@ -47,6 +50,9 @@ export default class CopyChannels extends Command {
       char: 't', // shorter flag version
       description: 'slug of the target channel',
       required: true,
+    }),
+    force: flags.boolean({
+      description: 'do not ask confirmation to overwrite existing channel',
     }),
     all: flags.boolean({
       char: 'a',
@@ -69,9 +75,9 @@ export default class CopyChannels extends Command {
     }
 
     if (fromChannel != null && toChannel != null) {
-      await this.executeCopySingle({ fromSite, toSite, fromChannel, toChannel })
+      await this.executeCopySingle({ fromSite, toSite, fromChannel, toChannel, overwrite: !!flags.force })
     } else {
-      await this.executeCopyAll({ fromSite, toSite })
+      await this.executeCopyAll({ fromSite, toSite, overwrite: !!flags.force })
     }
   }
 
@@ -100,13 +106,11 @@ export default class CopyChannels extends Command {
         toChannel,
         toSite,
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
   }
 
-  private async executeCopyAll({ fromSite, toSite }: CopyAll) {
+  private async executeCopyAll({ fromSite, toSite, overwrite }: CopyAll) {
     debug('Running executeCopyAll')
-
-    // const Listr = require('listr')
 
     let fetchTitle = `Fetching all channels from ${chalk.bold(fromSite)}`
     let upsertTitle = `Copying all channels to ${chalk.bold(toSite)}`
@@ -120,8 +124,13 @@ export default class CopyChannels extends Command {
         title: upsertTitle,
         enabled: (ctx: CopyAll) => ctx.channels != null && ctx.channels.length > 0,
         task: (ctx: CopyAllChannelsKnown, task) => {
-          return new Listr(
-            ctx.channels.map((channel) => ({
+          return new Listr([
+            {
+              title: 'Ensure circular dependencies are created first',
+              enabled: (ctx: CopyAll) => ctx.circularDependencies != null && ctx.circularDependencies.length > 0,
+              task: (ctx: CopyAll) => this.ensureCircularDependencies(ctx),
+            },
+            ...ctx.channels.map((channel) => ({
               title: `${chalk.bold(channel.name)} (${channel.slug})`,
               task: (ctx, task) =>
                 this.copy(
@@ -132,11 +141,12 @@ export default class CopyChannels extends Command {
                     toSite,
                     channel: channel,
                     copyAll: true,
+                    overwrite: overwrite,
                   },
                   task,
                 ),
             })),
-          )
+          ])
         },
       },
     ])
@@ -146,7 +156,7 @@ export default class CopyChannels extends Command {
         fromSite,
         toSite,
       })
-      .catch(() => {})
+      .catch((error) => this.error(error))
   }
 
   private extractSiteAndChannel(flag: string, copyAll?: boolean) {
@@ -181,6 +191,8 @@ export default class CopyChannels extends Command {
         } else {
           throw new Error(error.message)
         }
+      } else {
+        throw error
       }
     }
   }
@@ -218,8 +230,21 @@ export default class CopyChannels extends Command {
       // get the order in which to insert / update channels
       const channelsInOrder = graph.overallOrder()
 
+      // search for circular dependencies
+      const circularDependencies: string[] = []
+      for (const slug of channelsInOrder) {
+        const transientDeps = graph.dependenciesOf(slug)
+        for (const dependency of transientDeps) {
+          if (graph.dependenciesOf(dependency).includes(slug)) {
+            // we found a circular dependency
+            circularDependencies.push(slug)
+          }
+        }
+      }
+
       // assign channels to context in this order
       ctx.channels = channelsInOrder.map((slug) => channels.find((c) => c.slug === slug))
+      ctx.circularDependencies = circularDependencies
     } catch (error) {
       if (error instanceof APIError) {
         if (error.body != null && error.body.code === 101) {
@@ -227,8 +252,58 @@ export default class CopyChannels extends Command {
         } else {
           throw new Error(error.message)
         }
+      } else {
+        throw error
       }
     }
+  }
+
+  private async ensureCircularDependencies(ctx: CopyAll) {
+    const circularDependencies = ctx.circularDependencies!
+
+    const perform = async (observer) => {
+      for (const slug of circularDependencies) {
+        let targetChannel: any
+        observer.next(slug)
+
+        // check if target channel exists or not
+        try {
+          targetChannel = await this.nimbu.get<Channel>(`/channels/${slug}`, { site: ctx.toSite })
+        } catch (error) {
+          if (error instanceof APIError) {
+            if (error.body === undefined || error.body.code !== 101) {
+              throw new Error(error.message)
+            }
+          } else {
+            throw error
+          }
+        }
+
+        if (targetChannel == null) {
+          // ensure a channel with this slug exists, any field will do
+          await this.nimbu.post<Channel>(`/channels`, {
+            site: ctx.toSite,
+            body: {
+              slug: slug,
+              name: slug,
+              customizations: [
+                {
+                  label: 'Dummy Field for Circular Dependencies',
+                  name: 'dummy',
+                  type: 'string',
+                },
+              ],
+            },
+          })
+        }
+      }
+    }
+
+    return new Observable((observer) => {
+      perform(observer)
+        .then(() => observer.complete())
+        .catch((error) => observer.error(error))
+    })
   }
 
   private async copy(ctx: CopySingleChannelKnown, task: any) {
@@ -245,6 +320,8 @@ export default class CopyChannels extends Command {
         if (error.body === undefined || error.body.code !== 101) {
           throw new Error(error.message)
         }
+      } else {
+        throw error
       }
     }
 
@@ -264,7 +341,7 @@ export default class CopyChannels extends Command {
     options.body = ctx.channel
 
     if (ctx.copyAll) {
-      task.title = `Creating channel ${chalk.bold(ctx.toChannel)}`
+      task.title = `${chalk.bold(ctx.channel.name)} (${ctx.channel.slug}): created`
     } else {
       task.title = `Creating channel ${chalk.bold(ctx.toChannel)} in site ${chalk.bold(ctx.toSite)}`
     }
@@ -284,7 +361,7 @@ export default class CopyChannels extends Command {
     options.body = ctx.channel
 
     if (ctx.copyAll) {
-      task.title = `Updating channel ${chalk.bold(ctx.toChannel)}`
+      task.title = `${chalk.bold(ctx.channel.name)} (${ctx.channel.slug}): updated`
     } else {
       task.title = `Updating channel ${chalk.bold(ctx.toChannel)} in site ${chalk.bold(ctx.toSite)}`
     }
@@ -298,6 +375,8 @@ export default class CopyChannels extends Command {
         } else {
           throw new Error(JSON.stringify(error))
         }
+      } else {
+        throw error
       }
     }
   }
@@ -305,10 +384,14 @@ export default class CopyChannels extends Command {
   private askOverwrite(ctx: CopySingleChannelKnown, task: any) {
     debug(`Existing channel ${ctx.toSite}/${ctx.toChannel} found: asking for overwrite`)
 
+    if (ctx.overwrite) {
+      return this.update(ctx, task)
+    }
+
     return new Observable((observer) => {
       let buffer = ''
 
-      const outputStream = through((data) => {
+      const outputStream: any = through((data) => {
         if (/\u001b\[.*?(D|C)$/.test(data)) {
           if (buffer.length > 0) {
             observer.next(buffer)
