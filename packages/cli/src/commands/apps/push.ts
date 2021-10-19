@@ -4,8 +4,9 @@ import { findMatchingFiles } from '../../utils/files'
 
 import cli from 'cli-ux'
 import chalk from 'chalk'
-import { resolve as resolvePath } from 'path'
+import { dirname, normalize, resolve as resolvePath } from 'path'
 import { readFile } from 'fs-extra'
+import { intersection } from 'lodash'
 
 export default class AppsPush extends Command {
   static description = 'Push your cloud code files to nimbu'
@@ -44,9 +45,9 @@ export default class AppsPush extends Command {
         // If there is only 1 app, we allow flags.app to be empty
         this._app = this.nimbuConfig.apps[0]
       } else if (this.nimbuConfig.apps.length === 0) {
-        throw new Error('No applications configured, please execute apps:config first.')
+        throw new Error(`⚠️  No applications configured, please execute ${chalk.bold('apps:config')} first.`)
       } else {
-        throw new Error("More than 1 application is configured, but you didn't pass the --app flag.")
+        throw new Error("⚠️  More than 1 application is configured, but you didn't pass the --app flag.")
       }
     }
     return this._app!
@@ -55,11 +56,57 @@ export default class AppsPush extends Command {
   async files(): Promise<string[]> {
     if (!this._files) {
       const { argv } = this.parse(AppsPush)
+      const filesFound = await findMatchingFiles(this.app.dir, this.app.glob)
+
       if (argv.length > 0) {
-        this._files = argv.slice()
+        this._files = intersection(argv.slice(), filesFound)
       } else {
-        this._files = await findMatchingFiles(this.app.dir, this.app.glob)
+        this._files = filesFound
       }
+
+      // sort files on require dependencies
+      const DependencyGraph = require('dependency-graph').DepGraph
+      const graph = new DependencyGraph()
+
+      const regexp = /require\((?:"|')((?:\.\.?\/)*?[a-z0-9A-Z-_\/]+)(?:\.js)?(?:"|')\)/g
+
+      const names: string[] = []
+      const namesWithCode = {}
+      const filenamesWithCode = {}
+
+      for (const filename of this._files) {
+        const { name, code } = await this.getCode(filename)
+        graph.addNode(name)
+        names.push(name)
+        namesWithCode[filename] = {
+          name,
+          code,
+        }
+        filenamesWithCode[name] = filename
+      }
+
+      for (const filename of this._files) {
+        const { name, code } = namesWithCode[filename]
+        const matches = [...code.matchAll(regexp)]
+
+        for (const match of matches) {
+          const requiredFile = match[1]
+          try {
+            // normalize the match (replace ./ or ../../ in requires)
+            let namespace = dirname(name)
+            namespace = namespace === '.' ? '' : namespace
+            const dependency = normalize(requiredFile.replace('./', namespace)) + '.js'
+
+            if (names.includes(dependency)) {
+              graph.addDependency(name, dependency)
+            }
+          } catch {
+            this.error(`⚠️ There is a circular dependency with file ${chalk.bold(filename)}.`)
+          }
+        }
+      }
+      const filesInOrder = graph.overallOrder()
+      this._files = filesInOrder.map((name: string) => filenamesWithCode[name])
     }
     return this._files!
   }
@@ -78,6 +125,7 @@ export default class AppsPush extends Command {
       for (const file of files) {
         await this.pushFile(file)
       }
+      this.log('\n★  Done! ★')
     } catch (error) {
       if (error instanceof Error) {
         cli.error(error.message)
@@ -89,10 +137,8 @@ export default class AppsPush extends Command {
     filename: string,
     executor: (app: string, name: string, code: string) => Promise<Nimbu.AppFile>,
   ) {
-    const name = filename.replace(`${this.app.dir}/`, '')
-    const resolved = resolvePath(filename)
-    const code = await readFile(resolved)
-    await executor(this.app.id, name, code.toString('utf-8'))
+    const { name, code } = await this.getCode(filename)
+    await executor(this.app.id, name, code)
     cli.action.stop(chalk.green('✓'))
   }
 
@@ -130,5 +176,13 @@ export default class AppsPush extends Command {
     } else {
       return this.pushNewFile(filename)
     }
+  }
+
+  private async getCode(filename: string) {
+    const name = filename.replace(`${this.app.dir}/`, '')
+    const resolved = resolvePath(filename)
+    const code = await readFile(resolved)
+
+    return { name, code: code.toString('utf-8') }
   }
 }

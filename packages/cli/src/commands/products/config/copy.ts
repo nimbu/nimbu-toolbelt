@@ -3,9 +3,9 @@ import Command from '@nimbu-cli/command'
 import { flags } from '@oclif/command'
 import ux from 'cli-ux'
 import chalk from 'chalk'
-import through from 'through'
-import inquirer from 'inquirer'
 import { Observable } from 'rxjs'
+const through = require('through')
+const inquirer = require('inquirer')
 
 export default class CopyProductsConfig extends Command {
   static description = 'copy product customizations from one to another'

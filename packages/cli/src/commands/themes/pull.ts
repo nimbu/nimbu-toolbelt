@@ -5,7 +5,7 @@ import { flags } from '@oclif/command'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
-import pathFinder from 'path'
+import * as pathFinder from 'path'
 
 export default class PullThemes extends Command {
   static description = 'download all code and assets for a theme'

@@ -5,7 +5,7 @@ import { flags } from '@oclif/command'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
-import pathFinder from 'path'
+import * as pathFinder from 'path'
 import { capitalize } from 'lodash'
 
 export default class CopyThemes extends Command {
@@ -107,7 +107,7 @@ export default class CopyThemes extends Command {
       })
       .catch((error) => this.error(error))
 
-    this.log('\n★ Done!')
+    this.log('\n★  Done! ★')
   }
 
   private async fetchType(type: string, ctx: any) {

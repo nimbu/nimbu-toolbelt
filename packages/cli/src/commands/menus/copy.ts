@@ -4,9 +4,9 @@ import { flags } from '@oclif/command'
 import ux from 'cli-ux'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
-import through from 'through'
-import inquirer from 'inquirer'
 import { cloneDeep } from 'lodash'
+const through = require('through')
+const inquirer = require('inquirer')
 
 export default class CopyMenus extends Command {
   static description = 'copy menus from one site to another'

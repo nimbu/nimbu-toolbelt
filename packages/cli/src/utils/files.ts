@@ -2,7 +2,7 @@ import * as http from 'http'
 import * as https from 'https'
 import * as fs from 'fs-extra'
 import { basename } from 'path'
-import glob from 'glob'
+import * as glob from 'glob'
 
 const TIMEOUT = 10000
 
