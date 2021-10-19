@@ -22,3 +22,5 @@ OPTIONS
   --fromHost=fromHost  hostname of origin Nimbu API
   --toHost=toHost      hostname of target Nimbu API
 ```
+
+_See code: [lib/commands/translations/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/translations/copy.js)_

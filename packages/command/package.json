@@ -1,7 +1,7 @@
 {
   "name": "@nimbu-cli/command",
   "description": "base class for Nimbu CLI commands",
-  "version": "5.0.0-alpha.0",
+  "version": "5.0.0-alpha.5",
   "author": "Zenjoy Engineering",
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "dependencies": {
@@ -66,5 +66,5 @@
     "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 10000"
   },
   "types": "./lib/index.d.ts",
-  "gitHead": "555bca2e890ba5e3e9a42ed34118ec82b12cff03"
+  "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
 }

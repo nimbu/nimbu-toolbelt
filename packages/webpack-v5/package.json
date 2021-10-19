@@ -1,6 +1,6 @@
 {
   "name": "@nimbu-cli/plugin-webpack-v5",
-  "version": "5.0.0-alpha.0",
+  "version": "5.0.0-alpha.5",
   "author": "Zenjoy Engineering",
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "main": "lib/index.js",
@@ -22,13 +22,13 @@
     "html-webpack-plugin": "^5.3.2",
     "loader-utils": "^1.1.0",
     "mini-css-extract-plugin": "^2.4.2",
-    "nimbu": "^5.0.0-alpha.0",
+    "nimbu": "^5.0.0-alpha.5",
     "node-fetch": "^2.2.0",
     "node-sass": "^6.0",
+    "postcss": "^8.1.4",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^6.2.0",
     "postcss-scss": "^4.0.1",
-    "postcss": "^8.1.4",
     "react-dev-utils": "^12.0.0-next.47",
     "react-svg-core": "^3.0.3",
     "sass-loader": "^12.2.0",
@@ -102,5 +102,5 @@
     "test": "echo 'Not implemented yet...'",
     "version": "oclif-dev readme && git add README.md"
   },
-  "gitHead": "555bca2e890ba5e3e9a42ed34118ec82b12cff03"
+  "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
 }

@@ -19,6 +19,8 @@ OPTIONS
   -t, --to=to      subdomain of the destination site
 ```
 
+_See code: [lib/commands/products/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/products/config/copy.js)_
+
 ## `nimbu products:config:diff`
 
 check differences between product customizations from one to another
@@ -31,3 +33,5 @@ OPTIONS
   -f, --from=from  (required) slug of the source channel
   -t, --to=to      (required) slug of the target channel
 ```
+
+_See code: [lib/commands/products/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/products/config/diff.js)_

@@ -1,14 +1,14 @@
 {
   "name": "nimbu",
   "description": "Tools for Nimbu projects",
-  "version": "5.0.0-alpha.0",
+  "version": "5.0.0-alpha.5",
   "author": "Zenjoy Engineering",
   "bin": {
     "nimbu": "./bin/run"
   },
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "dependencies": {
-    "@nimbu-cli/command": "^5.0.0-alpha.0",
+    "@nimbu-cli/command": "^5.0.0-alpha.5",
     "@oclif/config": "^1",
     "@oclif/plugin-autocomplete": "^0.3.0",
     "@oclif/plugin-commands": "^1.2.2",
@@ -165,5 +165,5 @@
     "sourceMap": true,
     "instrument": true
   },
-  "gitHead": "555bca2e890ba5e3e9a42ed34118ec82b12cff03"
+  "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
 }

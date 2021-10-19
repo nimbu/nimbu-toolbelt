@@ -23,6 +23,8 @@ ALIASES
   $ nimbu login
 ```
 
+_See code: [lib/commands/auth/login.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/auth/login.js)_
+
 ## `nimbu auth:logout`
 
 clears local login credentials and invalidates API session
@@ -34,6 +36,8 @@ USAGE
 ALIASES
   $ nimbu logout
 ```
+
+_See code: [lib/commands/auth/logout.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/auth/logout.js)_
 
 ## `nimbu auth:token`
 
@@ -51,6 +55,8 @@ DESCRIPTION
   authorizations:create
 ```
 
+_See code: [lib/commands/auth/token.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/auth/token.js)_
+
 ## `nimbu auth:whoami`
 
 display the current logged in user
@@ -62,3 +68,5 @@ USAGE
 ALIASES
   $ nimbu whoami
 ```
+
+_See code: [lib/commands/auth/whoami.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/auth/whoami.js)_

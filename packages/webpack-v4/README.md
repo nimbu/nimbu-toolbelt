@@ -19,7 +19,7 @@ $ npm install -g @nimbu-cli/plugin-webpack-v4
 $ @nimbu-cli/plugin-webpack-v4 COMMAND
 running command...
 $ @nimbu-cli/plugin-webpack-v4 (-v|--version|version)
-@nimbu-cli/plugin-webpack-v4/5.0.0-alpha.3 darwin-x64 node-v16.10.0
+@nimbu-cli/plugin-webpack-v4/5.0.0-alpha.5 darwin-x64 node-v14.17.5
 $ @nimbu-cli/plugin-webpack-v4 --help [COMMAND]
 USAGE
   $ @nimbu-cli/plugin-webpack-v4 COMMAND
@@ -44,7 +44,7 @@ USAGE
   $ @nimbu-cli/plugin-webpack-v4 apps:transpile SOURCE TARGET
 ```
 
-_See code: [lib/commands/apps/transpile.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.3/lib/commands/apps/transpile.js)_
+_See code: [src/commands/apps/transpile.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/src/commands/apps/transpile.ts)_
 
 ## `@nimbu-cli/plugin-webpack-v4 build`
 
@@ -55,11 +55,11 @@ USAGE
   $ @nimbu-cli/plugin-webpack-v4 build
 ```
 
-_See code: [lib/commands/build.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.3/lib/commands/build.js)_
+_See code: [src/commands/build.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/src/commands/build.ts)_
 
 ## `@nimbu-cli/plugin-webpack-v4 server`
 
-run the development server
+run the development server (webpack 4)
 
 ```
 USAGE
@@ -76,7 +76,7 @@ OPTIONS
   --port=port              [default: 4567] The port to listen on.
 ```
 
-_See code: [lib/commands/server.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.3/lib/commands/server.js)_
+_See code: [src/commands/server.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/src/commands/server.ts)_
 
 ## `@nimbu-cli/plugin-webpack-v4 themes:diff [THEME]`
 
@@ -90,7 +90,7 @@ ARGUMENTS
   THEME  The name of the theme to list
 ```
 
-_See code: [lib/commands/themes/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.3/lib/commands/themes/diff.js)_
+_See code: [src/commands/themes/diff.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/src/commands/themes/diff.ts)_
 
 ## `@nimbu-cli/plugin-webpack-v4 themes:list [THEME]`
 
@@ -104,7 +104,7 @@ ARGUMENTS
   THEME  The name of the theme to list
 ```
 
-_See code: [lib/commands/themes/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.3/lib/commands/themes/list.js)_
+_See code: [src/commands/themes/list.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/src/commands/themes/list.ts)_
 
 ## `@nimbu-cli/plugin-webpack-v4 themes:push [FILES]`
 
@@ -127,5 +127,5 @@ OPTIONS
   --only         only push the files given on the command line
 ```
 
-_See code: [lib/commands/themes/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.3/lib/commands/themes/push.js)_
+_See code: [src/commands/themes/push.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/src/commands/themes/push.ts)_
 <!-- commandsstop -->
