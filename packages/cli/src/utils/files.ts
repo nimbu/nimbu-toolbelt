@@ -2,11 +2,11 @@ import * as http from 'http'
 import * as https from 'https'
 import * as fs from 'fs-extra'
 import { basename } from 'path'
-import * as glob from 'glob'
+import glob = require('glob')
 
 const TIMEOUT = 10000
 
-const promiseGlob = function (pattern: string, options: glob.IOptions = {}): Promise<string[]> {
+const promiseGlob = function (pattern: string, options: any = {}): Promise<string[]> {
   return new Promise((resolve, reject) => {
     glob(pattern, options, (err, files) => (err === null ? resolve(files) : reject(err)))
   })
