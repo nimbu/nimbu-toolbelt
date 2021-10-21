@@ -155,6 +155,7 @@ function fileLoaders(options = {}) {
         name: 'images/[name].[ext]?h=[hash:8]',
         outputPath: fileloaderOutputPath,
         publicPath: options.publicPath || '/',
+        esModule: false,
       },
     },
   ]
