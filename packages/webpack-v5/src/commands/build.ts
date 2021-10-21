@@ -10,7 +10,8 @@ import cli from 'cli-ux'
 import chalk from 'chalk'
 
 export default class Build extends Command {
-  static description = 'build a production version of your javascript and CSS'
+  static aliases = ['build:v5']
+  static description = 'build a production bundle of your JS and CSS (using webpack 5)'
 
   webpack(config: webpack.Configuration): Promise<webpack.Stats> {
     return new Promise((resolve, reject) => {

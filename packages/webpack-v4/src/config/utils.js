@@ -1,7 +1,6 @@
 const autoprefixer = require('autoprefixer')
 const _ = require('lodash')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const CssoWebpackPlugin = require('csso-webpack-plugin').default
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const {
@@ -214,7 +213,7 @@ function styleConfigWithExtraction(options) {
   return {
     loaders: [
       {
-        test: /\.(css|scss)$/,
+        test: /.s?css$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
@@ -228,9 +227,6 @@ function styleConfigWithExtraction(options) {
       new MiniCssExtractPlugin({
         filename: 'stylesheets/[name].css',
       }),
-      new CssoWebpackPlugin({
-        restructure: false, // Merging rules sometimes behaves incorrectly.
-      }),
     ],
   }
 }
@@ -239,7 +235,7 @@ function styleConfigWithoutExtraction(options) {
   return {
     loaders: [
       {
-        test: /\.(css|scss)$/,
+        test: /.s?css$/,
         use: [require.resolve('style-loader')].concat(styleLoaders(options)),
       },
     ],

@@ -10,7 +10,8 @@ import cli from 'cli-ux'
 import chalk from 'chalk'
 
 export default class Build extends Command {
-  static description = 'build a production version of your javascript and CSS'
+  static aliases = ['build:v4']
+  static description = 'build a production bundle of your JS and CSS (using webpack 4)'
 
   webpack(config: webpack.Configuration): Promise<webpack.Stats> {
     return new Promise((resolve, reject) => {
@@ -28,7 +29,7 @@ export default class Build extends Command {
     try {
       process.env.NODE_ENV = 'production'
 
-      cli.action.start('building for production')
+      cli.action.start(chalk.red('building for production (using webpack 4)'))
       const webpackConfig = projectWebpack.customize(defaultWebpackConfig(), getProjectConfig())
       const stats = await this.webpack(webpackConfig)
       cli.action.stop()

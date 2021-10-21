@@ -5,6 +5,7 @@ import NimbuServer from '../nimbu-gem/server'
 import WebpackDevServer from '../webpack/server'
 
 export default class Server extends Command {
+  static aliases = ['server:v5']
   static description = 'run the development server (webpack 5)'
 
   static flags = {

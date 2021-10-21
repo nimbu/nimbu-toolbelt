@@ -1,5 +1,6 @@
 const webpack = require('webpack')
 const merge = require('webpack-merge')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const getBaseWebpackConfig = require('./webpack.base.js')
@@ -39,7 +40,9 @@ const webpackConfig = () => {
       ],
     },
     optimization: {
+      minimize: true,
       minimizer: [
+        new CssMinimizerPlugin(),
         new UglifyJsPlugin({
           sourceMap: shouldUseSourceMap,
           uglifyOptions: {

@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const CssoWebpackPlugin = require('csso-webpack-plugin').default
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const debug = require('debug')('nimbu')
 const {
@@ -211,9 +210,6 @@ function styleConfigWithExtraction(options) {
       // extract css into its own file
       new MiniCssExtractPlugin({
         filename: 'stylesheets/[name].css',
-      }),
-      new CssoWebpackPlugin({
-        restructure: false, // Merging rules sometimes behaves incorrectly.
       }),
     ],
   }
