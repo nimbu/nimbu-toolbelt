@@ -142,6 +142,7 @@ function fileLoaders(options = {}) {
         name: 'fonts/[name].[ext]?h=[hash:8]',
         outputPath: fileloaderOutputPath,
         publicPath: options.publicPath || '/',
+        esModule: false,
       },
       test: [/\.(eot|otf|woff|woff2|ttf)(\?\S*)?$/, /fonts.*\.svg(\?\S*)?$/],
     },
