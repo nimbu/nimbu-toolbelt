@@ -23,7 +23,7 @@ ALIASES
   $ nimbu login
 ```
 
-_See code: [lib/commands/auth/login.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/auth/login.js)_
+_See code: [lib/commands/auth/login.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/auth/login.js)_
 
 ## `nimbu auth:logout`
 
@@ -37,7 +37,7 @@ ALIASES
   $ nimbu logout
 ```
 
-_See code: [lib/commands/auth/logout.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/auth/logout.js)_
+_See code: [lib/commands/auth/logout.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/auth/logout.js)_
 
 ## `nimbu auth:token`
 
@@ -55,7 +55,7 @@ DESCRIPTION
   authorizations:create
 ```
 
-_See code: [lib/commands/auth/token.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/auth/token.js)_
+_See code: [lib/commands/auth/token.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/auth/token.js)_
 
 ## `nimbu auth:whoami`
 
@@ -69,4 +69,4 @@ ALIASES
   $ nimbu whoami
 ```
 
-_See code: [lib/commands/auth/whoami.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/auth/whoami.js)_
+_See code: [lib/commands/auth/whoami.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/auth/whoami.js)_

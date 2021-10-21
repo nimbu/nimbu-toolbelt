@@ -15,7 +15,7 @@ USAGE
   $ nimbu browse:admin
 ```
 
-_See code: [lib/commands/browse/admin.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/browse/admin.js)_
+_See code: [lib/commands/browse/admin.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/browse/admin.js)_
 
 ## `nimbu browse:simulator`
 
@@ -26,4 +26,4 @@ USAGE
   $ nimbu browse:simulator
 ```
 
-_See code: [lib/commands/browse/simulator.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/browse/simulator.js)_
+_See code: [lib/commands/browse/simulator.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/browse/simulator.js)_

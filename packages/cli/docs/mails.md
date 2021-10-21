@@ -18,7 +18,7 @@ OPTIONS
   -o, --only=only  the names of the templates to pull from Nimbu
 ```
 
-_See code: [lib/commands/mails/pull.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/mails/pull.js)_
+_See code: [lib/commands/mails/pull.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/mails/pull.js)_
 
 ## `nimbu mails:push`
 
@@ -32,4 +32,4 @@ OPTIONS
   -o, --only=only  the names of the templates to push online
 ```
 
-_See code: [lib/commands/mails/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/mails/push.js)_
+_See code: [lib/commands/mails/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/mails/push.js)_

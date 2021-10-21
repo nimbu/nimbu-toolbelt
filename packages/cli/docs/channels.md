@@ -22,7 +22,7 @@ OPTIONS
   --force          do not ask confirmation to overwrite existing channel
 ```
 
-_See code: [lib/commands/channels/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/channels/copy.js)_
+_See code: [lib/commands/channels/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/channels/copy.js)_
 
 ## `nimbu channels:diff`
 
@@ -37,7 +37,7 @@ OPTIONS
   -t, --to=to      (required) slug of the target channel
 ```
 
-_See code: [lib/commands/channels/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/channels/diff.js)_
+_See code: [lib/commands/channels/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/channels/diff.js)_
 
 ## `nimbu channels:entries:copy`
 
@@ -55,4 +55,4 @@ OPTIONS
   -u, --upsert=upsert      name of parameter to use for matching existing documents
 ```
 
-_See code: [lib/commands/channels/entries/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/channels/entries/copy.js)_
+_See code: [lib/commands/channels/entries/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/channels/entries/copy.js)_

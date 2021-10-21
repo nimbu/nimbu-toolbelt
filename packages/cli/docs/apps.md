@@ -16,7 +16,7 @@ USAGE
   $ nimbu apps:config
 ```
 
-_See code: [lib/commands/apps/config.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/apps/config.js)_
+_See code: [lib/commands/apps/config.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/apps/config.js)_
 
 ## `nimbu apps:list`
 
@@ -27,7 +27,7 @@ USAGE
   $ nimbu apps:list
 ```
 
-_See code: [lib/commands/apps/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/apps/list.js)_
+_See code: [lib/commands/apps/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/apps/list.js)_
 
 ## `nimbu apps:push [FILES]`
 
@@ -44,4 +44,4 @@ OPTIONS
   -a, --app=app  The (local) name of the application to push to (see apps:list and apps:config).
 ```
 
-_See code: [lib/commands/apps/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/apps/push.js)_
+_See code: [lib/commands/apps/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/apps/push.js)_

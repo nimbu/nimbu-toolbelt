@@ -19,7 +19,7 @@ OPTIONS
   -t, --to=to      subdomain of the destination site
 ```
 
-_See code: [lib/commands/customers/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/customers/config/copy.js)_
+_See code: [lib/commands/customers/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/customers/config/copy.js)_
 
 ## `nimbu customers:config:diff`
 
@@ -34,4 +34,4 @@ OPTIONS
   -t, --to=to      (required) slug of the target channel
 ```
 
-_See code: [lib/commands/customers/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/customers/config/diff.js)_
+_See code: [lib/commands/customers/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/customers/config/diff.js)_

@@ -20,7 +20,7 @@ OPTIONS
   --force          do not ask confirmation to overwrite existing channel
 ```
 
-_See code: [lib/commands/sites/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/sites/copy.js)_
+_See code: [lib/commands/sites/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/sites/copy.js)_
 
 ## `nimbu sites:list`
 
@@ -37,4 +37,4 @@ ALIASES
   $ nimbu sites
 ```
 
-_See code: [lib/commands/sites/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/sites/list.js)_
+_See code: [lib/commands/sites/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/sites/list.js)_

@@ -21,4 +21,4 @@ OPTIONS
   -t, --to=to      subdomain of the destination site
 ```
 
-_See code: [lib/commands/menus/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.5/lib/commands/menus/copy.js)_
+_See code: [lib/commands/menus/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/menus/copy.js)_
