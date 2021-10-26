@@ -5,11 +5,10 @@ import ux from 'cli-ux'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import { Channel, FieldType, RelationalField } from '../../nimbu/types'
+import { fetchAllChannels } from '../../utils/channels'
 const through = require('through')
 const inquirer = require('inquirer')
 const Listr = require('listr')
-
-const debug = Debug('nimbu')
 
 type CopyAll = {
   fromSite: string
@@ -82,7 +81,7 @@ export default class CopyChannels extends Command {
   }
 
   private async executeCopySingle({ fromSite, toSite, fromChannel, toChannel }: CopySingle) {
-    debug('Running executeCopySingle')
+    this.debug('Running executeCopySingle')
 
     let fetchTitle = `Fetching channel ${chalk.bold(fromChannel)} from site ${chalk.bold(fromSite)}`
     let upsertTitle = `Copying to channel ${chalk.bold(toChannel)} in site ${chalk.bold(toSite)}`
@@ -110,7 +109,7 @@ export default class CopyChannels extends Command {
   }
 
   private async executeCopyAll({ fromSite, toSite, overwrite }: CopyAll) {
-    debug('Running executeCopyAll')
+    this.debug('Running executeCopyAll')
 
     let fetchTitle = `Fetching all channels from ${chalk.bold(fromSite)}`
     let upsertTitle = `Copying all channels to ${chalk.bold(toSite)}`
@@ -178,7 +177,7 @@ export default class CopyChannels extends Command {
   }
 
   private async fetch(ctx: any) {
-    debug(`Fetching channel ${ctx.fromChannel} from ${ctx.fromSite}`)
+    this.debug(`Fetching channel ${ctx.fromChannel} from ${ctx.fromSite}`)
 
     let options: APIOptions = { site: ctx.fromSite }
 
@@ -198,64 +197,12 @@ export default class CopyChannels extends Command {
   }
 
   private async fetchAll(ctx: CopyAll) {
-    debug(`Fetching all channels from ${ctx.fromSite}`)
+    this.debug(`Fetching all channels from ${ctx.fromSite}`)
 
-    let options: APIOptions = { fetchAll: true, site: ctx.fromSite }
+    const { channels, circularDependencies } = await fetchAllChannels(this, ctx.fromSite)
 
-    try {
-      let channels = await this.nimbu.get<Channel[]>(`/channels`, options)
-
-      // determine dependencies between channels using a dependency graph
-      let DependencyGraph = require('dependency-graph').DepGraph
-      let graph = new DependencyGraph({ circular: true })
-
-      // add all channels first
-      const slugs: string[] = []
-      channels.forEach((channel) => {
-        graph.addNode(channel.slug)
-        slugs.push(channel.slug)
-      })
-
-      // add dependencies
-      channels.forEach((channel) => {
-        const relationalFields = channel.customizations.filter(
-          (field) => field.type === FieldType.BELONGS_TO || field.type === FieldType.BELONGS_TO_MANY,
-        ) as RelationalField[]
-
-        relationalFields.forEach((field) => {
-          if (slugs.includes(field.reference)) graph.addDependency(channel.slug, field.reference)
-        })
-      })
-
-      // get the order in which to insert / update channels
-      const channelsInOrder = graph.overallOrder()
-
-      // search for circular dependencies
-      const circularDependencies: string[] = []
-      for (const slug of channelsInOrder) {
-        const transientDeps = graph.dependenciesOf(slug)
-        for (const dependency of transientDeps) {
-          if (graph.dependenciesOf(dependency).includes(slug)) {
-            // we found a circular dependency
-            circularDependencies.push(slug)
-          }
-        }
-      }
-
-      // assign channels to context in this order
-      ctx.channels = channelsInOrder.map((slug) => channels.find((c) => c.slug === slug))
-      ctx.circularDependencies = circularDependencies
-    } catch (error) {
-      if (error instanceof APIError) {
-        if (error.body != null && error.body.code === 101) {
-          throw new Error(`could not find site ${chalk.bold(ctx.fromSite)}`)
-        } else {
-          throw new Error(error.message)
-        }
-      } else {
-        throw error
-      }
-    }
+    ctx.channels = channels
+    ctx.circularDependencies = circularDependencies
   }
 
   private async ensureCircularDependencies(ctx: CopyAll) {
@@ -307,7 +254,7 @@ export default class CopyChannels extends Command {
   }
 
   private async copy(ctx: CopySingleChannelKnown, task: any) {
-    debug(`Copying channel ${ctx.fromSite}/${ctx.fromChannel} to ${ctx.toSite}/${ctx.toChannel}`)
+    this.debug(`Copying channel ${ctx.fromSite}/${ctx.fromChannel} to ${ctx.toSite}/${ctx.toChannel}`)
 
     let options: APIOptions = { site: ctx.toSite }
     let targetChannel: any
@@ -333,7 +280,7 @@ export default class CopyChannels extends Command {
   }
 
   private async create(ctx: CopySingleChannelKnown, task: any) {
-    debug(`Creating channel ${ctx.toSite}/${ctx.toChannel}`)
+    this.debug(`Creating channel ${ctx.toSite}/${ctx.toChannel}`)
 
     let options: APIOptions = { site: ctx.toSite }
 
@@ -350,7 +297,7 @@ export default class CopyChannels extends Command {
   }
 
   private async update(ctx: CopySingleChannelKnown, task: any) {
-    debug(`Updating channel ${ctx.toSite}/${ctx.toChannel}`)
+    this.debug(`Updating channel ${ctx.toSite}/${ctx.toChannel}`)
 
     let options: APIOptions = {}
     if (ctx.toSite != null) {
@@ -382,7 +329,7 @@ export default class CopyChannels extends Command {
   }
 
   private askOverwrite(ctx: CopySingleChannelKnown, task: any) {
-    debug(`Existing channel ${ctx.toSite}/${ctx.toChannel} found: asking for overwrite`)
+    this.debug(`Existing channel ${ctx.toSite}/${ctx.toChannel} found: asking for overwrite`)
 
     if (ctx.overwrite) {
       return this.update(ctx, task)

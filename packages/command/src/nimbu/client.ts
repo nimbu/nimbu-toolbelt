@@ -20,6 +20,7 @@ export interface IOptions {
   host?: string
   body?: object
   auth?: string
+  onNextPage?: (nextPage: string, lastPage: string) => void
 }
 
 export interface IAPIErrorOptions {

@@ -1,4 +1,4 @@
-import Command, { APITypes as Nimbu, APIError } from '@nimbu-cli/command'
+import Command, { APITypes as Nimbu, APIError, APIOptions } from '@nimbu-cli/command'
 import { download, generateRandom } from '../../../utils/files'
 
 import { flags } from '@oclif/command'
@@ -6,7 +6,60 @@ import ux from 'cli-ux'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, intersection, uniq, compact, flatten } from 'lodash'
+import {
+  Channel,
+  ChannelEntry,
+  ChannelEntryFile,
+  ChannelEntryReferenceMany,
+  ChannelEntryReferenceSingle,
+  Customer,
+  CustomField,
+  FieldType,
+  FileField,
+  isFieldOf,
+  isFileField,
+  isRelationalField,
+  RegularField,
+  RelationalField,
+  SelectField,
+} from '../../../nimbu/types'
+import { fetchAllChannels } from '../../../utils/channels'
+
+type CopySingle = {
+  fromSite: string
+  toSite: string
+  fromChannel: string
+  toChannel: string
+  channel: Channel
+  entries: ChannelEntry[]
+  nbEntries?: number
+  fileFields: FileField[]
+  galleryFields: RegularField[]
+  selectFields: SelectField[]
+  multiSelectFields: SelectField[]
+  customerFields: RelationalField[]
+  referenceFields: RelationalField[]
+  selfReferences: RelationalField[]
+  query?: string
+  per_page?: string
+  upsert?: boolean
+  files: {
+    [k: string]: { path: string; cleanup: any }
+  }
+}
+
+type CopySingleRecursive = {
+  fromSite: string
+  toSite: string
+  fromChannel: string
+  toChannel: string
+  query?: string
+  per_page?: string
+  upsert?: boolean
+  only?: string
+  channels: Channel[]
+}
 
 export default class CopyChannels extends Command {
   static description = 'copy channel entries from one to another'
@@ -30,14 +83,185 @@ export default class CopyChannels extends Command {
       char: 'u',
       description: 'name of parameter to use for matching existing documents',
     }),
-    per_page: flags.string({
+    'per-page': flags.string({
       char: 'p',
       description: 'number of entries to fetch per page',
     }),
+    recursive: flags.boolean({
+      char: 'r',
+      description: 'automatically copy all dependent objects',
+    }),
+    only: flags.string({
+      description: 'limit copy of channels to this list (comma-separated)',
+    }),
+    'copy-customers': flags.boolean({
+      description: 'copy and replicate all owners related to the objects we are copying',
+    }),
+    'allow-errors': flags.boolean({
+      description: 'do not stop when an item fails and continue with the other',
+    }),
   }
 
+  // mapping of ids in source site to newly created items in target site
+  private idMapping: {
+    [channelSlug: string]: {
+      [id: string]: string
+    }
+  } = {}
+
+  private abortOnError = true
+  private warnings: string[] = []
+
   async execute() {
+    const { flags } = this.parse(CopyChannels)
+
+    if (flags['allow-errors']) {
+      this.abortOnError = false
+    }
+
+    if (flags.recursive) {
+      await this.executeRecursiveCopy()
+    } else {
+      await this.executeSingleCopy()
+    }
+  }
+
+  async executeSingleCopy(channel?: string) {
     const Listr = require('listr')
+    const { flags } = this.parse(CopyChannels)
+
+    const { fromChannel, toChannel, fromSite, toSite } = this.getFromTo()
+
+    const tasks = new Listr([
+      {
+        title: `Fetching channel information ${chalk.bold(channel || fromChannel)} from site ${chalk.bold(fromSite)}`,
+        task: (ctx: CopySingle) => this.fetchChannel(ctx),
+      },
+      {
+        title: `Querying entries from channel ${chalk.bold(channel || fromChannel)}`,
+        task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
+      },
+      {
+        title: `Downloading attachments from channel ${chalk.bold(channel || fromChannel)}`,
+        enabled: (ctx: CopySingle) =>
+          (ctx.fileFields && ctx.fileFields.length > 0) || (ctx.galleryFields && ctx.galleryFields.length > 0),
+        task: (ctx: CopySingle) => this.downloadAttachments(ctx),
+      },
+      {
+        title: `Creating entries in channel ${chalk.bold(toChannel)} for site ${chalk.bold(toSite)}`,
+        skip: (ctx: CopySingle) => ctx.entries.length === 0,
+        task: (ctx: CopySingle) => this.createEntries(ctx),
+      },
+      {
+        title: `Updating self-references for new entries in channel ${chalk.bold(toChannel)}`,
+        enabled: (ctx: CopySingle) => ctx.selfReferences && ctx.selfReferences.length > 0,
+        task: (ctx: CopySingle) => this.updateEntries(ctx),
+      },
+    ])
+
+    await tasks
+      .run({
+        fromChannel: channel || fromChannel,
+        fromSite,
+        toChannel: channel || toChannel,
+        toSite,
+        query: flags.query,
+        per_page: flags['per-page'],
+        upsert: flags.upsert,
+      })
+      .catch((error) => this.error(error))
+
+    this.printWarnings()
+  }
+
+  async executeRecursiveCopy() {
+    const Listr = require('listr')
+    const { flags } = this.parse(CopyChannels)
+
+    const { fromChannel, toChannel, fromSite, toSite } = this.getFromTo()
+
+    const tasks = new Listr(
+      [
+        {
+          title: `Fetching related channel config for ${chalk.bold(fromChannel)} from site ${chalk.bold(fromSite)}`,
+          task: (ctx: CopySingleRecursive) => this.fetchAllChannels(ctx),
+        },
+        {
+          title: `Copying related channel entries to site ${chalk.bold(toSite)}`,
+          enabled: (ctx: CopySingleRecursive) => ctx.channels != null && ctx.channels.length > 0,
+          task: (ctx: CopySingleRecursive, task) => {
+            return new Listr(
+              [
+                ...ctx.channels.map((channel) => ({
+                  title: `Copying ${chalk.bold(channel.name)} (${channel.slug})`,
+                  task: (ctx, task) => {
+                    ctx.fromChannel = channel.slug
+                    ctx.toChannel = channel.slug
+
+                    return new Listr(
+                      [
+                        {
+                          title: `Fetching detailed channel information for ${chalk.bold(channel.slug)}`,
+                          task: (ctx: CopySingle) => this.fetchChannel(ctx),
+                        },
+                        {
+                          title: `Querying channel entries`,
+                          task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
+                        },
+                        {
+                          title: `Querying related customers for fetched entries`,
+                          task: (ctx: CopySingle, task) => this.queryRelatedCustomers(ctx, task),
+                          skip: (ctx) => ctx.entries == null || ctx.entries.length < 1,
+                          enabled: (ctx) => flags['copy-customers'],
+                        },
+                        {
+                          title: `Downloading attachments`,
+                          enabled: (ctx: CopySingle) =>
+                            (ctx.fileFields && ctx.fileFields.length > 0) ||
+                            (ctx.galleryFields && ctx.galleryFields.length > 0),
+                          task: (ctx: CopySingle) => this.downloadAttachments(ctx),
+                        },
+                        {
+                          title: `Creating entries in site ${chalk.bold(toSite)}`,
+                          skip: (ctx: CopySingle) => ctx.entries.length === 0,
+                          task: (ctx: CopySingle) => this.createEntries(ctx),
+                        },
+                        {
+                          title: `Updating self-references`,
+                          enabled: (ctx: CopySingle) => ctx.selfReferences && ctx.selfReferences.length > 0,
+                          task: (ctx: CopySingle) => this.updateEntries(ctx),
+                        },
+                      ],
+                      { collapse: false },
+                    )
+                  },
+                })),
+              ],
+              { collapse: false },
+            )
+          },
+        },
+      ],
+      { collapse: false },
+    )
+
+    await tasks
+      .run({
+        fromChannel,
+        fromSite,
+        toChannel,
+        toSite,
+        query: flags.query,
+        per_page: flags['per-page'],
+        upsert: flags.upsert,
+        only: flags.only,
+      })
+      .catch((error) => this.error(error))
+
+    this.printWarnings()
+  }
+
+  private getFromTo() {
     const { flags } = this.parse(CopyChannels)
 
     let fromChannel: string
@@ -64,74 +288,53 @@ export default class CopyChannels extends Command {
 
     if (fromSite === undefined) {
       ux.error('You need to specify the source site.')
-      return
     }
 
     if (toSite === undefined) {
       ux.error('You need to specify the destination site.')
-      return
     }
 
-    let fetchTitle = `Fetching channel information ${chalk.bold(fromChannel)} from site ${chalk.bold(fromSite)}`
-    let queryTitle = `Querying entries from channel ${chalk.bold(fromChannel)}`
-    let downloadTitle = `Downloading attachments from channel ${chalk.bold(fromChannel)}`
-    let createTitle = `Creating entries in channel ${chalk.bold(toChannel)} for site ${chalk.bold(toSite)}`
-    let updateTitle = `Updating self-references for new entries in channel ${chalk.bold(toChannel)}`
-
-    const tasks = new Listr([
-      {
-        title: fetchTitle,
-        task: (ctx) => this.fetchChannel(ctx),
-      },
-      {
-        title: queryTitle,
-        task: (ctx, task) => this.queryChannel(ctx, task),
-      },
-      {
-        title: downloadTitle,
-        enabled: (ctx) =>
-          (ctx.fileFields && ctx.fileFields.length > 0) || (ctx.galleryFields && ctx.galleryFields.length > 0),
-        task: (ctx) => this.downloadAttachments(ctx),
-      },
-      {
-        title: createTitle,
-        skip: (ctx) => ctx.entries.length === 0,
-        task: (ctx) => this.createEntries(ctx),
-      },
-      {
-        title: updateTitle,
-        enabled: (ctx) => ctx.selfReferences && ctx.selfReferences.length > 0,
-        task: (ctx) => this.updateEntries(ctx),
-      },
-    ])
-
-    tasks
-      .run({
-        fromChannel,
-        fromSite,
-        toChannel,
-        toSite,
-        query: flags.query,
-        per_page: flags.per_page,
-        upsert: flags.upsert,
-      })
-      .catch((error) => this.error(error))
+    return { fromChannel, toChannel, fromSite, toSite }
   }
 
-  private async fetchChannel(ctx: any) {
-    let options: any = {}
-    if (ctx.fromSite != null) {
-      options.site = ctx.fromSite
+  private async fetchAllChannels(ctx: CopySingleRecursive) {
+    this.debug(`Fetching all channels from ${ctx.fromSite}`)
+
+    // first fetch all channel config from Nimbu
+    const { channels } = await fetchAllChannels(this, ctx.fromSite)
+
+    // find all channels with references to the fromChannel
+    let channelsWithReferences = channels.filter(
+      (channel) =>
+        channel.slug === ctx.fromChannel ||
+        channel.customizations.filter(isRelationalField).some((field) => field.reference === ctx.fromChannel),
+    )
+
+    if (ctx.only != null) {
+      // limit recursive copying to this selection of channels
+      let channelsToConsider = ctx.only.split(',')
+      channelsToConsider = intersection(
+        channelsWithReferences.map((channel) => channel.slug),
+        channelsToConsider,
+      )
+      channelsWithReferences = channelsWithReferences.filter((channel) => channelsToConsider.includes(channel.slug))
     }
+
+    ctx.channels = channelsWithReferences
+  }
+
+  private async fetchChannel(ctx: CopySingle) {
+    let options: APIOptions = { site: ctx.fromSite }
+
     try {
       ctx.channel = await this.nimbu.get(`/channels/${ctx.fromChannel}`, options)
-      ctx.fileFields = ctx.channel.customizations.filter((f) => f.type === 'file')
-      ctx.galleryFields = ctx.channel.customizations.filter((f) => f.type === 'gallery')
-      ctx.selectFields = ctx.channel.customizations.filter((f) => f.type === 'select')
-      ctx.multiSelectFields = ctx.channel.customizations.filter((f) => f.type === 'multi_select')
-      ctx.selfReferences = ctx.channel.customizations.filter(
-        (f) => (f.type === 'belongs_to' || f.type === 'belongs_to_many') && f.reference === ctx.channel.slug,
-      )
+      ctx.fileFields = ctx.channel.customizations.filter(isFileField)
+      ctx.galleryFields = ctx.channel.customizations.filter(isFieldOf(FieldType.GALLERY))
+      ctx.selectFields = ctx.channel.customizations.filter(isFieldOf(FieldType.SELECT))
+      ctx.multiSelectFields = ctx.channel.customizations.filter(isFieldOf(FieldType.MULTI_SELECT))
+      ctx.referenceFields = ctx.channel.customizations.filter(isRelationalField)
+      ctx.customerFields = ctx.referenceFields.filter((f) => f.reference === 'customers')
+      ctx.selfReferences = ctx.referenceFields.filter((f) => f.reference === ctx.channel.slug)
     } catch (error) {
       if (error instanceof APIError) {
         if (error.body != null && error.body.code === 101) {
@@ -145,11 +348,8 @@ export default class CopyChannels extends Command {
     }
   }
 
-  private async queryChannel(ctx: any, task: any) {
-    let options: any = { fetchAll: true }
-    if (ctx.fromSite != null) {
-      options.site = ctx.fromSite
-    }
+  private async queryChannel(ctx: CopySingle, task: any) {
+    let options: APIOptions = { site: ctx.fromSite, fetchAll: true }
 
     // first count the entries
     let baseUrl = `/channels/${ctx.fromChannel}/entries`
@@ -167,11 +367,11 @@ export default class CopyChannels extends Command {
     let query = queryParts.length > 0 ? `?${queryParts.join('&')}` : ''
     let url = `${baseUrl}/count${query}`
     let result = await this.nimbu.get<Nimbu.CountResult>(url, options)
-    ctx.count = result.count
+    ctx.nbEntries = result.count
 
     let nbPages = 1
-    if (ctx.count > 0) {
-      nbPages = Math.floor(ctx.count / perPage) + 1
+    if (ctx.nbEntries > 0) {
+      nbPages = Math.floor(ctx.nbEntries / perPage) + 1
     }
     ctx.entries = []
 
@@ -184,7 +384,7 @@ export default class CopyChannels extends Command {
       }
 
       this.nimbu
-        .get<any>(url, options)
+        .get<ChannelEntry[]>(url, options)
         .then(function (results) {
           task.title = `Got ${results.length} entries from ${chalk.bold(ctx.fromChannel)}`
           ctx.entries = results
@@ -201,7 +401,86 @@ export default class CopyChannels extends Command {
     })
   }
 
-  private async downloadAttachments(ctx: any) {
+  private async queryRelatedCustomers(ctx: CopySingle, task: any) {
+    let fromOptions: APIOptions = { site: ctx.fromSite, fetchAll: true }
+    let toOptions: APIOptions = { site: ctx.toSite, fetchAll: true }
+
+    // collect owners
+    let customerIds = uniq(compact(ctx.entries.map((entry) => entry._owner)))
+
+    // collect ids for all fields referencing customers
+    for (const field of ctx.customerFields) {
+      let references: ChannelEntryReferenceSingle[]
+
+      if (field.type === FieldType.BELONGS_TO_MANY) {
+        let referencesMany = compact(ctx.entries.map((entry) => entry[field.name] as ChannelEntryReferenceMany))
+        references = compact(flatten(referencesMany.map((relation) => relation.objects)))
+      } else {
+        references = ctx.entries.map((entry) => entry[field.name] as ChannelEntryReferenceSingle)
+      }
+
+      customerIds = uniq(compact(customerIds.concat(references.map((ref) => ref.id))))
+    }
+
+    task.title = `Fetching ${customerIds.length} customers from ${chalk.bold(ctx.fromSite)}`
+
+    // fetch customers from original site based on these ids
+    const fromCustomers = await this.nimbu.get<Customer[]>(`/customers?id.in=${customerIds.join(',')}`, fromOptions)
+
+    // fetch customers from target site based on emails for these customers
+    const emails = fromCustomers.map((c) => c.email)
+    const toCustomers = await this.nimbu.get<Customer[]>(`/customers?email.in=${emails.join(',')}`, toOptions)
+
+    task.title = `Found ${customerIds.length} customers, mapping ${toCustomers.length} existing, creating ${
+      customerIds.length - toCustomers.length
+    } new...`
+
+    for (const customer of fromCustomers) {
+      const existingCustomer = toCustomers.find((c) => c.email === customer.email)
+
+      if (existingCustomer != null) {
+        this.cacheId('customers', customer.id, existingCustomer.id)
+      } else {
+        const randomPassword = new Array(32)
+          .fill(null)
+          .map(() => String.fromCharCode(Math.random() * 86 + 40))
+          .join('')
+        try {
+          const newCustomer = await this.nimbu.post<Customer>('/customers', {
+            site: ctx.toSite,
+            body: {
+              ...customer,
+              skip_confirmation: true,
+              skip_welcome: true,
+              password: randomPassword,
+              password_confirmation: randomPassword,
+            },
+          })
+          this.cacheId('customers', customer.id, newCustomer.id)
+        } catch (error) {
+          if (error instanceof APIError) {
+            const errorMessage = `creating customer #${customer.id} failed: ${error.body.message} => ${JSON.stringify(
+              error.body.errors,
+            )}`
+
+            if (this.abortOnError) {
+              ux.error(errorMessage)
+            } else {
+              this.warnings.push(errorMessage)
+            }
+          } else {
+            throw error
+          }
+        }
+      }
+    }
+
+    task.title = `Found ${customerIds.length} customers, mapped ${toCustomers.length} existing, created ${
+      customerIds.length - toCustomers.length
+    } new`
+  }
+
+  private async downloadAttachments(ctx: CopySingle) {
     return new Observable((observer) => {
       ;(async (observer, ctx) => {
         let i = 1
@@ -235,7 +514,14 @@ export default class CopyChannels extends Command {
     })
   }
 
-  private async downloadFile(observer, i, ctx, fileObject, cacheKey, fieldName) {
+  private async downloadFile(
+    observer,
+    i: number,
+    ctx: CopySingle,
+    fileObject: ChannelEntryFile,
+    cacheKey: string,
+    fieldName: string,
+  ) {
     let tmp = require('tmp-promise')
     let prettyBytes = require('pretty-bytes')
     let pathFinder = require('path')
@@ -262,7 +548,7 @@ export default class CopyChannels extends Command {
     }
   }
 
-  private async createEntries(ctx: any) {
+  private async createEntries(ctx: CopySingle) {
     return new Observable((observer) => {
       ;(async (observer, ctx) => {
         let i = 1
@@ -309,6 +595,38 @@ export default class CopyChannels extends Command {
             }
           }
 
+          // see if there are references we can replace with ids from newly created objects
+          for (let field of ctx.referenceFields) {
+            if (entry[field.name] != null) {
+              if (field.type === FieldType.BELONGS_TO) {
+                const reference = entry[field.name] as ChannelEntryReferenceSingle
+                const newId = this.getCachedId(reference.className, reference.id)
+                if (newId != null) {
+                  entry[field.name].id = newId
+                  delete entry[field.name].slug
+                }
+              } else {
+                const relation = entry[field.name] as ChannelEntryReferenceMany
+
+                entry[field.name].objects = relation.objects.map((reference) => {
+                  const newId = this.getCachedId(reference.className, reference.id)
+                  if (newId != null) {
+                    reference.id = newId
+                    delete reference.slug
+                  }
+                  return reference
+                })
+              }
+            }
+          }
+
+          if (entry._owner != null) {
+            const newId = this.getCachedId('customers', entry._owner)
+            if (newId != null) {
+              entry._owner = newId
+            }
+          }
+
           // remove self references first, as we'll try to update this in a second pass
           for (let field of ctx.selfReferences) {
             if (entry[field.name] != null) {
@@ -318,26 +636,31 @@ export default class CopyChannels extends Command {
 
           observer.next(`[${i}/${nbEntries}] creating entry "${chalk.bold(entry.title_field_value)}"`)
 
-          let options: any = {}
+          let options: APIOptions = {}
           if (ctx.toSite != null) {
             options.site = ctx.toSite
           }
           options.body = entry
 
           try {
-            let created: any = await this.nimbu.post(`/channels/${ctx.toChannel}/entries`, options)
+            let created = await this.nimbu.post<ChannelEntry>(`/channels/${ctx.toChannel}/entries`, options)
+
+            // store id in cache for dependant channels
+            this.cacheId(ctx.toChannel, entry.id, created.id)
 
             // store id for second pass in case of self-references
             original.id = created.id
           } catch (error) {
             if (error instanceof APIError) {
-              observer.error(
-                new Error(
-                  `[${i}/${nbEntries}] creating entry #${entry.id} failed: ${error.body.message} => ${JSON.stringify(
-                    error.body.errors,
-                  )}`,
-                ),
-              )
+              const errorMessage = `[${i}/${nbEntries}] creating entry ${ctx.toChannel}/#${entry.id} failed: ${
+                error.body.message
+              } => ${JSON.stringify(error.body.errors)}`
+
+              if (this.abortOnError) {
+                observer.error(new Error(errorMessage))
+              } else {
+                this.warnings.push(errorMessage)
+              }
             } else {
               throw error
             }
@@ -353,7 +676,7 @@ export default class CopyChannels extends Command {
     })
   }
 
-  private async updateEntries(ctx: any) {
+  private async updateEntries(ctx: CopySingle) {
     return new Observable((observer) => {
       ;(async (observer, ctx) => {
         let i = 1
@@ -406,11 +729,36 @@ export default class CopyChannels extends Command {
     })
   }
 
-  private fileCacheKey(entry, field) {
+  private fileCacheKey(entry: ChannelEntry, field: CustomField) {
     return `${entry.id}-${field.name}`
   }
 
-  private galleryCacheKey(entry, field, image) {
+  private galleryCacheKey(entry: ChannelEntry, field: CustomField, image: any) {
     return `${entry.id}-${field.name}-${image.id}`
+  }
+
+  private cacheId(slug: string, sourceId: string, targetId: string) {
+    if (this.idMapping[slug] == null) {
+      this.idMapping[slug] = {}
+    }
+
+    this.idMapping[slug][sourceId] = targetId
+  }
+
+  private getCachedId(slug: string, sourceId: string) {
+    if (this.idMapping[slug] == null) {
+      return null
+    } else {
+      return this.idMapping[slug][sourceId]
+    }
+  }
+
+  private printWarnings() {
+    if (this.warnings.length > 0) {
+      ux.warn('Some entries could not be created due to validation errors:')
+      for (const message of this.warnings) {
+        ux.warn(message)
+      }
+    }
   }
 }
