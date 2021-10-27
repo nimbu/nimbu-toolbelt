@@ -65,11 +65,11 @@ export default class CopyChannels extends Command {
     const { channel: fromChannel, site: fromSite } = this.extractSiteAndChannel(flags.from, flags.all)
     const { channel: toChannel, site: toSite } = this.extractSiteAndChannel(flags.to, flags.all)
 
-    if (fromSite === undefined) {
+    if (fromSite == null) {
       ux.error('You need to specify the source site.')
     }
 
-    if (toSite === undefined) {
+    if (toSite == null) {
       ux.error('You need to specify the destination site.')
     }
 

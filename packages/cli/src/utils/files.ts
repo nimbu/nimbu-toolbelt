@@ -1,5 +1,4 @@
-import * as http from 'http'
-import * as https from 'https'
+import { http, https } from 'follow-redirects'
 import * as fs from 'fs-extra'
 import { basename } from 'path'
 import glob = require('glob')
@@ -16,7 +15,7 @@ export async function findMatchingFiles(dir: string, pattern: string): Promise<s
   return promiseGlob(`${dir}/${pattern}`)
 }
 
-export function download(url, path, callback) {
+export function download(url, path, callback, debug = (msg: string) => {}) {
   return new Promise<void>(function (resolve, reject) {
     const uri = new URL(url)
     if (!path) {

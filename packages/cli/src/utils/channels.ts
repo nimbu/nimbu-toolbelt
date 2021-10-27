@@ -2,11 +2,15 @@ import Command, { APIOptions, APIError } from '@nimbu-cli/command'
 import { Channel, isRelationalField } from '../nimbu/types'
 import chalk from 'chalk'
 
-export const fetchAllChannels = async (command: Command, site: string) => {
-  let options: APIOptions = { fetchAll: true, site }
+type FetchChannelOptions = {
+  includeBuiltIns?: boolean
+}
+
+export const fetchAllChannels = async (command: Command, site: string, options?: FetchChannelOptions = {}) => {
+  let apiOptions: APIOptions = { fetchAll: true, site }
 
   try {
-    let channels: Channel[] = await command.nimbu.get<Channel[]>(`/channels`, options)
+    let channels: Channel[] = await command.nimbu.get<Channel[]>(`/channels`, apiOptions)
 
     // determine dependencies between channels using a dependency graph
     let DependencyGraph = require('dependency-graph').DepGraph
@@ -18,6 +22,13 @@ export const fetchAllChannels = async (command: Command, site: string) => {
       graph.addNode(channel.slug)
       slugs.push(channel.slug)
     })
+
+    if (!!options.includeBuiltIns) {
+      for (const slug of ['articles', 'customers', 'orders', 'products']) {
+        graph.addNode(slug)
+        slugs.push(slug)
+      }
+    }
 
     // add dependencies
     channels.forEach((channel) => {
@@ -48,7 +59,7 @@ export const fetchAllChannels = async (command: Command, site: string) => {
       .map((slug) => channels.find((c) => c.slug === slug))
       .filter((channel) => channel != null) as Channel[]
 
-    return { channels: sortedChannels, circularDependencies }
+    return { channels: sortedChannels, circularDependencies, graph }
   } catch (error) {
     if (error instanceof APIError) {
       if (error.body != null && error.body.code === 101) {

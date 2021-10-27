@@ -30,6 +30,7 @@ type CopySingle = {
   fromSite: string
   toSite: string
   fromChannel: string
+  fromChannelOriginal?: string
   toChannel: string
   channel: Channel
   entries: ChannelEntry[]
@@ -43,7 +44,7 @@ type CopySingle = {
   selfReferences: RelationalField[]
   query?: string
   per_page?: string
-  upsert?: boolean
+  upsert?: string
   files: {
     [k: string]: { path: string; cleanup: any }
   }
@@ -56,7 +57,7 @@ type CopySingleRecursive = {
   toChannel: string
   query?: string
   per_page?: string
-  upsert?: boolean
+  upsert?: string
   only?: string
   channels: Channel[]
 }
@@ -105,7 +106,7 @@ export default class CopyChannels extends Command {
   // mapping of ids in source site to newly created items in target site
   private idMapping: {
     [channelSlug: string]: {
-      [id: string]: string
+      [id: string]: string | null
     }
   } = {}
 
@@ -114,6 +115,10 @@ export default class CopyChannels extends Command {
 
   async execute() {
     const { flags } = this.parse(CopyChannels)
+
+    if (process.env.DEBUG != null) {
+      process.stdout.isTTY = false
+    }
 
     if (flags['allow-errors']) {
       this.abortOnError = false
@@ -187,6 +192,11 @@ export default class CopyChannels extends Command {
           task: (ctx: CopySingleRecursive) => this.fetchAllChannels(ctx),
         },
         {
+          title: `Fetching which entries to copy from ${chalk.bold(fromChannel)}`,
+          enabled: (ctx: CopySingleRecursive) => ctx.query != null,
+          task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
+        },
+        {
           title: `Copying related channel entries to site ${chalk.bold(toSite)}`,
           enabled: (ctx: CopySingleRecursive) => ctx.channels != null && ctx.channels.length > 0,
           task: (ctx: CopySingleRecursive, task) => {
@@ -248,6 +258,7 @@ export default class CopyChannels extends Command {
     await tasks
       .run({
         fromChannel,
+        fromChannelOriginal: fromChannel,
         fromSite,
         toChannel,
         toSite,
@@ -301,14 +312,13 @@ export default class CopyChannels extends Command {
     this.debug(`Fetching all channels from ${ctx.fromSite}`)
 
     // first fetch all channel config from Nimbu
-    const { channels } = await fetchAllChannels(this, ctx.fromSite)
+    const { channels, graph } = await fetchAllChannels(this, ctx.fromSite, { includeBuiltIns: true })
 
     // find all channels with references to the fromChannel
-    let channelsWithReferences = channels.filter(
-      (channel) =>
-        channel.slug === ctx.fromChannel ||
-        channel.customizations.filter(isRelationalField).some((field) => field.reference === ctx.fromChannel),
-    )
+    const dependants = graph.dependantsOf(ctx.fromChannel)
+    this.debug(`Found ${dependants.length} dependants: ${dependants.join(',')}`)
+
+    let channelsWithReferences = channels.filter((channel) => dependants.includes(channel.slug))
 
     if (ctx.only != null) {
       // limit recursive copying to this selection of channels
@@ -318,6 +328,11 @@ export default class CopyChannels extends Command {
         channelsToConsider,
       )
       channelsWithReferences = channelsWithReferences.filter((channel) => channelsToConsider.includes(channel.slug))
+      this.debug(
+        `Limiting recursion to ${channelsWithReferences.length} dependants: ${channelsWithReferences
+          .map((c) => c.slug)
+          .join(',')}`,
+      )
     }
 
     ctx.channels = channelsWithReferences
@@ -349,15 +364,38 @@ export default class CopyChannels extends Command {
   }
 
   private async queryChannel(ctx: CopySingle, task: any) {
-    let options: APIOptions = { site: ctx.fromSite, fetchAll: true }
+    let apiOptions: APIOptions = { site: ctx.fromSite, fetchAll: true }
 
     // first count the entries
     let baseUrl = `/channels/${ctx.fromChannel}/entries`
     let queryParts: string[] = ['include_slugs=1', 'x-cdn-expires=600']
     let queryFromCtx: string | undefined = ctx.query
     if (queryFromCtx !== undefined && queryFromCtx.trim() !== '') {
-      queryParts.push(queryFromCtx.trim())
+      // if fromChannelOriginal is not set, we are just copying a single channel and not copying recursively
+      // or if this is the first channel in the recursive chain, let's use the original query
+      if (ctx.fromChannelOriginal == null || ctx.fromChannelOriginal === ctx.fromChannel) {
+        queryParts.push(`where=${encodeURIComponent(queryFromCtx.trim())}`)
+      } else if (ctx.fromChannelOriginal != null && ctx.fromChannelOriginal !== ctx.fromChannel) {
+        // in this case we have specified an original query and we want only to copy all dependant
+        // channel entries with a link to this original query... this is a little more complicated
+
+        // in the idsCache we already have a list of all previously copied items: if we have relational fields with
+        // reference to a channel already present there, we limit the records we fetch for this channels to those matching
+        // their id with these entries
+        const whereParts: string[] = []
+        for (const field of ctx.referenceFields) {
+          if (field.reference != 'customers' && this.idMapping[field.reference] != null) {
+            const originalIds = Object.keys(this.idMapping[field.reference])
+            if (originalIds.length > 0) whereParts.push(`${field.name}.in:"${originalIds.join(',')}"`)
+          }
+        }
+
+        if (whereParts.length > 0) {
+          queryParts.push(`where=${encodeURIComponent(whereParts.join(' OR '))}`)
+        }
+      }
     }
+
     let perPageFromCtx: string | undefined = ctx.per_page
     let perPage = 30
     if (perPageFromCtx !== undefined && parseInt(perPageFromCtx, 10) > 0) {
@@ -366,8 +404,18 @@ export default class CopyChannels extends Command {
     }
     let query = queryParts.length > 0 ? `?${queryParts.join('&')}` : ''
     let url = `${baseUrl}/count${query}`
-    let result = await this.nimbu.get<Nimbu.CountResult>(url, options)
+
+    this.debug(` -> fetching: ${url}`)
+    let result = await this.nimbu.get<Nimbu.CountResult>(url, apiOptions)
     ctx.nbEntries = result.count
+
+    if (
+      result.count === 0 &&
+      queryFromCtx != null &&
+      (ctx.fromChannelOriginal == null || ctx.fromChannelOriginal === ctx.fromChannel)
+    ) {
+      ux.error('Please specify a query that returns entries to copy...')
+    }
 
     let nbPages = 1
     if (ctx.nbEntries > 0) {
@@ -379,16 +427,20 @@ export default class CopyChannels extends Command {
       url = `${baseUrl}${query}`
       observer.next(`Fetching entries (page ${1} / ${nbPages})`)
 
-      options.onNextPage = (next, last) => {
+      apiOptions.onNextPage = (next, last) => {
         observer.next(`Fetching entries (page ${next} / ${last})`)
       }
 
       this.nimbu
-        .get<ChannelEntry[]>(url, options)
-        .then(function (results) {
+        .get<ChannelEntry[]>(url, apiOptions)
+        .then((results) => {
           task.title = `Got ${results.length} entries from ${chalk.bold(ctx.fromChannel)}`
           ctx.entries = results
           ctx.nbEntries = results.length
+
+          for (const entry of results) {
+            this.cacheId(ctx.fromChannel, entry.id)
+          }
         })
         .then(() => observer.complete())
         .catch((error) => {
@@ -416,7 +468,7 @@ export default class CopyChannels extends Command {
         let referencesMany = compact(ctx.entries.map((entry) => entry[field.name] as ChannelEntryReferenceMany))
         references = compact(flatten(referencesMany.map((relation) => relation.objects)))
       } else {
-        references = ctx.entries.map((entry) => entry[field.name] as ChannelEntryReferenceSingle)
+        references = compact(ctx.entries.map((entry) => entry[field.name] as ChannelEntryReferenceSingle))
       }
 
       customerIds = uniq(compact(customerIds.concat(references.map((ref) => ref.id))))
@@ -486,10 +538,12 @@ export default class CopyChannels extends Command {
         let i = 1
         ctx.files = {}
 
+        this.debug(`Downloading attachments for ${ctx.entries.length} items`)
         for (let entry of ctx.entries) {
           for (let field of ctx.fileFields) {
             let fileObject = entry[field.name]
             if (fileObject != null) {
+              this.debug(` -> field ${field.name} has a file`)
               let cacheKey = this.fileCacheKey(entry, field)
               await this.downloadFile(observer, i, ctx, fileObject, cacheKey, field.name)
             }
@@ -533,13 +587,19 @@ export default class CopyChannels extends Command {
       let filename = pathFinder.basename(url)
 
       try {
-        await download(url, path, (bytes, percentage) => {
-          observer.next(
-            `[${i}/${ctx.nbEntries}] Downloading ${fieldName} => "${filename}" (${percentage}% of ${prettyBytes(
-              bytes,
-            )})`,
-          )
-        })
+        this.debug(` -> downloading ${url}`)
+        await download(
+          url,
+          path,
+          (bytes, percentage) => {
+            observer.next(
+              `[${i}/${ctx.nbEntries}] Downloading ${fieldName} => "${filename}" (${percentage}% of ${prettyBytes(
+                bytes,
+              )})`,
+            )
+          },
+          this.debug,
+        )
       } catch (error) {
         observer.error(error)
       }
@@ -563,6 +623,7 @@ export default class CopyChannels extends Command {
               const key = this.fileCacheKey(entry, field)
               if (ctx.files[key] != null) {
                 delete entry[field.name].url
+                this.debug(` -> reading ${ctx.files[key].path}`)
                 entry[field.name].attachment = await fs.readFile(ctx.files[key].path, { encoding: 'base64' })
               }
             }
@@ -642,14 +703,49 @@ export default class CopyChannels extends Command {
           }
           options.body = entry
 
+          let existingId: string | undefined = undefined
+          if (ctx.upsert != null) {
+            const upsertParts = ctx.upsert.split(',')
+            const globalUpserts = upsertParts.filter((u) => !u.includes(':'))
+            const specificUpserts = upsertParts
+              .filter((u) => u.includes(':') && u.split(':')[0] === ctx.toChannel)
+              .map((u) => u.split(':')[1])
+
+            if (globalUpserts.length > 0 || specificUpserts.length > 0) {
+              try {
+                const whereExpression = [...globalUpserts, ...specificUpserts]
+                  .map((u) => `${u}:"${entry[u]}"`)
+                  .join(' OR ')
+
+                const url = `/channels/${ctx.toChannel}/entries?where=${encodeURIComponent(whereExpression)}`
+                this.debug(url)
+                let existing = await this.nimbu.get<ChannelEntry[]>(url, {
+                  site: ctx.toSite,
+                })
+
+                if (existing.length > 0) {
+                  existingId = existing[0].id
+                }
+              } catch (error) {}
+            }
+          }
+
           try {
-            let created = await this.nimbu.post<ChannelEntry>(`/channels/${ctx.toChannel}/entries`, options)
+            let createdOrUpdated: ChannelEntry
+            if (existingId != null) {
+              createdOrUpdated = await this.nimbu.put<ChannelEntry>(
+                `/channels/${ctx.toChannel}/entries/${existingId}`,
+                options,
+              )
+            } else {
+              createdOrUpdated = await this.nimbu.post<ChannelEntry>(`/channels/${ctx.toChannel}/entries`, options)
+            }
 
             // store id in cache for dependant channels
-            this.cacheId(ctx.toChannel, entry.id, created.id)
+            this.cacheId(ctx.toChannel, entry.id, createdOrUpdated.id)
 
             // store id for second pass in case of self-references
-            original.id = created.id
+            original.id = createdOrUpdated.id
           } catch (error) {
             if (error instanceof APIError) {
               const errorMessage = `[${i}/${nbEntries}] creating entry ${ctx.toChannel}/#${entry.id} failed: ${
@@ -737,12 +833,12 @@ export default class CopyChannels extends Command {
     return `${entry.id}-${field.name}-${image.id}`
   }
 
-  private cacheId(slug: string, sourceId: string, targetId: string) {
+  private cacheId(slug: string, sourceId: string, targetId?: string) {
     if (this.idMapping[slug] == null) {
       this.idMapping[slug] = {}
     }
 
-    this.idMapping[slug][sourceId] = targetId
+    this.idMapping[slug][sourceId] = targetId ?? null
   }
 
   private getCachedId(slug: string, sourceId: string) {
