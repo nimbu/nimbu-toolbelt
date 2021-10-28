@@ -6,7 +6,7 @@ import ux from 'cli-ux'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
-import { cloneDeep, intersection, uniq, compact, flatten } from 'lodash'
+import { cloneDeep, intersection, uniq, compact, flatten, chunk, sumBy, sum } from 'lodash'
 import {
   Channel,
   ChannelEntry,
@@ -366,8 +366,11 @@ export default class CopyChannels extends Command {
   private async queryChannel(ctx: CopySingle, task: any) {
     let apiOptions: APIOptions = { site: ctx.fromSite, fetchAll: true }
 
-    // first count the entries
     let baseUrl = `/channels/${ctx.fromChannel}/entries`
+    let containedInParts: {
+      [k: string]: string[]
+    } = {}
+
     let queryParts: string[] = ['include_slugs=1', 'x-cdn-expires=600']
     let queryFromCtx: string | undefined = ctx.query
     if (queryFromCtx !== undefined && queryFromCtx.trim() !== '') {
@@ -382,16 +385,13 @@ export default class CopyChannels extends Command {
         // in the idsCache we already have a list of all previously copied items: if we have relational fields with
         // reference to a channel already present there, we limit the records we fetch for this channels to those matching
         // their id with these entries
-        const whereParts: string[] = []
         for (const field of ctx.referenceFields) {
           if (field.reference != 'customers' && this.idMapping[field.reference] != null) {
             const originalIds = Object.keys(this.idMapping[field.reference])
-            if (originalIds.length > 0) whereParts.push(`${field.name}.in:"${originalIds.join(',')}"`)
+            if (originalIds.length > 0) {
+              containedInParts[field.name] = originalIds
+            }
           }
-        }
-
-        if (whereParts.length > 0) {
-          queryParts.push(`where=${encodeURIComponent(whereParts.join(' OR '))}`)
         }
       }
     }
@@ -402,15 +402,44 @@ export default class CopyChannels extends Command {
       perPage = parseInt(perPageFromCtx, 10)
       queryParts.push(`per_page=${perPage}`)
     }
-    let query = queryParts.length > 0 ? `?${queryParts.join('&')}` : ''
-    let url = `${baseUrl}/count${query}`
 
-    this.debug(` -> fetching: ${url}`)
-    let result = await this.nimbu.get<Nimbu.CountResult>(url, apiOptions)
-    ctx.nbEntries = result.count
+    let queries: string[] = []
+    if (Object.keys(containedInParts).length > 0) {
+      for (const [fieldName, ids] of Object.entries(containedInParts)) {
+        // ensure the API url will not exceed 2000 characters
+        // see: https://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers
+        let objectIdBatchSize = 75 //(2000 - 200)/24
+        let chunckedIds = chunk(ids, objectIdBatchSize)
 
+        for (const chunk of chunckedIds) {
+          const partialQueryParts = [
+            ...queryParts,
+            'where=' + encodeURIComponent(`${fieldName}.in:"${chunk.join(',')}"`),
+          ]
+          queries.push(`?${partialQueryParts.join('&')}`)
+        }
+      }
+    } else {
+      queries = [queryParts.length > 0 ? `?${queryParts.join('&')}` : '']
+    }
+
+    // first count the entries
+    let counts = await Promise.all(
+      queries.map(async (query) => {
+        let url = `${baseUrl}/count${query}`
+
+        this.debug(` -> fetching: ${url}`)
+        let result = await this.nimbu.get<Nimbu.CountResult>(url, apiOptions)
+        this.debug(` <- result: ${result.count}`)
+
+        return result.count
+      }),
+    )
+    ctx.nbEntries = sum(counts)
+
+    // halt further execution if the first query does not result in any entries to copy
     if (
-      result.count === 0 &&
+      ctx.nbEntries === 0 &&
       queryFromCtx != null &&
       (ctx.fromChannelOriginal == null || ctx.fromChannelOriginal === ctx.fromChannel)
     ) {
@@ -419,37 +448,50 @@ export default class CopyChannels extends Command {
 
     let nbPages = 1
     if (ctx.nbEntries > 0) {
-      nbPages = Math.floor(ctx.nbEntries / perPage) + 1
+      nbPages = sum(counts.map((count) => Math.floor(count / perPage) + 1))
     }
+
+    ctx.nbEntries = 0
     ctx.entries = []
 
     return new Observable((observer) => {
-      url = `${baseUrl}${query}`
-      observer.next(`Fetching entries (page ${1} / ${nbPages})`)
-
       apiOptions.onNextPage = (next, last) => {
         observer.next(`Fetching entries (page ${next} / ${last})`)
       }
 
-      this.nimbu
-        .get<ChannelEntry[]>(url, apiOptions)
-        .then((results) => {
-          task.title = `Got ${results.length} entries from ${chalk.bold(ctx.fromChannel)}`
-          ctx.entries = results
-          ctx.nbEntries = results.length
+      Promise.all(
+        queries.map(async (query) => {
+          let url = `${baseUrl}${query}`
+          observer.next(`Fetching entries (page ${1} / ${nbPages})`)
 
-          for (const entry of results) {
-            this.cacheId(ctx.fromChannel, entry.id)
-          }
-        })
-        .then(() => observer.complete())
-        .catch((error) => {
-          if (error.body != null && error.body.code === 101) {
-            throw new Error(`could not find channel ${chalk.bold(ctx.fromChannel)}`)
-          } else {
-            throw new Error(error.message)
-          }
-        })
+          this.debug(` -> fetching: ${url}`)
+          await this.nimbu
+            .get<ChannelEntry[]>(url, apiOptions)
+            .then((results) => {
+              ctx.entries = ctx.entries.concat(results)
+              ctx.nbEntries = ctx.nbEntries! + results.length
+
+              for (const entry of results) {
+                this.cacheId(ctx.fromChannel, entry.id)
+              }
+
+              return results
+            })
+            .then((results) => {
+              this.debug(` <- result: ${results.length} entries`)
+            })
+            .catch((error) => {
+              if (error.body != null && error.body.code === 101) {
+                throw new Error(`could not find channel ${chalk.bold(ctx.fromChannel)}`)
+              } else {
+                throw new Error(error.message)
+              }
+            })
+        }),
+      ).then(() => {
+        task.title = `Found ${ctx.nbEntries} entries in ${chalk.bold(ctx.fromChannel)}`
+        observer.complete()
+      })
     })
   }
 
@@ -695,8 +737,6 @@ export default class CopyChannels extends Command {
             }
           }
 
-          observer.next(`[${i}/${nbEntries}] creating entry "${chalk.bold(entry.title_field_value)}"`)
-
           let options: APIOptions = {}
           if (ctx.toSite != null) {
             options.site = ctx.toSite
@@ -733,11 +773,17 @@ export default class CopyChannels extends Command {
           try {
             let createdOrUpdated: ChannelEntry
             if (existingId != null) {
+              observer.next(
+                `[${i}/${nbEntries}] updating entry #${existingId} "${chalk.bold(entry.title_field_value)}"`,
+              )
+
               createdOrUpdated = await this.nimbu.put<ChannelEntry>(
                 `/channels/${ctx.toChannel}/entries/${existingId}`,
                 options,
               )
             } else {
+              observer.next(`[${i}/${nbEntries}] creating entry "${chalk.bold(entry.title_field_value)}"`)
+
               createdOrUpdated = await this.nimbu.post<ChannelEntry>(`/channels/${ctx.toChannel}/entries`, options)
             }
 
