@@ -6,7 +6,7 @@ type FetchChannelOptions = {
   includeBuiltIns?: boolean
 }
 
-export const fetchAllChannels = async (command: Command, site: string, options?: FetchChannelOptions = {}) => {
+export const fetchAllChannels = async (command: Command, site: string, options: FetchChannelOptions = {}) => {
   let apiOptions: APIOptions = { fetchAll: true, site }
 
   try {
