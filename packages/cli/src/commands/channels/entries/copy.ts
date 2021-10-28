@@ -43,6 +43,7 @@ type CopySingle = {
   referenceFields: RelationalField[]
   selfReferences: RelationalField[]
   query?: string
+  where?: string
   per_page?: string
   upsert?: string
   files: {
@@ -56,6 +57,7 @@ type CopySingleRecursive = {
   fromChannel: string
   toChannel: string
   query?: string
+  where?: string
   per_page?: string
   upsert?: string
   only?: string
@@ -78,7 +80,11 @@ export default class CopyChannels extends Command {
     }),
     query: flags.string({
       char: 'q',
-      description: 'query params to apply to source channel',
+      description: 'query params to append to source channel api call',
+    }),
+    where: flags.string({
+      char: 'w',
+      description: 'query expression to filter the source channel',
     }),
     upsert: flags.string({
       char: 'u',
@@ -171,6 +177,7 @@ export default class CopyChannels extends Command {
         toChannel: channel || toChannel,
         toSite,
         query: flags.query,
+        where: flags.where,
         per_page: flags['per-page'],
         upsert: flags.upsert,
       })
@@ -193,7 +200,7 @@ export default class CopyChannels extends Command {
         },
         {
           title: `Fetching which entries to copy from ${chalk.bold(fromChannel)}`,
-          enabled: (ctx: CopySingleRecursive) => ctx.query != null,
+          enabled: (ctx: CopySingleRecursive) => ctx.query != null || ctx.where != null,
           task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
         },
         {
@@ -263,6 +270,7 @@ export default class CopyChannels extends Command {
         toChannel,
         toSite,
         query: flags.query,
+        where: flags.where,
         per_page: flags['per-page'],
         upsert: flags.upsert,
         only: flags.only,
@@ -372,12 +380,18 @@ export default class CopyChannels extends Command {
     } = {}
 
     let queryParts: string[] = ['include_slugs=1', 'x-cdn-expires=600']
-    let queryFromCtx: string | undefined = ctx.query
-    if (queryFromCtx !== undefined && queryFromCtx.trim() !== '') {
+    let queryFromCtx: string | null = ctx.query != null && ctx.query.trim() != '' ? ctx.query.trim() : null
+    let whereFromCtx: string | null = ctx.where != null && ctx.where.trim() != '' ? ctx.where.trim() : null
+
+    if (queryFromCtx != null || whereFromCtx != null) {
       // if fromChannelOriginal is not set, we are just copying a single channel and not copying recursively
       // or if this is the first channel in the recursive chain, let's use the original query
       if (ctx.fromChannelOriginal == null || ctx.fromChannelOriginal === ctx.fromChannel) {
-        queryParts.push(`where=${encodeURIComponent(queryFromCtx.trim())}`)
+        if (queryFromCtx != null) {
+          queryParts.push(queryFromCtx)
+        } else if (whereFromCtx != null) {
+          queryParts.push(`where=${encodeURIComponent(whereFromCtx)}`)
+        }
       } else if (ctx.fromChannelOriginal != null && ctx.fromChannelOriginal !== ctx.fromChannel) {
         // in this case we have specified an original query and we want only to copy all dependant
         // channel entries with a link to this original query... this is a little more complicated
