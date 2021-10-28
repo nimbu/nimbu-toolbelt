@@ -343,6 +343,14 @@ export default class CopyChannels extends Command {
       )
     }
 
+    // ensure the original channel to copy is included
+    if (!channelsWithReferences.some((c) => c.slug === ctx.fromChannel)) {
+      const channel = channels.find((c) => c.slug === ctx.fromChannel)
+      if (channel != null) {
+        channelsWithReferences.unshift(channel)
+      }
+    }
+
     ctx.channels = channelsWithReferences
   }
 
@@ -768,7 +776,12 @@ export default class CopyChannels extends Command {
             if (globalUpserts.length > 0 || specificUpserts.length > 0) {
               try {
                 const whereExpression = [...globalUpserts, ...specificUpserts]
-                  .map((u) => `${u}:"${entry[u]}"`)
+                  .map((u) => {
+                    const key = u === 'slug' ? '_slug' : u
+                    const value = entry[u]
+
+                    return `${key}:"${value}"`
+                  })
                   .join(' OR ')
 
                 const url = `/channels/${ctx.toChannel}/entries?where=${encodeURIComponent(whereExpression)}`
