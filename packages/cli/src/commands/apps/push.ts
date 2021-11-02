@@ -1,4 +1,10 @@
-import Command, { APITypes as Nimbu, AppConfig } from '@nimbu-cli/command'
+import Command, {
+  APIError,
+  APITypes as Nimbu,
+  AppConfig,
+  IValidationError,
+  isValidationError,
+} from '@nimbu-cli/command'
 import { flags } from '@oclif/command'
 import { findMatchingFiles } from '../../utils/files'
 
@@ -127,6 +133,16 @@ export default class AppsPush extends Command {
       }
       this.log('\n★  Done! ★')
     } catch (error) {
+      if (error instanceof APIError) {
+        if (error.body?.code === 142 && error.body.errors != null && error.body.errors.length > 0) {
+          cli.error(
+            error.body.errors
+              .map((err: string | IValidationError) => (isValidationError(err) ? err.message : err))
+              .join('\n'),
+          )
+        }
+      }
+      console.log('BOOM ERROR')
       if (error instanceof Error) {
         cli.error(error.message)
       }

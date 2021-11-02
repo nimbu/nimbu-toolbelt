@@ -23,12 +23,25 @@ export interface IOptions {
   onNextPage?: (nextPage: string, lastPage: string) => void
 }
 
+export interface IValidationError {
+  resource: string
+  resource_id: string
+  field: string
+  message: string
+  code: string
+  value: string
+}
+
+export function isValidationError(error: any): error is IValidationError {
+  return error.resource != null && error.field != null && error.message != null
+}
+
 export interface IAPIErrorOptions {
   resource?: string
   site?: { id: string; name: string }
   message?: string
   code?: number
-  errors?: string[]
+  errors?: string[] | IValidationError[]
 }
 
 export class APIError extends CLIError {
