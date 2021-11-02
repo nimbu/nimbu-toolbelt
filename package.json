@@ -1,228 +1,37 @@
 {
-  "name": "nimbu",
-  "description": "Tools for Nimbu projects",
-  "version": "4.1.7",
-  "author": "Zenjoy Engineering",
-  "bin": {
-    "nimbu": "./bin/run"
-  },
-  "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
-  "dependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
-    "@oclif/command": "^1",
-    "@oclif/config": "^1",
-    "@oclif/errors": "^1.2.2",
-    "@oclif/plugin-autocomplete": "^0.1.0",
-    "@oclif/plugin-help": "^2",
-    "@oclif/plugin-not-found": "^1.2.2",
-    "autoprefixer": "^9.1.5",
-    "babel-loader": "^8.0.0",
-    "babel-plugin-root-import": "^6.1.0",
-    "babel-preset-react-app": "^7.0.2",
-    "chalk": "^2.4.1",
-    "cli-ux": "^5.2.0",
-    "coffee-loader": "^0.9.0",
-    "coffeescript": "^2.1.1",
-    "core-js": "^3.2.1",
-    "css-loader": "^1.0.0",
-    "csso-webpack-plugin": "^2.0.0-beta.1",
-    "date-fns": "^2.0.0-alpha.27",
-    "debug": "^4.1.1",
-    "deep-object-diff": "^1.1.0",
-    "file-loader": "^2.0.0",
-    "find-up": "^3.0.0",
-    "friendly-errors-webpack-plugin": "^1.7.0",
-    "front-matter": "^3.0.2",
-    "fs-extra": "^7.0.1",
-    "fuzzy": "^0.1.3",
-    "glob": "^7.1.3",
-    "graceful-fs": "^4.1.15",
-    "html-webpack-harddisk-plugin": "^1.0.0",
-    "html-webpack-plugin": "^4.0.0",
-    "hyperlinker": "^1.0.0",
-    "inquirer": "^6.2.2",
-    "inquirer-autocomplete-prompt": "^1.0.1",
-    "js-object-pretty-print": "^0.3.0",
-    "js-yaml": "^3.13.1",
-    "listr": "^0.14.3",
-    "loader-utils": "^1.1.0",
-    "lodash": "^4.17.11",
-    "lodash.clonedeep": "^4.5.0",
-    "log-symbols": "^3.0.0",
-    "make-dir": "^2.1.0",
-    "mini-css-extract-plugin": "^1.0.0",
-    "netrc-parser": "^3.1.6",
-    "nimbu-client": "^1.0.5",
-    "node-fetch": "^2.2.0",
-    "node-sass": "^4.9.3",
-    "node-yaml": "^3.1.1",
-    "object-treeify": "^1.1.26",
-    "os": "^0.1.1",
-    "postcss-flexbugs-fixes": "^4.1.0",
-    "postcss-loader": "^3.0.0",
-    "pretty-bytes": "^5.3.0",
-    "promise": "^8.0.2",
-    "react-dev-utils": "^9.0.1",
-    "react-svg-core": "^3.0.3",
-    "request-progress": "^3.0.0",
-    "rxjs": "^6.5.2",
-    "sass-loader": "^7.1.0",
-    "script-loader": "^0.7.2",
-    "style-loader": "^0.23.0",
-    "supports-color": "^6.1.0",
-    "supports-hyperlinks": "^1.0.1",
-    "through": "^2.3.8",
-    "tmp-promise": "^2.0.2",
-    "tslib": "^1",
-    "uglifyjs-webpack-plugin": "^2.0.1",
-    "urlencode": "^1.1.0",
-    "webpack": "^4.37.0",
-    "webpack-dev-server": "^3.7.2",
-    "webpack-merge": "^4.2.1"
-  },
   "devDependencies": {
-    "@oclif/dev-cli": "^1.22.0",
-    "@oclif/test": "^1.2.4",
-    "@oclif/tslint": "^3.1.1",
-    "@types/babel__core": "^7.1.2",
-    "@types/chai": "^4.1.7",
-    "@types/chalk": "^2.2.0",
-    "@types/fs-extra": "^5.0.5",
-    "@types/glob": "^7.1.1",
-    "@types/lodash": "^4.14.116",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^12.6.8",
-    "@types/node-fetch": "^2.1.2",
-    "@types/webpack": "^4.32.0",
-    "@types/webpack-dev-server": "^3.1.7",
-    "chai": "^4.2.0",
-    "chai-match": "^1.1.1",
-    "codecov": "^3.2.0",
-    "fancy-test": "^1.4.3",
-    "fs-monkey": "^0.3.3",
-    "globby": "^8",
-    "isbinaryfile": "^4.0.0",
-    "memfs": "^2.15.2",
-    "mocha": "^6.0.2",
-    "mock-fs": "^4.8.0",
-    "nock": "^13.0.11",
-    "np": "^5.0.3",
-    "nyc": "^13.3.0",
-    "ts-node": "^8.0.3",
-    "tslint": "^5",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.8",
-    "unionfs": "^4.2.0"
+    "@typescript-eslint/parser": "^2",
+    "eslint": "^6",
+    "eslint-plugin-oclif": "^0.1.0",
+    "eslint-config-standard": "12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "lerna": "^3.22.1",
+    "@octokit/core": "^3",
+    "promise-request-retry": "^1.0.2",
+    "standard": "12.0.1",
+    "typescript": "^4.4"
+  },
+  "standard": {
+    "env": "mocha",
+    "ignore": [
+      "**/node_modules/**",
+      "packages/*/lib/**"
+    ]
   },
   "engines": {
     "node": ">=10.0.0"
   },
-  "files": [
-    "/bin",
-    "/lib",
-    "/oclif.manifest.json",
-    "/Gemfile",
-    "/Gemfile.lock",
-    "/polyfills.js",
-    "/template",
-    "/README.md",
-    "/.bundle/config"
-  ],
-  "homepage": "https://github.com/zenjoy/nimbu-toolbelt",
-  "keywords": [
-    "oclif"
-  ],
-  "license": "MIT",
-  "main": "lib/index.js",
-  "oclif": {
-    "commands": "./lib/commands",
-    "bin": "nimbu",
-    "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-not-found",
-      "@oclif/plugin-autocomplete"
-    ],
-    "topics": {
-      "auth": {
-        "description": "authenticate, display token and current user"
-      },
-      "init": {
-        "description": "working directory initialization"
-      },
-      "sites": {
-        "description": "interacting with your sites (list, create)"
-      },
-      "themes": {
-        "description": "working with themes (upload / download)"
-      },
-      "browse": {
-        "description": "open the current site in your browser (simulator, admin)"
-      },
-      "apps": {
-        "description": "manage (cloud code) applications"
-      },
-      "mails": {
-        "description": "manage your notification templates"
-      },
-      "channels": {
-        "description": "working with channels"
-      },
-      "products": {
-        "description": "working with products"
-      },
-      "customers": {
-        "description": "working with customers"
-      },
-      "notifications": {
-        "description": "working with notifications"
-      },
-      "translations": {
-        "description": "working with translations"
-      }
-    }
-  },
-  "repository": "zenjoy/nimbu-toolbelt",
+  "private": true,
   "scripts": {
-    "build": "rm -rf lib && tsc",
-    "lint": "tsc -p test --noEmit && tslint -p test -t stylish",
-    "postpack": "rm -f oclif.manifest.json",
-    "posttest": "tslint -p . -t stylish",
-    "postinstall": "bundle install",
-    "prepack": "tsc && oclif-dev manifest && oclif-dev readme",
-    "test": "TS_NODE_FILES=false TS_NODE_TRANSPILE_ONLY=true mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif-dev readme && git add README.md"
+    "build": "lerna run build",
+    "test": "lerna run test --concurrency 4",
+    "version": "cp packages/cli/CHANGELOG.md CHANGELOG.md && git add CHANGELOG.md",
+    "alpha": "lerna publish prerelease --pre-dist-tag next --allow-branch '**' --no-git-tag-version"
   },
-  "types": "lib/index.d.ts",
-  "mocha": {
-    "diff": true,
-    "recursive": true,
-    "extension": [
-      "ts"
-    ],
-    "opts": "./test/mocha.opts",
-    "package": "./package.json",
-    "reporter": "spec",
-    "slow": 75,
-    "timeout": 5000,
-    "ui": "bdd"
-  },
-  "nyc": {
-    "include": [
-      "src/**/*.ts",
-      "src/**/*.tsx"
-    ],
-    "extension": [
-      ".ts",
-      ".tsx"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text"
-    ],
-    "sourceMap": true,
-    "instrument": true
-  }
+  "workspaces": [
+    "packages/*"
+  ]
 }

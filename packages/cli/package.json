@@ -1,0 +1,172 @@
+{
+  "name": "nimbu",
+  "description": "Tools for Nimbu projects",
+  "version": "5.0.0-alpha.10",
+  "author": "Zenjoy Engineering",
+  "bin": {
+    "nimbu": "./bin/run"
+  },
+  "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
+  "dependencies": {
+    "@nimbu-cli/command": "^5.0.0-alpha.9",
+    "@oclif/config": "^1",
+    "@oclif/plugin-autocomplete": "^0.3.0",
+    "@oclif/plugin-commands": "^1.2.2",
+    "@oclif/plugin-help": "^3.0",
+    "@oclif/plugin-legacy": "^1.2",
+    "@oclif/plugin-not-found": "^1.2",
+    "@oclif/plugin-plugins": "^1.10",
+    "@oclif/plugin-update": "^1.3",
+    "@oclif/plugin-warn-if-update-available": "^1.7",
+    "@oclif/plugin-which": "^1.0",
+    "date-fns": "^2",
+    "deep-object-diff": "^1.1.0",
+    "dependency-graph": "^0.11.0",
+    "follow-redirects": "^1.14.4",
+    "front-matter": "^3.0.2",
+    "fuzzy": "^0.1.3",
+    "glob": "^7.2.0",
+    "hyperlinker": "^1",
+    "inquirer": "^6.2.2",
+    "inquirer-autocomplete-prompt": "^1.0.1",
+    "js-yaml": "^3.13.1",
+    "listr": "^0.14.3",
+    "lodash": "^4.17.11",
+    "log-symbols": "^3.0.0",
+    "pretty-bytes": "^5.3.0",
+    "rxjs": "^6.5.2",
+    "supports-hyperlinks": "^1.0.1",
+    "through": "^2.3.8",
+    "tmp-promise": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/follow-redirects": "^1.13.1",
+    "@types/glob": "^7.1.4",
+    "mocha-nock": "^1.0.2"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "files": [
+    "/bin",
+    "/lib",
+    "/oclif.manifest.json",
+    "/polyfills.js",
+    "/README.md"
+  ],
+  "homepage": "https://github.com/zenjoy/nimbu-toolbelt",
+  "keywords": [
+    "oclif",
+    "nimbu",
+    "nimbu-cli"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "nimbu",
+    "dirname": "nimbu",
+    "scope": "nimbu-cli",
+    "npmRegistry": "https://registry.npmjs.org",
+    "plugins": [
+      "@oclif/plugin-commands",
+      "@oclif/plugin-help",
+      "@oclif/plugin-not-found",
+      "@oclif/plugin-plugins",
+      "@oclif/plugin-update",
+      "@oclif/plugin-warn-if-update-available",
+      "@oclif/plugin-which",
+      "@oclif/plugin-autocomplete"
+    ],
+    "optionalPlugins": [
+      "@nimbu-cli/plugin-webpack-v4",
+      "@nimbu-cli/plugin-webpack-v5"
+    ],
+    "hooks": {
+      "init": "./lib/hooks/optional-plugins"
+    },
+    "topics": {
+      "auth": {
+        "description": "authenticate, display token and current user"
+      },
+      "init": {
+        "description": "working directory initialization"
+      },
+      "sites": {
+        "description": "interacting with your sites (list, create)"
+      },
+      "themes": {
+        "description": "working with themes (upload / download)"
+      },
+      "browse": {
+        "description": "open the current site in your browser (simulator, admin)"
+      },
+      "apps": {
+        "description": "manage (cloud code) applications"
+      },
+      "mails": {
+        "description": "manage your notification templates"
+      },
+      "channels": {
+        "description": "working with channels"
+      },
+      "products": {
+        "description": "working with products"
+      },
+      "customers": {
+        "description": "working with customers"
+      },
+      "notifications": {
+        "description": "working with notifications"
+      },
+      "translations": {
+        "description": "working with translations"
+      }
+    }
+  },
+  "repository": "zenjoy/nimbu-toolbelt",
+  "scripts": {
+    "lint": "eslint . --ext .ts --config .eslintrc",
+    "build": "rm -rf lib && rm -f tsconfig.tsbuildinfo && tsc",
+    "postpublish": "rm -f oclif.manifest.json",
+    "prepack": "yarn run build && yarn oclif-dev manifest",
+    "pretest": "tsc -p test --noEmit",
+    "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 60000",
+    "posttest": "yarn lint",
+    "version": "oclif-dev readme --multi && git add README.md"
+  },
+  "types": "lib/index.d.ts",
+  "mocha": {
+    "diff": true,
+    "recursive": true,
+    "extension": [
+      "ts"
+    ],
+    "opts": "./test/mocha.opts",
+    "package": "./package.json",
+    "reporter": "spec",
+    "slow": 75,
+    "timeout": 5000,
+    "ui": "bdd"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
+    ],
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  },
+  "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
+}

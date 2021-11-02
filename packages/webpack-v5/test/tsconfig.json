@@ -1,0 +1,15 @@
+{
+  "declaration": false,
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "noEmit": true,
+    "rootDir": "../.",
+    "sourceMap": true,
+  },
+  "include": [
+    "./**/*",
+    "../src/**/*"
+  ]
+}
