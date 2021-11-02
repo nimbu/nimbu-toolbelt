@@ -20,6 +20,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
+      - name: Skip webpack v5 based packages for Node 12
+        if: ${{ matrix.node == '12' }} # This step will only run if `[deploy]` is found
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: ./packages/webpack-v5
       - run: yarn
       - run: yarn build
       - run: yarn test

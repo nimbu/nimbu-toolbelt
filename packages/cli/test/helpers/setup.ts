@@ -2,12 +2,25 @@ import * as Config from '@oclif/config'
 import Debug from 'debug'
 import base, { expect } from '@oclif/test'
 import { loadConfig } from '@oclif/test/lib/load-config'
-import Nock from 'nock'
+import nock from 'nock'
 import mockfs from 'mock-fs'
 
 import { AbsPath, MockFSHelper } from './utils'
 
 export { expect } from '@oclif/test'
+
+export function nockActivate() {
+  if (!nock.isActive()) {
+    nock.activate()
+  }
+  nock.disableNetConnect()
+}
+
+export function nockCleanup() {
+  nock.abortPendingRequests()
+  nock.cleanAll()
+  nock.restore()
+}
 
 const castArray = <T>(input?: T | T[]): T[] => {
   if (input === undefined) return []
@@ -53,10 +66,10 @@ export const test = base
   .register('disableNetConnect', () => {
     return {
       run() {
-        Nock.disableNetConnect()
+        nock.disableNetConnect()
       },
       finally() {
-        Nock.enableNetConnect()
+        nock.enableNetConnect()
       },
     }
   })

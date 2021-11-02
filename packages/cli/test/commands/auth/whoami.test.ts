@@ -1,4 +1,16 @@
-import { expect, test } from '@oclif/test'
+import { expect } from '@oclif/test'
+import test, { nockActivate, nockCleanup } from '../../helpers/setup'
+import nock from 'nock'
+
+beforeEach(function (done) {
+  nockActivate()
+  done()
+})
+
+afterEach(function (done) {
+  nockCleanup()
+  done()
+})
 
 describe('auth:whoami', () => {
   test

@@ -1,9 +1,20 @@
-import { expect, test } from '@oclif/test'
+import { expect } from '@oclif/test'
+import test, { nockActivate, nockCleanup } from '../../helpers/setup'
+
+beforeEach(function (done) {
+  nockActivate()
+  done()
+})
+
+afterEach(function (done) {
+  nockCleanup()
+  done()
+})
 
 describe('auth:token', () => {
   test
     .env({ NIMBU_API_KEY: 'foobar' }, { clear: true })
-    .nock('https://api.nimbu.io', api =>
+    .nock('https://api.nimbu.io', (api) =>
       api
         .get('/tokens')
         // return some tokens
@@ -12,7 +23,7 @@ describe('auth:token', () => {
     .stdout()
     .stderr()
     .command(['auth:token'])
-    .it('should show the currently used api token', ctx => {
+    .it('should show the currently used api token', (ctx) => {
       expect(ctx.stdout).to.equal('foobar\n')
       expect(ctx.stderr).to.match(new RegExp('Warning: token will expire today'))
     })
