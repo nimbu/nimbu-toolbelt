@@ -6,7 +6,7 @@ import ux from 'cli-ux'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
-import { cloneDeep, intersection, uniq, compact, flatten, chunk, sumBy, sum } from 'lodash'
+import { pick, cloneDeep, intersection, uniq, compact, flatten, chunk, sum } from 'lodash'
 import {
   Channel,
   ChannelEntry,
@@ -46,6 +46,9 @@ type CopySingle = {
   where?: string
   per_page?: string
   upsert?: string
+  fields?: string[]
+  skipNew?: boolean
+  skipExisting?: boolean
   files: {
     [k: string]: { path: string; cleanup: any }
   }
@@ -61,6 +64,9 @@ type CopySingleRecursive = {
   per_page?: string
   upsert?: string
   only?: string
+  fields?: string[]
+  skipNew?: boolean
+  skipExisting?: boolean
   channels: Channel[]
 }
 
@@ -94,12 +100,21 @@ export default class CopyChannels extends Command {
       char: 'p',
       description: 'number of entries to fetch per page',
     }),
+    'skip-new': flags.boolean({
+      description: 'do not create new items, only update existing entries',
+    }),
+    'skip-existing': flags.boolean({
+      description: 'only create new items, do not update existing entries',
+    }),
     recursive: flags.boolean({
       char: 'r',
       description: 'automatically copy all dependent objects',
     }),
     only: flags.string({
       description: 'limit copy of channels to this list (comma-separated)',
+    }),
+    fields: flags.string({
+      description: 'limit fields to copy to this list (comma-separated)',
     }),
     'copy-customers': flags.boolean({
       description: 'copy and replicate all owners related to the objects we are copying',
@@ -178,6 +193,9 @@ export default class CopyChannels extends Command {
         toSite,
         query: flags.query,
         where: flags.where,
+        fields: `${flags.fields}`.split(','),
+        skipNew: !!flags['skip-new'],
+        skipExisting: !!flags['skip-existing'],
         per_page: flags['per-page'],
         upsert: flags.upsert,
       })
@@ -271,6 +289,9 @@ export default class CopyChannels extends Command {
         toSite,
         query: flags.query,
         where: flags.where,
+        fields: `${flags.fields}`.split(','),
+        skipNew: !!flags['skip-new'],
+        skipExisting: !!flags['skip-existing'],
         per_page: flags['per-page'],
         upsert: flags.upsert,
         only: flags.only,
@@ -359,7 +380,7 @@ export default class CopyChannels extends Command {
 
     try {
       ctx.channel = await this.nimbu.get(`/channels/${ctx.fromChannel}`, options)
-      ctx.fileFields = ctx.channel.customizations.filter(isFileField)
+      ctx.fileFields = ctx.channel.customizations.filter(isFieldOf(FieldType.FILE))
       ctx.galleryFields = ctx.channel.customizations.filter(isFieldOf(FieldType.GALLERY))
       ctx.selectFields = ctx.channel.customizations.filter(isFieldOf(FieldType.SELECT))
       ctx.multiSelectFields = ctx.channel.customizations.filter(isFieldOf(FieldType.MULTI_SELECT))
@@ -605,6 +626,11 @@ export default class CopyChannels extends Command {
         this.debug(`Downloading attachments for ${ctx.entries.length} items`)
         for (let entry of ctx.entries) {
           for (let field of ctx.fileFields) {
+            // skip downloading field if we will not us it to upload
+            if(ctx.fields != null && ctx.fields.length > 0 && !ctx.fields.includes(field.name)) {
+              continue
+            }
+
             let fileObject = entry[field.name]
             if (fileObject != null) {
               this.debug(` -> field ${field.name} has a file`)
@@ -613,6 +639,11 @@ export default class CopyChannels extends Command {
             }
           }
           for (let field of ctx.galleryFields) {
+            // skip downloading field if we will not us it to upload
+            if(ctx.fields != null && ctx.fields.length > 0 && !ctx.fields.includes(field.name)) {
+              continue
+            }
+
             let galleryObject = entry[field.name]
             if (galleryObject != null && galleryObject.images != null) {
               for (let image of galleryObject.images) {
@@ -763,7 +794,7 @@ export default class CopyChannels extends Command {
           if (ctx.toSite != null) {
             options.site = ctx.toSite
           }
-          options.body = entry
+          options.body = ctx.fields != null && ctx.fields.length > 0 ? pick(entry, ctx.fields) : entry
 
           let existingId: string | undefined = undefined
           if (ctx.upsert != null) {
@@ -798,8 +829,8 @@ export default class CopyChannels extends Command {
           }
 
           try {
-            let createdOrUpdated: ChannelEntry
-            if (existingId != null) {
+            let createdOrUpdated: ChannelEntry | undefined = undefined
+            if (existingId != null && !ctx.skipExisting) {
               observer.next(
                 `[${i}/${nbEntries}] updating entry #${existingId} "${chalk.bold(entry.title_field_value)}"`,
               )
@@ -808,17 +839,19 @@ export default class CopyChannels extends Command {
                 `/channels/${ctx.toChannel}/entries/${existingId}`,
                 options,
               )
-            } else {
+            } else if(!ctx.skipNew) {
               observer.next(`[${i}/${nbEntries}] creating entry "${chalk.bold(entry.title_field_value)}"`)
 
               createdOrUpdated = await this.nimbu.post<ChannelEntry>(`/channels/${ctx.toChannel}/entries`, options)
             }
 
-            // store id in cache for dependant channels
-            this.cacheId(ctx.toChannel, entry.id, createdOrUpdated.id)
+            if(createdOrUpdated != null) {
+              // store id in cache for dependant channels
+              this.cacheId(ctx.toChannel, entry.id, createdOrUpdated.id)
 
-            // store id for second pass in case of self-references
-            original.id = createdOrUpdated.id
+              // store id for second pass in case of self-references
+              original.id = createdOrUpdated.id
+            }
           } catch (error) {
             if (error instanceof APIError) {
               const errorMessage = `[${i}/${nbEntries}] creating entry ${ctx.toChannel}/#${entry.id} failed: ${
