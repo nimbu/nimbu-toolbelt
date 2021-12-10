@@ -160,7 +160,7 @@ function fileLoaders(options = {}) {
       },
     },
   ]
-  if (config.REACT && config.SVG_LOADER_INCLUDE) {
+  if (config.REACT && config.SVG_LOADER_INCLUDE != null) {
     loaders.splice(0, 0, {
       include: config.SVG_LOADER_INCLUDE,
       test: /\.svg$/,
