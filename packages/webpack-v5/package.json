@@ -22,7 +22,7 @@
     "loader-utils": "^1.1.0",
     "mini-css-extract-plugin": "^2.4.2",
     "nimbu": "^5.0.0-alpha.7",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^3.1.1",
     "node-sass": "^6.0",
     "postcss": "^8.1.4",
     "postcss-flexbugs-fixes": "^5.0.2",
