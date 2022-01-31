@@ -39,9 +39,9 @@ const toInterfaceType = (field: CustomField) => {
     case 'date_time':
       return 'Nimbu.DateTime'
     case 'select':
-      return `Nimbu.Select<'${field.select_options.map((o) => o.name).join("' | '")}''>`
+      return `Nimbu.Select<'${field.select_options.map((o) => o.name).join("' | '")}'>`
     case 'multi_select':
-      return `Nimbu.MultiSelect<'${field.select_options.map((o) => o.name).join("' | '")}''>`
+      return `Nimbu.MultiSelect<'${field.select_options.map((o) => o.name).join("' | '")}'>`
     case 'belongs_to':
     case 'customer':
       return 'Nimbu.ReferenceTo'
