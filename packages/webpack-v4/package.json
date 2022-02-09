@@ -100,7 +100,8 @@
     "posttest": "eslint . --ext .ts --config .eslintrc",
     "postinstall": "bundle install",
     "test": "echo 'Not implemented yet...'",
-    "version": "oclif-dev readme && git add README.md"
+    "version": "oclif readme && git add README.md",
+    "yalc:publish": "yalc publish"
   },
   "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
 }

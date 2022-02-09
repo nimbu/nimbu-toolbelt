@@ -162,7 +162,7 @@ export default class ChannelsInfo extends Command {
           },
         },
         {
-          printLine: this.log,
+          printLine: this.log.bind(this),
           ...flags, // parsed flags
         },
       )

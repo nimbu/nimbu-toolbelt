@@ -85,7 +85,7 @@ export default class Server extends Command {
   async initialize() {
     if (!this.initialized) {
       await super.initialize()
-      this._nimbuServer = new NimbuServer(this.nimbu, this.log, this.warn)
+      this._nimbuServer = new NimbuServer(this.nimbu, this.log.bind(this), this.warn.bind(this))
     }
   }
 

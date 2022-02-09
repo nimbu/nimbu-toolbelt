@@ -41,4 +41,8 @@ export default abstract class extends Command {
     }
     return this._client
   }
+
+  jsonEnabled() {
+    return this.ctor.enableJsonFlag && this.argv.includes('--json')
+  }
 }

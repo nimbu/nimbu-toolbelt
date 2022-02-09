@@ -1,15 +1,16 @@
 {
   "devDependencies": {
+    "@octokit/core": "^3",
     "@typescript-eslint/parser": "^2",
-    "eslint": "^6",
-    "eslint-plugin-oclif": "^0.1.0",
     "eslint-config-standard": "12.0.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-oclif": "^0.1.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
+    "eslint": "^6",
     "lerna": "^3.22.1",
-    "@octokit/core": "^3",
+    "oclif": "^2.4.3",
     "promise-request-retry": "^1.0.2",
     "standard": "12.0.1",
     "typescript": "^4.4"
@@ -29,7 +30,8 @@
     "build": "lerna run build",
     "test": "lerna run test --concurrency 4",
     "version": "cp packages/cli/CHANGELOG.md CHANGELOG.md && git add CHANGELOG.md",
-    "alpha": "lerna publish prerelease --pre-dist-tag next --allow-branch '**' --no-git-tag-version"
+    "alpha": "lerna publish prerelease --pre-dist-tag next --allow-branch '**' --no-git-tag-version",
+    "yalc:publish": "lerna run yalc:publish"
   },
   "workspaces": [
     "packages/*"

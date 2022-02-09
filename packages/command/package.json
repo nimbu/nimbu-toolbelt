@@ -57,7 +57,8 @@
     "lint": "eslint . --ext .ts --config .eslintrc",
     "posttest": "yarn run lint",
     "prepublishOnly": "yarn run build",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 10000"
+    "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 10000",
+    "yalc:publish": "yalc publish"
   },
   "types": "./lib/index.d.ts",
   "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
