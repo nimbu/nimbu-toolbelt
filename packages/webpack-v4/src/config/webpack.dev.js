@@ -53,6 +53,7 @@ const webpackConfig = () => {
         NODE_ENV: JSON.stringify('development'),
       },
     }),
+    ...utils.tsWebpackPlugins(),
     ...styleConfig.plugins,
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),

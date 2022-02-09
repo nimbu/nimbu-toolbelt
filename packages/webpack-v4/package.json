@@ -5,10 +5,16 @@
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "main": "lib/index.js",
   "dependencies": {
-    "@babel/core": "^7.15.8",
-    "@babel/preset-env": "^7.15.8",
+    "@babel/core": "^7.16.7",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/plugin-proposal-export-default-from": "^7.16.7",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.16.7",
+    "@babel/plugin-proposal-optional-chaining": "^7.16.7",
+    "@babel/plugin-proposal-private-methods": "^7.16.7",
+    "@babel/plugin-proposal-private-property-in-object": "^7.16.7",
+    "@babel/preset-env": "^7.16.7",
     "autoprefixer": "^9.8.8",
-    "babel-loader": "^8.2.2",
+    "babel-loader": "^8.0.5",
     "babel-plugin-root-import": "^6.6.0",
     "babel-preset-react-app": "^7.0.2",
     "coffee-loader": "^1.0",
@@ -16,6 +22,7 @@
     "core-js": "^3.2.1",
     "css-loader": "^1.0.0",
     "css-minimizer-webpack-plugin": "^1.2",
+    "detect-port": "^1.2.0",
     "file-loader": "^6.2.0",
     "friendly-errors-webpack-plugin": "^1.7.0",
     "html-webpack-harddisk-plugin": "^1.0",
@@ -34,9 +41,9 @@
     "style-loader": "^0.23.0",
     "tslib": "^1",
     "uglifyjs-webpack-plugin": "^2.0.1",
-    "webpack": "^4.37.0",
     "webpack-dev-server": "^3.11.2",
-    "webpack-merge": "^4.2.1"
+    "webpack-merge": "^4.2.1",
+    "webpack": "^4.37.0"
   },
   "devDependencies": {
     "@oclif/test": "^2.0.3",
@@ -101,7 +108,7 @@
     "postinstall": "bundle install",
     "test": "echo 'Not implemented yet...'",
     "version": "oclif readme && git add README.md",
-    "yalc:publish": "yalc publish"
+    "yalc:publish": "yalc publish --push"
   },
   "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
 }

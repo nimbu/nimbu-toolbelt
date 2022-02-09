@@ -3,7 +3,7 @@ import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import NimbuServer from '../nimbu-gem/server'
 import WebpackDevServer from '../webpack/server'
-
+import detectPort from 'detect-port'
 export default class Server extends Command {
   static aliases = ['server:v4']
   static description = 'run the development server (webpack 4)'
@@ -70,8 +70,13 @@ export default class Server extends Command {
     open: boolean,
     options?: { poll?: boolean },
   ) {
-    this.log(chalk.cyan('Starting the webpack-dev-server (Webpack 4)...\n'))
-    await this.webpackServer.start(host, defaultPort, nimbuPort, 'http', open, options)
+    this.log(chalk.cyan('\nStarting the webpack-dev-server (Webpack 4)...\n'))
+    try {
+      await this.webpackServer.start(host, defaultPort, nimbuPort, 'http', open, options)
+    } catch (error) {
+      console.error('⚠️  Could not start webpack-dev-server ⚠️ \n\n', error, '\n')
+      process.exit(1)
+    }
   }
 
   async stopWebpackDevServer() {
@@ -92,13 +97,18 @@ export default class Server extends Command {
   async execute() {
     const { flags } = await this.parse(Server)
 
-    await this.spawnNimbuServer(flags.nowebpack ? flags.port! : flags['nimbu-port']!, flags.nocookies, flags.compass)
+    const nimbuPort = flags.nowebpack ? flags.port : flags['nimbu-port']!
 
     if (!flags.nowebpack) {
-      await this.startWebpackDevServer(flags.host!, flags.port!, flags['nimbu-port']!, !flags.noopen, {
+      await this.checkPort(flags.port)
+      await this.startWebpackDevServer(flags.host, flags.port, flags['nimbu-port']!, !flags.noopen, {
         poll: flags.poll,
       })
     }
+
+    await this.checkPort(nimbuPort)
+    await this.spawnNimbuServer(nimbuPort, flags.nocookies, flags.compass)
+
     await this.waitForStopSignals()
     // Explicitly exit the process to make sure all subprocesses started by webpack plugins are gone
     process.exit(0)
@@ -110,6 +120,15 @@ export default class Server extends Command {
     }
     if (this.nimbuServer.isRunning()) {
       await this.stopNimbuServer()
+    }
+  }
+
+  private async checkPort(port: number) {
+    const suggestedPort = await detectPort(port)
+
+    if (suggestedPort != port) {
+      console.error(`\n⚠️  There is already a process listening on port ${port} ⚠️ \n`)
+      process.exit(1)
     }
   }
 

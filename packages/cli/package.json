@@ -142,7 +142,7 @@
     "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 60000",
     "posttest": "yarn lint",
     "version": "oclif readme --multi && git add README.md",
-    "yalc:publish": "yalc publish"
+    "yalc:publish": "yalc publish --push"
   },
   "types": "lib/index.d.ts",
   "mocha": {

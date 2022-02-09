@@ -90,6 +90,8 @@ export default class WebpackDevServer {
       if (this.server) {
         this.server.listen(port, host, (err: Error | null) => {
           if (err) {
+            console.error('ERRRROR')
+            console.error(err)
             reject(err)
           } else {
             resolve()

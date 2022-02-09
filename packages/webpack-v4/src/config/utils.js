@@ -33,6 +33,7 @@ function hasOptional(moduleName) {
 function babelLoader(loaderOptions = {}) {
   const config = getProjectConfig()
   const options = {
+    babelrc: true,
     cacheDirectory: true,
     cacheIdentifier: getCacheIdentifier(loaderOptions.cachePrefix || 'app-js', [
       'babel-plugin-named-asset-import',
@@ -49,6 +50,8 @@ function babelLoader(loaderOptions = {}) {
         rootPathSuffix: 'src',
       },
     ],
+    '@babel/plugin-proposal-optional-chaining',
+    '@babel/plugin-proposal-nullish-coalescing-operator',
   ]
   if (config.REACT && hasOptional('react-hot-loader/babel')) {
     options.plugins.push('react-hot-loader/babel')
@@ -72,7 +75,7 @@ function codeLoaders(options) {
     {
       // Application JS
       // exclude node modules, except our own polyfills
-      exclude: /node_modules(?!.*nimbu-toolbelt\/polyfills\.js)/,
+      exclude: /node_modules(?!.*nimbu-toolbelt\/polyfills\.js|alpinejs)/,
       test: /\.jsx?$/,
       use: [babelLoader(options)],
     },
@@ -83,7 +86,7 @@ function codeLoaders(options) {
       loader: require.resolve('babel-loader'),
       /* tslint:disable:object-literal-sort-keys */
       options: {
-        babelrc: false,
+        babelrc: true,
         configFile: false,
         compact: false,
         presets: [[require.resolve('babel-preset-react-app/dependencies'), { helpers: true }]],
@@ -106,6 +109,7 @@ function codeLoaders(options) {
       test: /\.(js|mjs)$/,
     },
   ]
+
   if (hasOptional('ts-loader')) {
     loaders.push({
       exclude: /node_modules/,
@@ -115,6 +119,7 @@ function codeLoaders(options) {
         {
           loader: getOptional('ts-loader'),
           options: {
+            transpileOnly: true,
             compilerOptions: {
               noEmit: false,
             },
@@ -270,12 +275,44 @@ function htmlWebPackPlugins(entries, options = {}) {
   })
 }
 
+function tsWebpackPlugins(options = {}) {
+  const plugins = []
+
+  // WIP: works first time, second time feedback seems swallowed by webpack clearing the screen each compile
+
+  // if (hasOptional('ts-loader')) {
+  //   if (hasOptional('fork-ts-checker-webpack-plugin')) {
+  //     const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+  //     plugins.push(
+  //       new ForkTsCheckerWebpackPlugin(
+  //         options.production
+  //           ? {
+  //               async: false,
+  //               useTypescriptIncrementalApi: true,
+  //               memoryLimit: 4096,
+  //             }
+  //           : {
+  //               eslint: true,
+  //             },
+  //       ),
+  //     )
+  //   }
+  //   if (hasOptional('fork-ts-checker-notifier-webpack-plugin') && !options.production) {
+  //     const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin')
+  //     plugins.push(new ForkTsCheckerNotifierWebpackPlugin({ title: 'TypeScript', excludeWarnings: false }))
+  //   }
+  // }
+
+  return plugins
+}
+
 module.exports = {
   codeLoaders,
   fileLoaders,
   getOptional,
   hasOptional,
   htmlWebPackPlugins,
+  tsWebpackPlugins,
   styleConfig,
   styleLoaders,
 }
