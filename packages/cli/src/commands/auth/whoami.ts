@@ -22,4 +22,8 @@ export default class Whoami extends Command {
   notloggedin() {
     this.error('not logged in', { exit: 100 })
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }

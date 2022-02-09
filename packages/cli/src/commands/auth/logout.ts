@@ -9,4 +9,8 @@ export default class Logout extends Command {
     CliUx.ux.action.start('Logging out')
     await this.nimbu.logout()
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }

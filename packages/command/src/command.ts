@@ -1,22 +1,28 @@
-import { Command } from '@oclif/core'
+import { CliUx, Command } from '@oclif/core'
 import Client from './nimbu/client'
 import * as buildConfig from './config/config'
 import { Config } from './nimbu/config'
 
 export default abstract class extends Command {
+  private _initialized?: boolean
   private _client?: Client
   private _buildConfig?: any
   private _nimbuConfig?: Config
 
   get initialized() {
-    return this._buildConfig !== undefined && this._nimbuConfig !== undefined && this._client !== undefined
+    return !!this._initialized
   }
 
   async initialize() {
     if (!this.initialized) {
-      this._buildConfig = await buildConfig.initialize()
+      // allow certain commands to skip config initialization
+      if (this.needsConfig) this._buildConfig = await buildConfig.initialize()
+
+      // setup the rest
       this._nimbuConfig = new Config(this._buildConfig)
       this._client = new Client(this.config, this.nimbuConfig)
+
+      this._initialized = true
     }
   }
 
@@ -42,7 +48,7 @@ export default abstract class extends Command {
     return this._client
   }
 
-  jsonEnabled() {
-    return this.ctor.enableJsonFlag && this.argv.includes('--json')
+  get needsConfig() {
+    return !(this.argv.includes('--help') || this.argv.includes('help'))
   }
 }

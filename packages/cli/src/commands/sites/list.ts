@@ -59,4 +59,8 @@ export default class SitesList extends Command {
       this.log("\nYou don't have access to any sites.\n")
     }
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }

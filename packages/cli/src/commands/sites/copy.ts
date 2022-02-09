@@ -50,4 +50,8 @@ export default class CopySite extends Command {
     await CopyMenus.run(['--from', fromSite, '--to', toSite])
     await CopyTranslations.run(['--from', fromSite, '--to', toSite])
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }

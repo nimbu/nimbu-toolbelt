@@ -7,4 +7,8 @@ export default class BrowseSimulator extends Command {
   async execute() {
     await CliUx.ux.open('http://localhost:4567/')
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }

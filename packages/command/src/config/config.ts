@@ -19,20 +19,19 @@ try {
 }
 
 let projectConfig: any = {}
-
-try {
-  if (projectConfigPath != null) {
-    projectConfig = require(projectConfigPath)
-  }
-} catch (error) {
-  if ((error as any).code !== 'MODULE_NOT_FOUND') {
-    throw error
-  }
-}
-
 let config = defaultConfig
 
 export async function initialize() {
+  try {
+    if (projectConfigPath != null) {
+      projectConfig = require(projectConfigPath)
+    }
+  } catch (error) {
+    if ((error as any).code !== 'MODULE_NOT_FOUND') {
+      throw error
+    }
+  }
+
   const prC = await Promise.resolve(projectConfig)
   config = Object.assign({}, defaultConfig, prC)
   return config

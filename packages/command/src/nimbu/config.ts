@@ -57,7 +57,7 @@ export class Config {
   }
 
   get projectHost(): string | undefined {
-    return this._projectConfig.NIMBU_HOST
+    return this._projectConfig?.NIMBU_HOST
   }
 
   get hostname() {
@@ -95,7 +95,7 @@ export class Config {
   }
 
   get projectSite(): string | undefined {
-    return this._projectConfig.NIMBU_SITE
+    return this._projectConfig?.NIMBU_SITE
   }
 
   get projectPath(): string {
@@ -155,7 +155,7 @@ export class Config {
   }
 
   get projectTheme(): string | undefined {
-    return this._projectConfig.NIMBU_THEME
+    return this._projectConfig?.NIMBU_THEME
   }
 
   private get config() {

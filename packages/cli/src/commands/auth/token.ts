@@ -38,4 +38,8 @@ By default, the CLI auth token is only valid for 1 year. To generate a long-live
 
     this.log(this.nimbu.token)
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }

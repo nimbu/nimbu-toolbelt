@@ -17,4 +17,8 @@ export default class Login extends Command {
     this.log(`Logged in as ${color.green(account.email!)}`)
     await this.config.runHook('recache', { type: 'login' })
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }

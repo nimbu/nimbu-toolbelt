@@ -159,4 +159,8 @@ export default class Init extends Command {
 
     await fs.writeFile(filename, content)
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }
