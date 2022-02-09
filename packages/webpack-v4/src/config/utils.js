@@ -75,14 +75,14 @@ function codeLoaders(options) {
     {
       // Application JS
       // exclude node modules, except our own polyfills
-      exclude: /node_modules(?!.*nimbu-toolbelt\/polyfills\.js|alpinejs)/,
+      exclude: /node_modules(?!.*nimbu-toolbelt\/polyfills\.js)/,
       test: /\.jsx?$/,
       use: [babelLoader(options)],
     },
     // Process any JS outside of the app with Babel.
     // Unlike the application JS, we only compile the standard ES features.
     {
-      exclude: /@babel(?:\/|\\{1,2})runtime/,
+      exclude: /@babel(?:\/|\\{1,2})runtime|alpinejs/,
       loader: require.resolve('babel-loader'),
       /* tslint:disable:object-literal-sort-keys */
       options: {
