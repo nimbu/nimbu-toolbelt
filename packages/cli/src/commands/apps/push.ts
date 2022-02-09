@@ -5,10 +5,9 @@ import Command, {
   IValidationError,
   isValidationError,
 } from '@nimbu-cli/command'
-import { flags } from '@oclif/command'
+import { CliUx, Flags } from '@oclif/core'
 import { findMatchingFiles } from '../../utils/files'
 
-import cli from 'cli-ux'
 import chalk from 'chalk'
 import { dirname, normalize, resolve as resolvePath } from 'path'
 import { readFile } from 'fs-extra'
@@ -18,7 +17,7 @@ export default class AppsPush extends Command {
   static description = 'Push your cloud code files to nimbu'
 
   static flags = {
-    app: flags.string({
+    app: Flags.string({
       char: 'a',
       description: 'The (local) name of the application to push to (see apps:list and apps:config).',
     }),
@@ -37,9 +36,9 @@ export default class AppsPush extends Command {
   private _files?: string[]
   private _code?: Nimbu.AppFile[]
 
-  get app(): AppConfig {
+  async appConfig(): Promise<AppConfig> {
     if (!this._app) {
-      const { flags } = this.parse(AppsPush)
+      const { flags } = await this.parse(AppsPush)
       if (flags.app) {
         const app = this.nimbuConfig.apps.find((a) => a.name === flags.app)
         if (app) {
@@ -61,8 +60,9 @@ export default class AppsPush extends Command {
 
   async files(): Promise<string[]> {
     if (!this._files) {
-      const { argv } = this.parse(AppsPush)
-      const filesFound = await findMatchingFiles(this.app.dir, this.app.glob)
+      const { argv } = await this.parse(AppsPush)
+      const appConfig = await this.appConfig()
+      const filesFound = await findMatchingFiles(appConfig.dir, appConfig.glob)
 
       if (argv.length > 0) {
         this._files = intersection(argv.slice(), filesFound)
@@ -118,16 +118,20 @@ export default class AppsPush extends Command {
   }
 
   async code(): Promise<Nimbu.AppFile[]> {
+    const appConfig = await this.appConfig()
+
     if (!this._code) {
-      this._code = await this.nimbu.get<Nimbu.AppFile[]>(`/apps/${this.app.id}/code`)
+      this._code = await this.nimbu.get<Nimbu.AppFile[]>(`/apps/${appConfig.id}/code`)
     }
     return this._code
   }
 
   async execute() {
+    const appConfig = await this.appConfig()
+
     try {
       const files = await this.files()
-      this.log(`Pushing code for app ${this.app.name}:`)
+      this.log(`Pushing code for app ${appConfig.name}:`)
       for (const file of files) {
         await this.pushFile(file)
       }
@@ -135,7 +139,7 @@ export default class AppsPush extends Command {
     } catch (error) {
       if (error instanceof APIError) {
         if (error.body?.code === 142 && error.body.errors != null && error.body.errors.length > 0) {
-          cli.error(
+          CliUx.ux.error(
             error.body.errors
               .map((err: string | IValidationError) => (isValidationError(err) ? err.message : err))
               .join('\n'),
@@ -144,7 +148,7 @@ export default class AppsPush extends Command {
       }
       console.log('BOOM ERROR')
       if (error instanceof Error) {
-        cli.error(error.message)
+        CliUx.ux.error(error.message)
       }
     }
   }
@@ -154,8 +158,9 @@ export default class AppsPush extends Command {
     executor: (app: string, name: string, code: string) => Promise<Nimbu.AppFile>,
   ) {
     const { name, code } = await this.getCode(filename)
-    await executor(this.app.id, name, code)
-    cli.action.stop(chalk.green('✓'))
+    const appConfig = await this.appConfig()
+    await executor(appConfig.id, name, code)
+    CliUx.ux.action.stop(chalk.green('✓'))
   }
 
   private async pushNewFile(filename: string) {
@@ -185,8 +190,9 @@ export default class AppsPush extends Command {
 
   private async pushFile(filename: string) {
     const code = await this.code()
-    const existing = code.find((f) => `${this.app.dir}/${f.name}` === filename)
-    cli.action.start(`  - ${filename}${existing ? '' : ' (new)'}`)
+    const appConfig = await this.appConfig()
+    const existing = code.find((f) => `${appConfig.dir}/${f.name}` === filename)
+    CliUx.ux.action.start(`  - ${filename}${existing ? '' : ' (new)'}`)
     if (existing) {
       return this.pushExistingFile(filename)
     } else {
@@ -195,7 +201,8 @@ export default class AppsPush extends Command {
   }
 
   private async getCode(filename: string) {
-    const name = filename.replace(`${this.app.dir}/`, '')
+    const appConfig = await this.appConfig()
+    const name = filename.replace(`${appConfig.dir}/`, '')
     const resolved = resolvePath(filename)
     const code = await readFile(resolved)
 

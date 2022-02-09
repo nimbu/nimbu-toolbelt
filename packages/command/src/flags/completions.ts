@@ -1,5 +1,4 @@
-import { flags } from '@oclif/command'
-import * as Config from '@oclif/config'
+import { Interfaces } from '@oclif/core'
 import Client from '../nimbu/client'
 import buildConfig = require('../config/config')
 import { Config as NimbuConfig } from '../nimbu/config'
@@ -8,7 +7,7 @@ const day = 60 * 60 * 24
 
 const fetchFromNimbu = async (
   resource: string,
-  ctx: { config: Config.IConfig },
+  ctx: { config: Interfaces.Config },
   sortParam = 'name',
 ): Promise<string[]> => {
   const bConf = await buildConfig.initialize()
@@ -21,7 +20,7 @@ const fetchFromNimbu = async (
   return resources.map((a: any) => a[sortParam]).sort()
 }
 
-export const SiteCompletion: flags.ICompletion = {
+export const SiteCompletion: Interfaces.Completion = {
   cacheDuration: day,
   options: async (ctx) => {
     let sites = await fetchFromNimbu('sites', ctx)
@@ -29,12 +28,12 @@ export const SiteCompletion: flags.ICompletion = {
   },
 }
 
-export const SiteSubdomainCompletion: flags.ICompletion = {
-  skipCache: true,
-  options: async (_) => {
-    return ['a', 'b', 'c']
+// export const SiteSubdomainCompletion: Interfaces.Completion = {
+//   skipCache: true,
+//   options: async (_) => {
+//     return ['a', 'b', 'c']
 
-    // let sites = await fetchFromNimbu('sites', ctx, 'subdomain')
-    // return sites
-  },
-}
+//     // let sites = await fetchFromNimbu('sites', ctx, 'subdomain')
+//     // return sites
+//   },
+// }

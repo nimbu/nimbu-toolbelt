@@ -1,7 +1,6 @@
 import Command, { APIError } from '@nimbu-cli/command'
 
-import { flags } from '@oclif/command'
-import ux from 'cli-ux'
+import { CliUx, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 const through = require('through')
@@ -11,11 +10,11 @@ export default class CopyCustomerConfig extends Command {
   static description = 'copy customer customizations from one to another'
 
   static flags = {
-    from: flags.string({
+    from: Flags.string({
       char: 'f', // shorter flag version
       description: 'subdomain of the source site',
     }),
-    to: flags.string({
+    to: Flags.string({
       char: 't', // shorter flag version
       description: 'subdomain of the destination site',
     }),
@@ -23,13 +22,13 @@ export default class CopyCustomerConfig extends Command {
 
   async execute() {
     const Listr = require('listr')
-    const { flags } = this.parse(CopyCustomerConfig)
+    const { flags } = await this.parse(CopyCustomerConfig)
 
     let fromSite = flags.from !== undefined ? flags.from! : this.nimbuConfig.site!
     let toSite = flags.to !== undefined ? flags.to! : this.nimbuConfig.site!
 
     if (fromSite === toSite) {
-      ux.error('The source site needs to differ from the destination.')
+      CliUx.ux.error('The source site needs to differ from the destination.')
     }
 
     let fetchTitle = `Fetching customer customizations from site ${chalk.bold(fromSite)}`

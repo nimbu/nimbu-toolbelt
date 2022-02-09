@@ -1,5 +1,5 @@
 import nock from 'nock'
-import * as Config from '@oclif/config'
+import { Config } from '@oclif/core'
 import base, { expect } from 'fancy-test'
 
 import { default as CommandBase } from '../../src/command'

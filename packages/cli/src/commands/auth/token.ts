@@ -1,6 +1,6 @@
 import Command, { APITypes as Nimbu, color } from '@nimbu-cli/command'
 
-import { flags } from '@oclif/command'
+import { Flags } from '@oclif/core'
 import { formatRelative } from 'date-fns'
 
 export default class Token extends Command {
@@ -8,7 +8,7 @@ export default class Token extends Command {
 By default, the CLI auth token is only valid for 1 year. To generate a long-lived token, use nimbu authorizations:create`
 
   static flags = {
-    help: flags.help({ char: 'h' }),
+    help: Flags.help({ char: 'h' }),
   }
 
   async execute() {

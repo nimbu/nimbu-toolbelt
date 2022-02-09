@@ -1,7 +1,6 @@
 import Command, { APITypes as Nimbu, color, completions } from '@nimbu-cli/command'
 
-import { flags } from '@oclif/command'
-import cli from 'cli-ux'
+import { CliUx, Flags } from '@oclif/core'
 import { orderBy } from 'lodash'
 import inquirer from 'inquirer'
 import logSymbols from 'log-symbols'
@@ -11,26 +10,26 @@ export default class Init extends Command {
   static description = 'initialize your working directory to code a selected theme'
 
   static flags = {
-    cloudcode: flags.boolean({
+    cloudcode: Flags.boolean({
       char: 'c',
       description: 'Create CloudCode directory',
       default: false,
     }),
-    haml: flags.boolean({
+    haml: Flags.boolean({
       char: 'h',
       description: 'Use HAML for the templates in this project',
       default: false,
     }),
-    site: flags.string({
+    site: Flags.string({
       char: 's',
-      completion: completions.SiteSubdomainCompletion,
+      // completion: completions.SiteSubdomainCompletion,
       description: 'The site (use the Nimbu subdomain) to link to this project.',
       env: 'NIMBU_SITE',
     }),
   }
 
   async execute() {
-    const { flags } = this.parse(Init)
+    const { flags } = await this.parse(Init)
 
     let subdomain
     let haml
@@ -52,9 +51,9 @@ export default class Init extends Command {
   }
 
   private async askForSite() {
-    cli.action.start('Please wait while we get the list of sites...')
+    CliUx.ux.action.start('Please wait while we get the list of sites...')
     let sites = await this.nimbu.get<Nimbu.Site[]>('/sites', { fetchAll: true })
-    cli.action.stop('done \n')
+    CliUx.ux.action.stop('done \n')
 
     if (sites.length === 0) {
       this.error("You don't have access to any Nimbu sites.", { exit: 101 })

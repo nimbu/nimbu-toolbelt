@@ -1,8 +1,7 @@
 import Command, { APITypes as Nimbu, APIError, APIOptions } from '@nimbu-cli/command'
 import { download, generateRandom } from '../../../utils/files'
 
-import { flags } from '@oclif/command'
-import ux from 'cli-ux'
+import { CliUx, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
@@ -68,43 +67,43 @@ export default class CopyChannels extends Command {
   static description = 'copy channel entries from one to another'
 
   static flags = {
-    from: flags.string({
+    from: Flags.string({
       char: 'f',
       description: 'slug of the source channel',
       required: true,
     }),
-    to: flags.string({
+    to: Flags.string({
       char: 't',
       description: 'slug of the target channel',
       required: true,
     }),
-    query: flags.string({
+    query: Flags.string({
       char: 'q',
       description: 'query params to append to source channel api call',
     }),
-    where: flags.string({
+    where: Flags.string({
       char: 'w',
       description: 'query expression to filter the source channel',
     }),
-    upsert: flags.string({
+    upsert: Flags.string({
       char: 'u',
       description: 'name of parameter to use for matching existing documents',
     }),
-    'per-page': flags.string({
+    'per-page': Flags.string({
       char: 'p',
       description: 'number of entries to fetch per page',
     }),
-    recursive: flags.boolean({
+    recursive: Flags.boolean({
       char: 'r',
       description: 'automatically copy all dependent objects',
     }),
-    only: flags.string({
+    only: Flags.string({
       description: 'limit copy of channels to this list (comma-separated)',
     }),
-    'copy-customers': flags.boolean({
+    'copy-customers': Flags.boolean({
       description: 'copy and replicate all owners related to the objects we are copying',
     }),
-    'allow-errors': flags.boolean({
+    'allow-errors': Flags.boolean({
       description: 'do not stop when an item fails and continue with the other',
     }),
   }
@@ -120,7 +119,7 @@ export default class CopyChannels extends Command {
   private warnings: string[] = []
 
   async execute() {
-    const { flags } = this.parse(CopyChannels)
+    const { flags } = await this.parse(CopyChannels)
 
     if (process.env.DEBUG != null) {
       process.stdout.isTTY = false
@@ -139,9 +138,9 @@ export default class CopyChannels extends Command {
 
   async executeSingleCopy(channel?: string) {
     const Listr = require('listr')
-    const { flags } = this.parse(CopyChannels)
+    const { flags } = await this.parse(CopyChannels)
 
-    const { fromChannel, toChannel, fromSite, toSite } = this.getFromTo()
+    const { fromChannel, toChannel, fromSite, toSite } = await this.getFromTo()
 
     const tasks = new Listr([
       {
@@ -188,9 +187,9 @@ export default class CopyChannels extends Command {
 
   async executeRecursiveCopy() {
     const Listr = require('listr')
-    const { flags } = this.parse(CopyChannels)
+    const { flags } = await this.parse(CopyChannels)
 
-    const { fromChannel, toChannel, fromSite, toSite } = this.getFromTo()
+    const { fromChannel, toChannel, fromSite, toSite } = await this.getFromTo()
 
     const tasks = new Listr(
       [
@@ -280,8 +279,8 @@ export default class CopyChannels extends Command {
     this.printWarnings()
   }
 
-  private getFromTo() {
-    const { flags } = this.parse(CopyChannels)
+  private async getFromTo() {
+    const { flags } = await this.parse(CopyChannels)
 
     let fromChannel: string
     let toChannel: string
@@ -306,11 +305,11 @@ export default class CopyChannels extends Command {
     }
 
     if (fromSite === undefined) {
-      ux.error('You need to specify the source site.')
+      CliUx.ux.error('You need to specify the source site.')
     }
 
     if (toSite === undefined) {
-      ux.error('You need to specify the destination site.')
+      CliUx.ux.error('You need to specify the destination site.')
     }
 
     return { fromChannel, toChannel, fromSite, toSite }
@@ -465,7 +464,7 @@ export default class CopyChannels extends Command {
       queryFromCtx != null &&
       (ctx.fromChannelOriginal == null || ctx.fromChannelOriginal === ctx.fromChannel)
     ) {
-      ux.error('Please specify a query that returns entries to copy...')
+      CliUx.ux.error('Please specify a query that returns entries to copy...')
     }
 
     let nbPages = 1
@@ -580,7 +579,7 @@ export default class CopyChannels extends Command {
             )}`
 
             if (this.abortOnError) {
-              ux.error(errorMessage)
+              CliUx.ux.error(errorMessage)
             } else {
               this.warnings.push(errorMessage)
             }
@@ -924,9 +923,9 @@ export default class CopyChannels extends Command {
 
   private printWarnings() {
     if (this.warnings.length > 0) {
-      ux.warn('Some entries could not be created due to validation errors:')
+      CliUx.ux.warn('Some entries could not be created due to validation errors:')
       for (const message of this.warnings) {
-        ux.warn(message)
+        CliUx.ux.warn(message)
       }
     }
   }

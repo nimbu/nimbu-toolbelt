@@ -1,7 +1,6 @@
 import Command, { APIError } from '@nimbu-cli/command'
 
-import { flags } from '@oclif/command'
-import ux from 'cli-ux'
+import { CliUx, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import { cloneDeep } from 'lodash'
@@ -20,11 +19,11 @@ export default class CopyMenus extends Command {
   ]
 
   static flags = {
-    from: flags.string({
+    from: Flags.string({
       char: 'f', // shorter flag version
       description: 'subdomain of the source site',
     }),
-    to: flags.string({
+    to: Flags.string({
       char: 't', // shorter flag version
       description: 'subdomain of the destination site',
     }),
@@ -32,15 +31,14 @@ export default class CopyMenus extends Command {
 
   async execute() {
     const Listr = require('listr')
-    const { flags, args } = this.parse(CopyMenus)
+    const { flags, args } = await this.parse(CopyMenus)
 
     let fromSite = flags.from !== undefined ? flags.from! : this.nimbuConfig.site!
     let toSite = flags.to !== undefined ? flags.to! : this.nimbuConfig.site!
     let slug = args.slug
 
     if (fromSite === toSite) {
-      ux.error('The source site needs to differ from the destination.')
-      return
+      CliUx.ux.error('The source site needs to differ from the destination.')
     }
 
     let fetchTitle = `Querying ${slug != null ? "menu '" + slug + "'" : 'menus'} from site ${chalk.bold(fromSite)}`

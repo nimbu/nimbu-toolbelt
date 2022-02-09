@@ -1,8 +1,6 @@
-import { IConfig } from '@oclif/config'
-import { CLIError } from '@oclif/errors'
+import { CliUx, Errors, Interfaces } from '@oclif/core'
 import Netrc from 'netrc-parser'
 import Nimbu from 'nimbu-client'
-import ux from 'cli-ux'
 import { HTTPError } from 'nimbu-client'
 
 import { Credentials } from './credentials'
@@ -44,7 +42,7 @@ export interface IAPIErrorOptions {
   errors?: string[] | IValidationError[]
 }
 
-export class APIError extends CLIError {
+export class APIError extends Errors.CLIError {
   http: HTTPError
   body: IAPIErrorOptions
 
@@ -80,7 +78,7 @@ export default class Client {
   private readonly credentials: Credentials
   private client: Nimbu
 
-  constructor(protected oclifConfig: IConfig, config: Config) {
+  constructor(protected oclifConfig: Interfaces.Config, config: Config) {
     this.oclifConfig = oclifConfig
     this.config = config
     this.credentials = new Credentials(oclifConfig, this)
@@ -106,7 +104,7 @@ export default class Client {
 
       return true
     } catch {
-      ux.warn('Sorry, you need to be authenticated to continue.')
+      CliUx.ux.warn('Sorry, you need to be authenticated to continue.')
       return false
     }
   }
@@ -116,7 +114,7 @@ export default class Client {
       await this.credentials.logout()
     } catch (err) {
       if (err instanceof Error) {
-        ux.warn(err)
+        CliUx.ux.warn(err)
       }
     }
     delete Netrc.machines[this.config.apiHost]

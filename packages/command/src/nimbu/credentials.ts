@@ -1,5 +1,4 @@
-import { IConfig } from '@oclif/config'
-import ux from 'cli-ux'
+import { CliUx, Interfaces } from '@oclif/core'
 import { readFileSync, pathExistsSync } from 'fs-extra'
 import urlencode from 'urlencode'
 import Netrc from 'netrc-parser'
@@ -24,11 +23,11 @@ interface NetrcEntry {
 }
 
 export class Credentials {
-  private readonly config: IConfig
+  private readonly config: Interfaces.Config
   private readonly nimbu: Client
   private _auth?: string
 
-  constructor(config: IConfig, nimbu: Client) {
+  constructor(config: Interfaces.Config, nimbu: Client) {
     this.config = config
     this.nimbu = nimbu
   }
@@ -75,12 +74,12 @@ export class Credentials {
       // timeout after 10 minutes
       setTimeout(() => {
         if (!loggedIn) {
-          ux.error('timed out')
+          CliUx.ux.error('timed out')
         }
       }, 1000 * 60 * 10).unref()
 
       if (process.env.NIMBU_API_KEY) {
-        ux.error('Cannot log in with NIMBU_API_KEY set')
+        CliUx.ux.error('Cannot log in with NIMBU_API_KEY set')
       }
 
       await Netrc.load()
@@ -94,7 +93,7 @@ export class Credentials {
         }
       } catch (err) {
         if (err instanceof Error) {
-          ux.warn(err)
+          CliUx.ux.warn(err)
         }
       }
       let auth = await this.interactive(previousToken && previousToken.login, opts.expiresIn)
@@ -116,8 +115,8 @@ export class Credentials {
 
   private async interactive(login?: string, expiresIn?: number): Promise<NetrcEntry> {
     process.stderr.write('nimbu: Please enter your login credentials\n')
-    login = await ux.prompt('Email or username', { default: login })
-    let password = await ux.prompt('Password', { type: 'hide' })
+    login = await CliUx.ux.prompt('Email or username', { default: login })
+    let password = await CliUx.ux.prompt('Password', { type: 'hide' })
 
     let auth
     try {
@@ -126,7 +125,7 @@ export class Credentials {
       if (err instanceof HTTPError) {
         if (!err.body || err.body.code !== 210) throw err
       }
-      let secondFactor = await ux.prompt('Two-factor code', { type: 'mask' })
+      let secondFactor = await CliUx.ux.prompt('Two-factor code', { type: 'mask' })
       auth = await this.createOAuthToken(login!, password, { expiresIn, secondFactor })
     }
     this._auth = auth.password

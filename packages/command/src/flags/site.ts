@@ -1,12 +1,12 @@
-import { flags } from '@oclif/command'
+import { Flags } from '@oclif/core'
 import { SiteCompletion } from './completions'
 
-export const site = flags.build({
+export const site = Flags.build({
   char: 's',
-  completion: SiteCompletion,
+  // completion: SiteCompletion, FIXME: this worked before oclif@2
   description: 'site to run command against',
 
-  default: () => {
+  default: async () => {
     const envSite = process.env.NIMBU_SITE
     if (envSite) return envSite
   },

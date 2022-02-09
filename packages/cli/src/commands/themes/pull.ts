@@ -1,7 +1,7 @@
 import Command from '@nimbu-cli/command'
 import { download } from '../../utils/files'
 
-import { flags } from '@oclif/command'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
@@ -11,23 +11,23 @@ export default class PullThemes extends Command {
   static description = 'download all code and assets for a theme'
 
   static flags = {
-    theme: flags.string({
+    theme: Flags.string({
       char: 't',
       description: 'slug of the theme',
       default: 'default-theme',
     }),
-    site: flags.string({
+    site: Flags.string({
       char: 's',
       description: 'the site of the theme',
     }),
-    'liquid-only': flags.boolean({
+    'liquid-only': Flags.boolean({
       description: 'only download template files',
     }),
   }
 
   async execute() {
     const Listr = require('listr')
-    const { flags } = this.parse(PullThemes)
+    const { flags } = await this.parse(PullThemes)
 
     let fromTheme = flags.theme
     let fromSite = flags.site !== undefined ? flags.site! : this.nimbuConfig.site!

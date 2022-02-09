@@ -1,7 +1,6 @@
 import Command from '@nimbu-cli/command'
-import Debug from 'debug'
-import { flags } from '@oclif/command'
-import ux from 'cli-ux'
+
+import { CliUx, Flags } from '@oclif/core'
 import chalk from 'chalk'
 
 import CopyChannels from '../channels/copy'
@@ -18,27 +17,27 @@ export default class CopySite extends Command {
   static description = 'copy a complete site from one to another'
 
   static flags = {
-    from: flags.string({
+    from: Flags.string({
       char: 'f', // shorter flag version
       description: 'subdomain of the source site',
     }),
-    to: flags.string({
+    to: Flags.string({
       char: 't', // shorter flag version
       description: 'subdomain of the destination site',
     }),
-    force: flags.boolean({
+    force: Flags.boolean({
       description: 'do not ask confirmation to overwrite existing channel',
     }),
   }
 
   async execute() {
-    const { flags } = this.parse(CopySite)
+    const { flags } = await this.parse(CopySite)
 
     let fromSite = flags.from !== undefined ? flags.from! : this.nimbuConfig.site!
     let toSite = flags.to !== undefined ? flags.to! : this.nimbuConfig.site!
 
     if (fromSite === toSite) {
-      ux.error('The source site needs to differ from the destination.')
+      CliUx.ux.error('The source site needs to differ from the destination.')
     }
 
     this.log(`Copying everything from ${chalk.bold(fromSite)} to ${chalk.bold(toSite)}:\n`)

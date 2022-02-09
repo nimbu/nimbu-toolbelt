@@ -2,9 +2,8 @@ import Command, { APIError } from '@nimbu-cli/command'
 
 import { findMatchingFiles } from '../../utils/files'
 
-import { flags } from '@oclif/command'
+import { CliUx, Flags } from '@oclif/core'
 import * as fs from 'fs-extra'
-import ux from 'cli-ux'
 import chalk from 'chalk'
 import path from 'path'
 import fm from 'front-matter'
@@ -14,7 +13,7 @@ export default class PushMails extends Command {
   static description = 'upload all notification templates'
 
   static flags = {
-    only: flags.string({
+    only: Flags.string({
       char: 'o',
       description: 'the names of the templates to push online',
       multiple: true,
@@ -25,11 +24,11 @@ export default class PushMails extends Command {
   async execute() {
     await this.nimbu.validateLogin()
 
-    const { flags } = this.parse(PushMails)
+    const { flags } = await this.parse(PushMails)
     const mailsPath = this.nimbuConfig.projectPath + '/content/notifications/'
 
     if (!fs.existsSync(mailsPath)) {
-      ux.error('Could not find ./content/notifications directory! Aborting...')
+      CliUx.ux.error('Could not find ./content/notifications directory! Aborting...')
       return
     }
 
@@ -45,35 +44,35 @@ export default class PushMails extends Command {
       }
     })
 
-    ux.log('Updating notifications:')
+    CliUx.ux.log('Updating notifications:')
 
     for (let filename of notifications) {
       let slug = path.basename(filename, '.txt')
       if (flags.only && flags.only.length > 0 && flags.only.indexOf(slug) === -1) {
         continue
       }
-      ux.action.start(` - ${slug} `)
+      CliUx.ux.action.start(` - ${slug} `)
       let raw = await fs.readFile(filename)
       let content: any
       try {
         content = fm(raw.toString('utf-8'))
       } catch (error) {
-        ux.action.stop(chalk.red(`${logSymbols.error} ${error}`))
+        CliUx.ux.action.stop(chalk.red(`${logSymbols.error} ${error}`))
         break
       }
 
       if (content.attributes.name == undefined) {
-        ux.action.stop(chalk.red(`${logSymbols.error} name is missing!`))
+        CliUx.ux.action.stop(chalk.red(`${logSymbols.error} name is missing!`))
         break
       }
 
       if (content.attributes.description == undefined) {
-        ux.action.stop(chalk.red(`${logSymbols.error} description is missing!`))
+        CliUx.ux.action.stop(chalk.red(`${logSymbols.error} description is missing!`))
         break
       }
 
       if (content.attributes.subject == undefined) {
-        ux.action.stop(chalk.red(`${logSymbols.error} subject is missing!`))
+        CliUx.ux.action.stop(chalk.red(`${logSymbols.error} subject is missing!`))
         break
       }
 
@@ -127,13 +126,13 @@ export default class PushMails extends Command {
         await this.nimbu.post('/notifications', { body })
       } catch (error) {
         if (error instanceof APIError) {
-          ux.action.stop(chalk.red(`${logSymbols.error} ${error.message}`))
+          CliUx.ux.action.stop(chalk.red(`${logSymbols.error} ${error.message}`))
         } else {
           throw error
         }
       }
 
-      ux.action.stop(chalk.green(`${logSymbols.success} done!`))
+      CliUx.ux.action.stop(chalk.green(`${logSymbols.success} done!`))
     }
   }
 }

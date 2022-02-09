@@ -1,4 +1,4 @@
-import { Hook, Plugin } from '@oclif/config'
+import { Hook, Plugin } from '@oclif/core'
 import Debug from 'debug'
 
 const optionals = {}

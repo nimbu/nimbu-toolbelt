@@ -1,8 +1,7 @@
 import Command, { APIError } from '@nimbu-cli/command'
 import { convertChangesToTree, addFieldNames, cleanUpIds } from '../../utils/diff'
 
-import { flags } from '@oclif/command'
-import ux from 'cli-ux'
+import { CliUx, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { detailedDiff } from 'deep-object-diff'
 
@@ -10,12 +9,12 @@ export default class DiffChannels extends Command {
   static description = 'check differences between channel settings from one to another'
 
   static flags = {
-    from: flags.string({
+    from: Flags.string({
       char: 'f', // shorter flag version
       description: 'slug of the source channel',
       required: true,
     }),
-    to: flags.string({
+    to: Flags.string({
       char: 't', // shorter flag version
       description: 'slug of the target channel',
       required: true,
@@ -23,7 +22,7 @@ export default class DiffChannels extends Command {
   }
 
   async execute() {
-    const { flags } = this.parse(DiffChannels)
+    const { flags } = await this.parse(DiffChannels)
 
     let fromChannel: string
     //let toChannel: string
@@ -48,13 +47,11 @@ export default class DiffChannels extends Command {
     }
 
     if (fromSite === undefined) {
-      ux.error('You need to specify the source site.')
-      return
+      CliUx.ux.error('You need to specify the source site.')
     }
 
     if (toSite === undefined) {
-      ux.error('You need to specify the destination site.')
-      return
+      CliUx.ux.error('You need to specify the destination site.')
     }
 
     let query = ''
@@ -70,7 +67,7 @@ export default class DiffChannels extends Command {
       description = `${chalk.bold('all channels')}`
     }
 
-    ux.action.start(`Fetching ${description} from site ${chalk.bold(fromSite)}`)
+    CliUx.ux.action.start(`Fetching ${description} from site ${chalk.bold(fromSite)}`)
 
     let options = {
       fetchAll: true,
@@ -78,10 +75,10 @@ export default class DiffChannels extends Command {
     }
 
     let channelSummaries: any = await this.nimbu.get(`/channels${query}`, options)
-    ux.action.stop()
+    CliUx.ux.action.stop()
 
     for (let channel of channelSummaries) {
-      ux.action.start(`Comparing channel ${chalk.green(chalk.bold(channel.slug))}`)
+      CliUx.ux.action.start(`Comparing channel ${chalk.green(chalk.bold(channel.slug))}`)
 
       let detailedFrom: any
       let detailedTo: any
@@ -110,10 +107,10 @@ export default class DiffChannels extends Command {
         }
       }
 
-      ux.action.stop()
+      CliUx.ux.action.stop()
 
       if (detailedTo == undefined) {
-        ux.info(`Channel  ${chalk.bold(channel.slug)} is missing in site ${chalk.bold(toSite)}`)
+        CliUx.ux.info(`Channel  ${chalk.bold(channel.slug)} is missing in site ${chalk.bold(toSite)}`)
       } else {
         this.cleanUpBeforeDiff(detailedFrom)
         this.cleanUpBeforeDiff(detailedTo)
@@ -129,50 +126,54 @@ export default class DiffChannels extends Command {
 
         addFieldNames(diff, fromCustomizations, toCustomizations)
 
-        ux.log('')
+        CliUx.ux.log('')
         if (diff.added != null && Object.keys(diff.added).length > 0) {
           anyDifferences = true
-          ux.log(`Following fields or field attributes are present in ${chalk.bold(toSite)}, but not ${fromSite}:`)
+          CliUx.ux.log(
+            `Following fields or field attributes are present in ${chalk.bold(toSite)}, but not ${fromSite}:`,
+          )
           convertChangesToTree(diff.added).display()
         }
 
         if (diff.deleted != null && Object.keys(diff.deleted).length > 0) {
           anyDifferences = true
-          ux.log(`Following fields or field attributes are present in ${chalk.bold(fromSite)}, but not ${toSite}:`)
+          CliUx.ux.log(
+            `Following fields or field attributes are present in ${chalk.bold(fromSite)}, but not ${toSite}:`,
+          )
           convertChangesToTree(diff.deleted).display()
         }
 
         if (diff.updated != null && Object.keys(diff.updated).length > 0) {
           anyDifferences = true
-          ux.log(`Following fields or field attributes have differences:`)
+          CliUx.ux.log(`Following fields or field attributes have differences:`)
           convertChangesToTree(diff.updated).display()
         }
 
-        ux.log('')
+        CliUx.ux.log('')
         if (otherDiff.added != null && Object.keys(otherDiff.added).length > 0) {
           anyDifferences = true
-          ux.log(`Following channel attributes are present in ${chalk.bold(toSite)}, but not ${fromSite}:`)
+          CliUx.ux.log(`Following channel attributes are present in ${chalk.bold(toSite)}, but not ${fromSite}:`)
           convertChangesToTree(otherDiff.added).display()
         }
 
         if (otherDiff.deleted != null && Object.keys(otherDiff.deleted).length > 0) {
           anyDifferences = true
-          ux.log(`Following channel attributes are present in ${chalk.bold(fromSite)}, but not ${toSite}:`)
+          CliUx.ux.log(`Following channel attributes are present in ${chalk.bold(fromSite)}, but not ${toSite}:`)
           convertChangesToTree(otherDiff.deleted).display()
         }
 
         if (otherDiff.updated != null && Object.keys(otherDiff.updated).length > 0) {
           anyDifferences = true
-          ux.log(`Following channel attributes have differences:`)
+          CliUx.ux.log(`Following channel attributes have differences:`)
           convertChangesToTree(otherDiff.updated).display()
         }
 
         if (!anyDifferences) {
-          ux.log(`There are no differences.`)
+          CliUx.ux.log(`There are no differences.`)
         }
       }
 
-      ux.info(chalk.dim('===========================================================================\n'))
+      CliUx.ux.info(chalk.dim('===========================================================================\n'))
     }
   }
 

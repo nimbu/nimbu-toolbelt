@@ -1,5 +1,5 @@
 import Command, { APITypes as Nimbu } from '@nimbu-cli/command'
-import cli from 'cli-ux'
+import { CliUx } from '@oclif/core'
 import { pathExists } from 'fs-extra'
 
 export default class AppsList extends Command {
@@ -14,7 +14,7 @@ export default class AppsList extends Command {
     apps.forEach((a, i) => {
       this.log(`[${i + 1}] ${a.name}`)
     })
-    const answer = await cli.prompt('Which application do you want to configure?', {
+    const answer = await CliUx.ux.prompt('Which application do you want to configure?', {
       required: true,
       default: '1',
     })
@@ -26,23 +26,23 @@ export default class AppsList extends Command {
   }
 
   async configureApp(app: Nimbu.App): Promise<void> {
-    const name = await cli.prompt(
+    const name = await CliUx.ux.prompt(
       'Give this app a local name. Make it short and (white)spaceless! You might have to type it in apps:push commands.',
       {
         required: true,
         default: app.name.toLowerCase().replace(' ', '_'),
       },
     )
-    const dir = await cli.prompt('Where is the code?', {
+    const dir = await CliUx.ux.prompt('Where is the code?', {
       required: true,
       default: 'code',
     })
-    const glob = await cli.prompt('What files should be pushed?', {
+    const glob = await CliUx.ux.prompt('What files should be pushed?', {
       required: true,
       default: '*.js',
     })
     const dirExists = await pathExists(dir)
-    if (dirExists || (await cli.confirm("Code directory doesn't exists, are you sure want to continue?"))) {
+    if (dirExists || (await CliUx.ux.confirm("Code directory doesn't exists, are you sure want to continue?"))) {
       await this.nimbuConfig.addApp({
         name,
         id: app.key,

@@ -11,7 +11,7 @@ export default class AppsTranspile extends Command {
   ]
 
   async execute() {
-    const { args } = this.parse(AppsTranspile)
+    const { args } = await this.parse(AppsTranspile)
     this.log(`Transpiling ${args.source} to ${args.target}`)
     const result = await transformFileAsync(args.source, {
       presets: [

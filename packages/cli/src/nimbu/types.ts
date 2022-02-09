@@ -59,7 +59,7 @@ export type SelectOption = {
   slug: string
 }
 
-interface BaseNimbuObject {
+interface BaseNimbuObject extends Record<string, unknown> {
   id: string
   created_at: Date
   updated_at: Date

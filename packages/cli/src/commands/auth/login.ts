@@ -1,12 +1,12 @@
 import Command, { APITypes as Nimbu, color } from '@nimbu-cli/command'
 
-import { flags } from '@oclif/command'
+import { Flags } from '@oclif/core'
 
 export default class Login extends Command {
   static description = 'login with your nimbu credentials'
   static aliases = ['login']
   static flags = {
-    'expires-in': flags.integer({ char: 'e', description: 'duration of token in seconds (default 1 year)' }),
+    'expires-in': Flags.integer({ char: 'e', description: 'duration of token in seconds (default 1 year)' }),
   }
 
   async execute() {

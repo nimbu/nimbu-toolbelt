@@ -1,10 +1,8 @@
 import Command, { APIOptions, APIError } from '@nimbu-cli/command'
-import Debug from 'debug'
-import { flags } from '@oclif/command'
-import ux from 'cli-ux'
+import { CliUx, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
-import { Channel, FieldType, RelationalField } from '../../nimbu/types'
+import { Channel } from '../../nimbu/types'
 import { fetchAllChannels } from '../../utils/channels'
 const through = require('through')
 const inquirer = require('inquirer')
@@ -40,37 +38,37 @@ export default class CopyChannels extends Command {
   static description = 'copy channel configuration from one to another'
 
   static flags = {
-    from: flags.string({
+    from: Flags.string({
       char: 'f', // shorter flag version
       description: 'slug of the source channel',
       required: true,
     }),
-    to: flags.string({
+    to: Flags.string({
       char: 't', // shorter flag version
       description: 'slug of the target channel',
       required: true,
     }),
-    force: flags.boolean({
+    force: Flags.boolean({
       description: 'do not ask confirmation to overwrite existing channel',
     }),
-    all: flags.boolean({
+    all: Flags.boolean({
       char: 'a',
       description: 'copy all channels from source to target',
     }),
   }
 
   async execute() {
-    const { flags } = this.parse(CopyChannels)
+    const { flags } = await this.parse(CopyChannels)
 
     const { channel: fromChannel, site: fromSite } = this.extractSiteAndChannel(flags.from, flags.all)
     const { channel: toChannel, site: toSite } = this.extractSiteAndChannel(flags.to, flags.all)
 
     if (fromSite == null) {
-      ux.error('You need to specify the source site.')
+      CliUx.ux.error('You need to specify the source site.')
     }
 
     if (toSite == null) {
-      ux.error('You need to specify the destination site.')
+      CliUx.ux.error('You need to specify the destination site.')
     }
 
     if (fromChannel != null && toChannel != null) {

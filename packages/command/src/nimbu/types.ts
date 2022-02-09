@@ -38,7 +38,7 @@ export interface Token {
   expired_at?: string
 }
 
-export interface Site {
+export interface Site extends Record<string, unknown> {
   id: string
   url: string
   name: string

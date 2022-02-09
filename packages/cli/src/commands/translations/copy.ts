@@ -1,7 +1,6 @@
 import Command, { APIError } from '@nimbu-cli/command'
 
-import { flags } from '@oclif/command'
-import ux from 'cli-ux'
+import { CliUx, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 
@@ -18,25 +17,25 @@ export default class CopyTranslations extends Command {
   ]
 
   static flags = {
-    from: flags.string({
+    from: Flags.string({
       char: 'f', // shorter flag version
       description: 'subdomain of the source site',
     }),
-    to: flags.string({
+    to: Flags.string({
       char: 't', // shorter flag version
       description: 'subdomain of the destination site',
     }),
-    toHost: flags.string({
+    toHost: Flags.string({
       description: 'hostname of target Nimbu API',
     }),
-    fromHost: flags.string({
+    fromHost: Flags.string({
       description: 'hostname of origin Nimbu API',
     }),
   }
 
   async execute() {
     const Listr = require('listr')
-    const { flags, args } = this.parse(CopyTranslations)
+    const { flags, args } = await this.parse(CopyTranslations)
 
     let fromSite = flags.from !== undefined ? flags.from! : this.nimbuConfig.site!
     let toSite = flags.to !== undefined ? flags.to! : this.nimbuConfig.site!
@@ -44,7 +43,7 @@ export default class CopyTranslations extends Command {
     let toHost = flags.toHost !== undefined ? flags.toHost! : this.nimbuConfig.apiUrl
 
     if (fromSite === toSite) {
-      ux.error('The source site needs to differ from the destination.')
+      CliUx.ux.error('The source site needs to differ from the destination.')
       return
     }
 

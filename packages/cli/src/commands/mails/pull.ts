@@ -1,15 +1,14 @@
 import Command, { APITypes as Nimbu } from '@nimbu-cli/command'
 
-import { flags } from '@oclif/command'
+import { CliUx, Flags } from '@oclif/core'
 import * as fs from 'fs-extra'
-import ux from 'cli-ux'
 import yaml from 'js-yaml'
 
 export default class PullMails extends Command {
   static description = 'download all notification templates'
 
   static flags = {
-    only: flags.string({
+    only: Flags.string({
       char: 'o',
       description: 'the names of the templates to pull from Nimbu',
       multiple: true,
@@ -20,7 +19,7 @@ export default class PullMails extends Command {
   async execute() {
     const Listr = require('listr')
 
-    const { flags } = this.parse(PullMails)
+    const { flags } = await this.parse(PullMails)
 
     const tasks = new Listr([
       {
@@ -34,7 +33,7 @@ export default class PullMails extends Command {
     ])
 
     tasks.run().catch((err) => {
-      ux.error(err)
+      CliUx.ux.error(err)
     })
   }
 

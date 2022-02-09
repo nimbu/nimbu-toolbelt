@@ -1,4 +1,4 @@
-import * as Config from '@oclif/config'
+import { Interfaces } from '@oclif/core'
 import Debug from 'debug'
 import base, { expect } from '@oclif/test'
 import { loadConfig } from '@oclif/test/lib/load-config'
@@ -51,7 +51,7 @@ export const test = base
   })
   .register('command', (args: string[] | string, opts: loadConfig.Options = {}) => {
     return {
-      async run(ctx: { fs: any; config: Config.IConfig; expectation: string }) {
+      async run(ctx: { fs: any; config: Interfaces.Config; expectation: string }) {
         if (!ctx.config || opts.reset) ctx.config = await loadConfig(opts).run({} as any)
         args = castArray(args)
         let [id, ...extra] = args

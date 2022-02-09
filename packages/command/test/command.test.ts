@@ -1,4 +1,4 @@
-import * as Config from '@oclif/config'
+import { Config } from '@oclif/core'
 import base, { expect } from 'fancy-test'
 
 import Command from '../src/command'
@@ -18,7 +18,7 @@ describe('cli base command', () => {
       }
 
       async execute() {
-        const { flags } = this.parse(SiteCommand)
+        const { flags } = await this.parse(SiteCommand)
         expect(flags.site).to.equal('mysite')
       }
     }.run(['--site=mysite'])

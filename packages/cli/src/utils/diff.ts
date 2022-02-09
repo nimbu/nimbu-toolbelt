@@ -1,9 +1,9 @@
-import ux from 'cli-ux'
+import { CliUx } from '@oclif/core'
 import chalk from 'chalk'
 
 export function convertChangesToTree(fields, tree?) {
   if (tree == null) {
-    tree = ux.tree()
+    tree = CliUx.ux.tree()
   }
 
   for (let key of Object.keys(fields)) {

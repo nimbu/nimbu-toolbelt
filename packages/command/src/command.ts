@@ -1,4 +1,4 @@
-import Command from '@oclif/command'
+import { Command } from '@oclif/core'
 import Client from './nimbu/client'
 import * as buildConfig from './config/config'
 import { Config } from './nimbu/config'

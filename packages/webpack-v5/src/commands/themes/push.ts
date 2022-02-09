@@ -1,5 +1,5 @@
 import Command from '@nimbu-cli/command'
-import { flags } from '@oclif/command'
+import { Flags } from '@oclif/core'
 import proxy from '../../nimbu-gem/command'
 
 export default class ThemesPush extends Command {
@@ -7,36 +7,36 @@ export default class ThemesPush extends Command {
 
   static flags = {
     // --liquid, --liquid-only   # only push template code
-    liquid: flags.boolean({
+    liquid: Flags.boolean({
       hidden: true,
     }),
-    'liquid-only': flags.boolean({
+    'liquid-only': Flags.boolean({
       description: 'only push template code',
     }),
     // --css, --css-only   # only push css
-    css: flags.boolean({ hidden: true }),
-    'css-only': flags.boolean({
+    css: Flags.boolean({ hidden: true }),
+    'css-only': Flags.boolean({
       description: 'only push css',
     }),
     // --js, --js-only   # only push javascript
-    js: flags.boolean({ hidden: true }),
-    'js-only': flags.boolean({
+    js: Flags.boolean({ hidden: true }),
+    'js-only': Flags.boolean({
       description: 'only push javascript',
     }),
     // --images-only   # only push new images
-    'images-only': flags.boolean({
+    'images-only': Flags.boolean({
       description: 'only push new images',
     }),
     // --fonts-only    # only push fonts
-    'fonts-only': flags.boolean({
+    'fonts-only': Flags.boolean({
       description: 'only push fonts',
     }),
     // --only          # only push the files given on the command line
-    only: flags.boolean({
+    only: Flags.boolean({
       description: 'only push the files given on the command line',
     }),
     // --force         # skip the usage check and upload anyway
-    force: flags.boolean({
+    force: Flags.boolean({
       description: 'skip the usage check and upload anyway',
     }),
   }

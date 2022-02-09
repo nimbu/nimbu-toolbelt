@@ -1,5 +1,5 @@
 import Command from '@nimbu-cli/command'
-import { flags } from '@oclif/command'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import NimbuServer from '../nimbu-gem/server'
 import WebpackDevServer from '../webpack/server'
@@ -9,35 +9,35 @@ export default class Server extends Command {
   static description = 'run the development server (webpack 4)'
 
   static flags = {
-    nocookies: flags.boolean({
+    nocookies: Flags.boolean({
       description: 'Leave cookies untouched i.s.o. clearing them.',
     }),
-    port: flags.integer({
+    port: Flags.integer({
       description: 'The port to listen on.',
       env: 'DEFAULT_PORT',
       default: 4567,
     }),
-    host: flags.string({
+    host: Flags.string({
       description: 'The hostname/ip-address to bind on.',
       env: 'HOST',
       default: '0.0.0.0',
     }),
-    'nimbu-port': flags.integer({
+    'nimbu-port': Flags.integer({
       description: 'The port for the ruby nimbu server to listen on.',
       env: 'NIMBU_PORT',
       default: 4568,
     }),
-    compass: flags.boolean({
+    compass: Flags.boolean({
       description: 'Use legacy ruby SASS compilation.',
     }),
-    nowebpack: flags.boolean({
+    nowebpack: Flags.boolean({
       description: 'Do not use webpack.',
     }),
-    noopen: flags.boolean({
+    noopen: Flags.boolean({
       description: `Don't open/reload browser`,
       default: false,
     }),
-    poll: flags.boolean({
+    poll: Flags.boolean({
       description: `Tell webpack dev server to use polling`,
       default: false,
     }),
@@ -90,7 +90,7 @@ export default class Server extends Command {
   }
 
   async execute() {
-    const { flags } = this.parse(Server)
+    const { flags } = await this.parse(Server)
 
     await this.spawnNimbuServer(flags.nowebpack ? flags.port! : flags['nimbu-port']!, flags.nocookies, flags.compass)
 

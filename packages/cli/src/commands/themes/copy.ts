@@ -1,7 +1,7 @@
 import Command from '@nimbu-cli/command'
 import { download } from '../../utils/files'
 
-import { flags } from '@oclif/command'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
@@ -12,30 +12,30 @@ export default class CopyThemes extends Command {
   static description = 'copy themes from one site to another'
 
   static flags = {
-    from: flags.string({
+    from: Flags.string({
       char: 'f',
       description: 'slug of the source theme',
       required: true,
     }),
-    to: flags.string({
+    to: Flags.string({
       char: 't',
       description: 'slug of the target theme',
       required: true,
     }),
-    toHost: flags.string({
+    toHost: Flags.string({
       description: 'hostname of target Nimbu API',
     }),
-    fromHost: flags.string({
+    fromHost: Flags.string({
       description: 'hostname of origin Nimbu API',
     }),
-    'liquid-only': flags.boolean({
+    'liquid-only': Flags.boolean({
       description: 'only copy the templates',
     }),
   }
 
   async execute() {
     const Listr = require('listr')
-    const { flags } = this.parse(CopyThemes)
+    const { flags } = await this.parse(CopyThemes)
 
     let fromTheme: string
     let toTheme: string
