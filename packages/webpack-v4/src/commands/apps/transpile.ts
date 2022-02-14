@@ -16,7 +16,7 @@ export default class AppsTranspile extends Command {
     const result = await transformFileAsync(args.source, {
       presets: [
         [
-          '@babel/preset-env',
+          require.resolve('@babel/preset-env'),
           {
             modules: false,
             forceAllTransforms: true,

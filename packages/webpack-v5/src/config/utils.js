@@ -56,7 +56,7 @@ function babelLoader(loaderOptions = {}) {
     options.plugins.push('react-refresh/babel')
   }
   return {
-    loader: 'babel-loader',
+    loader: require.resolve('babel-loader'),
     options,
   }
 }

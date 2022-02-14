@@ -45,22 +45,22 @@ function babelLoader(loaderOptions = {}) {
   }
   options.plugins = [
     [
-      'babel-plugin-root-import',
+      require.resolve('babel-plugin-root-import'),
       {
         rootPathSuffix: 'src',
       },
     ],
-    '@babel/plugin-proposal-optional-chaining',
-    '@babel/plugin-proposal-nullish-coalescing-operator',
+    require.resolve('@babel/plugin-proposal-optional-chaining'),
+    require.resolve('@babel/plugin-proposal-nullish-coalescing-operator'),
   ]
   if (config.REACT && hasOptional('react-hot-loader/babel')) {
-    options.plugins.push('react-hot-loader/babel')
+    options.plugins.push(require.resolve('react-hot-loader/babel'))
   }
   if (options.enableReactRefresh && config.REACT && hasOptional('react-refresh/babel')) {
-    options.plugins.push('react-refresh/babel')
+    options.plugins.push(require.resolve('react-refresh/babel'))
   }
   return {
-    loader: 'babel-loader',
+    loader: require.resolve('babel-loader'),
     options,
   }
 }

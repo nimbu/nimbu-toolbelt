@@ -1,7 +1,7 @@
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 
 const getBaseWebpackConfig = require('./webpack.base.js')
 const utils = require('./utils')
@@ -43,19 +43,11 @@ const webpackConfig = () => {
       minimize: true,
       minimizer: [
         new CssMinimizerPlugin(),
-        new UglifyJsPlugin({
-          sourceMap: shouldUseSourceMap,
-          uglifyOptions: {
-            compress: {
-              comparisons: false,
-              drop_console: true,
-            },
-            mangle: true,
-            output: {
-              ascii_only: true,
-              comments: false,
-            },
-            warnings: false,
+        new TerserPlugin({
+          terserOptions: {
+            sourceMap: shouldUseSourceMap,
+            safari10: false,
+            ie8: false,
           },
         }),
       ],
