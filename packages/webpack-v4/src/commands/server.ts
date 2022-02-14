@@ -1,7 +1,7 @@
 import Command from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
-import NimbuServer from '../nimbu-gem/server'
+import NimbuServer, { NimbuGemServerOptions } from '../nimbu-gem/server'
 import WebpackDevServer from '../webpack/server'
 import detectPort from 'detect-port'
 export default class Server extends Command {
@@ -30,6 +30,9 @@ export default class Server extends Command {
     compass: Flags.boolean({
       description: 'Use legacy ruby SASS compilation.',
     }),
+    haml: Flags.boolean({
+      description: 'Use legacy ruby HAML compiler.',
+    }),
     nowebpack: Flags.boolean({
       description: 'Do not use webpack.',
     }),
@@ -53,9 +56,10 @@ export default class Server extends Command {
     return this._nimbuServer
   }
 
-  async spawnNimbuServer(port: number, nocookies: boolean, compass: boolean) {
+  type
+  async spawnNimbuServer(port: number, options: NimbuGemServerOptions = {}) {
     this.log(chalk.red('Starting nimbu server...'))
-    await this.nimbuServer.start(port, { nocookies, compass })
+    await this.nimbuServer.start(port, options)
   }
 
   async stopNimbuServer() {
@@ -100,7 +104,11 @@ export default class Server extends Command {
     const nimbuPort = flags.nowebpack ? flags.port : flags['nimbu-port']!
 
     await this.checkPort(nimbuPort)
-    await this.spawnNimbuServer(nimbuPort, flags.nocookies, flags.compass)
+    await this.spawnNimbuServer(nimbuPort, {
+      nocookies: flags.nocookies,
+      compass: flags.compass,
+      haml: flags.haml,
+    })
 
     if (!flags.nowebpack) {
       await this.checkPort(flags.port)
