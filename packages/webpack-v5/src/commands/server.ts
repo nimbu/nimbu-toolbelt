@@ -59,7 +59,6 @@ export default class Server extends Command {
   }
 
   async stopNimbuServer() {
-    this.log(chalk.red('Giving nimbu server some time to stop...'))
     await this.nimbuServer.stop()
   }
 

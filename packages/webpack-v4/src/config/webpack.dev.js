@@ -65,6 +65,7 @@ const webpackConfig = () => {
   if (ReactRefreshWebpackPlugin != null) {
     plugins.push(new ReactRefreshWebpackPlugin())
   }
+
   return merge(baseWebpackConfig, {
     devtool: 'cheap-module-source-map',
     mode: 'development',

@@ -59,7 +59,6 @@ export default class Server extends Command {
   }
 
   async stopNimbuServer() {
-    this.log(chalk.red('Giving nimbu server some time to stop...'))
     await this.nimbuServer.stop()
   }
 
@@ -75,6 +74,7 @@ export default class Server extends Command {
       await this.webpackServer.start(host, defaultPort, nimbuPort, 'http', open, options)
     } catch (error) {
       console.error('⚠️  Could not start webpack-dev-server ⚠️ \n\n', error, '\n')
+      await this.catch()
       process.exit(1)
     }
   }
@@ -99,6 +99,9 @@ export default class Server extends Command {
 
     const nimbuPort = flags.nowebpack ? flags.port : flags['nimbu-port']!
 
+    await this.checkPort(nimbuPort)
+    await this.spawnNimbuServer(nimbuPort, flags.nocookies, flags.compass)
+
     if (!flags.nowebpack) {
       await this.checkPort(flags.port)
       await this.startWebpackDevServer(flags.host, flags.port, flags['nimbu-port']!, !flags.noopen, {
@@ -106,10 +109,8 @@ export default class Server extends Command {
       })
     }
 
-    await this.checkPort(nimbuPort)
-    await this.spawnNimbuServer(nimbuPort, flags.nocookies, flags.compass)
-
     await this.waitForStopSignals()
+
     // Explicitly exit the process to make sure all subprocesses started by webpack plugins are gone
     process.exit(0)
   }
@@ -128,13 +129,14 @@ export default class Server extends Command {
 
     if (suggestedPort != port) {
       console.error(`\n⚠️  There is already a process listening on port ${port} ⚠️ \n`)
+      await this.catch()
       process.exit(1)
     }
   }
 
   private waitForStopSignals(): Promise<void> {
     return new Promise<void>((resolve, _reject) => {
-      ;(['SIGINT', 'SIGTERM'] as Array<NodeJS.Signals>).forEach((sig) => {
+      ;(['SIGHUP', 'SIGINT', 'SIGTERM'] as Array<NodeJS.Signals>).forEach((sig) => {
         process.on(sig, async () => {
           this.log(chalk.cyan('Shutting down ...'))
           await this.stopWebpackDevServer()
