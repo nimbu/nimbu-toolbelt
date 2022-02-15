@@ -1,5 +1,5 @@
 const webpack = require('webpack')
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 
 const getBaseWebpackConfig = require('./webpack.base.js')
 const utils = require('./utils')

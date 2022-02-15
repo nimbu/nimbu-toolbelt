@@ -5,7 +5,15 @@ import spawn from './process'
 export interface NimbuGemServerOptions {
   nocookies?: boolean
   compass?: boolean
+  haml?: boolean
 }
+
+// Makes the script crash on unhandled rejections instead of silently
+// ignoring them. In the future, promise rejections that are not handled will
+// terminate the Node.js process with a non-zero exit code.
+process.on('unhandledRejection', (err) => {
+  throw err
+})
 
 export default class NimbuGemServer {
   private process?: ChildProcess
@@ -24,8 +32,12 @@ export default class NimbuGemServer {
   }
 
   async start(port: number, options?: NimbuGemServerOptions): Promise<void> {
-    const args = ['--haml', '--host', '127.0.0.1', '--port', `${port}`]
+    const args = ['--host', '127.0.0.1', '--port', `${port}`]
     let embeddedGemfile = true
+
+    if (options && options.haml) {
+      args.push('--haml')
+    }
 
     if (options && options.nocookies) {
       args.push('--nocookies')
@@ -69,10 +81,25 @@ export default class NimbuGemServer {
   async stop(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.process) {
-        this.process.once('close', () => {
-          this.process = undefined
+        function exitHandler(options) {
+          if (options.exit) process.exit()
+
           resolve()
-        })
+        }
+
+        //do something when app is closing
+        this.process.on('exit', exitHandler.bind(null, { cleanup: true }))
+
+        //catches ctrl+c event
+        this.process.on('SIGINT', exitHandler.bind(null, { exit: true }))
+
+        // catches "kill pid" (for example: nodemon restart)
+        this.process.on('SIGUSR1', exitHandler.bind(null, { exit: true }))
+        this.process.on('SIGUSR2', exitHandler.bind(null, { exit: true }))
+
+        //catches uncaught exceptions
+        this.process.on('uncaughtException', exitHandler.bind(null, { exit: true }))
+
         this.process.kill('SIGTERM')
       } else {
         reject(new Error('Server is not started'))

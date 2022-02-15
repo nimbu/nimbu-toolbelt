@@ -40,9 +40,6 @@ const config = () => {
     resolve: {
       extensions: ['.js', '.jsx', '.coffee', '.ts', '.tsx'],
     },
-    experiments: {
-      asset: true,
-    },
   }
 }
 

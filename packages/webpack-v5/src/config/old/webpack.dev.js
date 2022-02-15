@@ -1,8 +1,8 @@
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const webpack = require('webpack')
 const getBaseWebpackConfig = require('./webpack.base.js')
 const utils = require('./utils')
-const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+const FriendlyErrorsPlugin = require('@nuxt/friendly-errors-webpack-plugin')
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin')
 const {
   buildConfig: { get: getProjectConfig },

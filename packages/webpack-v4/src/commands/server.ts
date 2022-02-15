@@ -56,7 +56,6 @@ export default class Server extends Command {
     return this._nimbuServer
   }
 
-  type
   async spawnNimbuServer(port: number, options: NimbuGemServerOptions = {}) {
     this.log(chalk.red('Starting nimbu server...'))
     await this.nimbuServer.start(port, options)
@@ -99,28 +98,56 @@ export default class Server extends Command {
   }
 
   async execute() {
-    const { flags } = await this.parse(Server)
+    try {
+      this.registerSignalHandlers()
 
-    const nimbuPort = flags.nowebpack ? flags.port : flags['nimbu-port']!
+      const { flags } = await this.parse(Server)
 
-    await this.checkPort(nimbuPort)
-    await this.spawnNimbuServer(nimbuPort, {
-      nocookies: flags.nocookies,
-      compass: flags.compass,
-      haml: flags.haml,
-    })
+      const nimbuPort = flags.nowebpack ? flags.port : flags['nimbu-port']!
 
-    if (!flags.nowebpack) {
-      await this.checkPort(flags.port)
-      await this.startWebpackDevServer(flags.host, flags.port, flags['nimbu-port']!, !flags.noopen, {
-        poll: flags.poll,
+      await this.checkPort(nimbuPort)
+      await this.spawnNimbuServer(nimbuPort, {
+        nocookies: flags.nocookies,
+        compass: flags.compass,
+        haml: flags.haml,
       })
+
+      if (!flags.nowebpack) {
+        await this.checkPort(flags.port)
+        await this.startWebpackDevServer(flags.host, flags.port, flags['nimbu-port']!, !flags.noopen, {
+          poll: flags.poll,
+        })
+      }
+
+      await this.waitForStopSignals()
+
+      // Explicitly exit the process to make sure all subprocesses started by webpack plugins are gone
+      process.exit(0)
+    } catch {
+      // ensure whatever happens, we exit both webpack-dev-server or the nimbu-server
+      this.catch()
+    }
+  }
+
+  private registerSignalHandlers() {
+    const exitHandler = async (options) => {
+      await this.catch()
+
+      if (options.exit) process.exit()
     }
 
-    await this.waitForStopSignals()
+    //do something when app is closing
+    process.on('exit', exitHandler.bind(null, { cleanup: true }))
 
-    // Explicitly exit the process to make sure all subprocesses started by webpack plugins are gone
-    process.exit(0)
+    //catches ctrl+c event
+    process.on('SIGINT', exitHandler.bind(null, { exit: true }))
+
+    // catches "kill pid" (for example: nodemon restart)
+    process.on('SIGUSR1', exitHandler.bind(null, { exit: true }))
+    process.on('SIGUSR2', exitHandler.bind(null, { exit: true }))
+
+    //catches uncaught exceptions
+    process.on('uncaughtException', exitHandler.bind(null, { exit: true }))
   }
 
   async catch() {
