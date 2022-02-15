@@ -55,7 +55,7 @@ const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false'
 const emitErrorsAsWarnings = process.env.ESLINT_NO_DEV_ERRORS === 'true'
 const disableESLintPlugin = process.env.DISABLE_ESLINT_PLUGIN === 'true'
 
-const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT || '10000')
+const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT || '10000') // smaller then 10000 bytes will be inlined as data url
 
 // Check if TypeScript is setup
 const useTypeScript = fs.existsSync(paths.appTsConfig)
@@ -244,7 +244,7 @@ module.exports = function (webpackEnv) {
       chunkFilename: isEnvProduction
         ? 'javascripts/[name].[contenthash:8].chunk.js'
         : isEnvDevelopment && 'javascripts/[name].chunk.js',
-      assetModuleFilename: 'images/[name].[hash][ext]',
+      assetModuleFilename: 'images/[name][ext]',
       // webpack uses `publicPath` to determine where the app is being served from.
       // It requires a trailing slash, or the file assets will get an incorrect path.
       // We inferred the "public path" (such as / or /my-project) from homepage.
@@ -273,6 +273,7 @@ module.exports = function (webpackEnv) {
       minimizer: [
         // This is only used in production mode
         new TerserPlugin({
+          extractComments: false, // do not output LICENSE.txt
           terserOptions: {
             parse: {
               // We want terser to parse ecma 8 code. However, we don't want it
@@ -391,12 +392,27 @@ module.exports = function (webpackEnv) {
             // smaller than specified limit in bytes as data URLs to avoid requests.
             // A missing `test` is equivalent to a match.
             {
-              test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+              test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ico$/],
               type: 'asset',
               parser: {
                 dataUrlCondition: {
                   maxSize: imageInlineSizeLimit,
                 },
+              },
+              generator: {
+                filename: 'images/[name][ext]?h=[hash:8]',
+              },
+            },
+            {
+              test: [/\.(eot|otf|woff|woff2|ttf)(\?\S*)?$/, /fonts.*\.svg(\?\S*)?$/],
+              type: 'asset',
+              parser: {
+                dataUrlCondition: {
+                  maxSize: imageInlineSizeLimit,
+                },
+              },
+              generator: {
+                filename: 'fonts/[name][ext]?h=[hash:8]',
               },
             },
             {
@@ -424,7 +440,7 @@ module.exports = function (webpackEnv) {
                 {
                   loader: require.resolve('file-loader'),
                   options: {
-                    name: 'images/[name].[ext]?h=[hash:8]',
+                    name: 'images/[name][ext]?h=[hash:8]',
                   },
                 },
               ],
