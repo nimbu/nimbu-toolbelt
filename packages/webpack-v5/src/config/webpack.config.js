@@ -483,6 +483,11 @@ module.exports = function (webpackEnv) {
                 },
               ],
             },
+            {
+              exclude: /node_modules/,
+              test: /\.coffee$/,
+              use: ['coffee-loader'],
+            },
             // Process application JS with Babel.
             // The preset includes JSX, Flow, TypeScript, and some ESnext features.
             {
@@ -642,6 +647,12 @@ module.exports = function (webpackEnv) {
       // This gives some necessary context to module not found errors, such as
       // the requesting resource.
       new ModuleNotFoundPlugin(paths.appPath),
+      // Make backwards compatible with projects using jQuery
+      new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+      }),
       // Makes some environment variables available to the JS code, for example:
       // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
       // It is absolutely essential that NODE_ENV is set to production

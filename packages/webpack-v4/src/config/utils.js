@@ -70,7 +70,7 @@ function codeLoaders(options) {
     {
       exclude: /node_modules/,
       test: /\.coffee$/,
-      use: [babelLoader(options), 'coffee-loader'],
+      use: require.resolve('coffee-loader'),
     },
     {
       // Application JS
