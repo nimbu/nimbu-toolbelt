@@ -32,7 +32,7 @@ const createEnvironmentHash = require('./persistentCache/createEnvironmentHash')
 const { hasOptional } = require('./utils')
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
-const shouldUseSourceMap = false //process.env.GENERATE_SOURCEMAP !== 'false'
+const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false'
 
 const reactRefreshRuntimeEntry = hasOptional('react-refresh/runtime') && require.resolve('react-refresh/runtime')
 
@@ -47,10 +47,6 @@ const babelRuntimeEntryHelpers = require.resolve('@babel/runtime/helpers/esm/ass
 const babelRuntimeRegenerator = require.resolve('@babel/runtime/regenerator', {
   paths: [babelRuntimeEntry],
 })
-
-// Some apps do not need the benefits of saving a web request, so not inlining the chunk
-// makes for a smoother build process.
-const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false'
 
 const emitErrorsAsWarnings = process.env.ESLINT_NO_DEV_ERRORS === 'true'
 const disableESLintPlugin = process.env.DISABLE_ESLINT_PLUGIN === 'true'
@@ -240,10 +236,6 @@ module.exports = function (webpackEnv) {
       // There will be one main bundle, and one file per asynchronous chunk.
       // In development, it does not produce real files.
       filename: 'javascripts/[name].js',
-      // There are also additional JS chunk files if you use code splitting.
-      chunkFilename: isEnvProduction
-        ? 'javascripts/[name].[contenthash:8].chunk.js'
-        : isEnvDevelopment && 'javascripts/[name].chunk.js',
       assetModuleFilename: 'images/[name][ext]',
       // webpack uses `publicPath` to determine where the app is being served from.
       // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -315,6 +307,38 @@ module.exports = function (webpackEnv) {
         // This is only used in production mode
         new CssMinimizerPlugin(),
       ],
+      removeEmptyChunks: true,
+      splitChunks: isEnvProduction
+        ? {
+            cacheGroups: {
+              polyfills: {
+                chunks: 'initial',
+                name: 'polyfills',
+                priority: 10,
+                test: function (module) {
+                  return (
+                    /css/.test(module.type) === false &&
+                    module.context &&
+                    (module.context.includes('node_modules/core-js') ||
+                      module.context.includes('node_modules/regenerator-runtime'))
+                  )
+                },
+              },
+              vendor: {
+                chunks: 'initial',
+                name: 'vendor',
+                priority: 0,
+                test: function (module) {
+                  return (
+                    /css/.test(module.type) === false &&
+                    module.context &&
+                    (module.context.includes('node_modules') || module.context.includes('src/vendor'))
+                  )
+                },
+              },
+            },
+          }
+        : {},
     },
     resolve: {
       // This allows you to set a fallback for where webpack should look for modules.
@@ -342,24 +366,25 @@ module.exports = function (webpackEnv) {
         }),
         ...(modules.webpackAliases || {}),
       },
-      // plugins: [
-      //   // Prevents users from importing files from outside of src/ (or node_modules/).
-      //   // This often causes confusion because we only process files within src/ with babel.
-      //   // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
-      //   // please link the files into your node_modules/ and let module-resolution kick in.
-      //   // Make sure your source files are compiled, as they will not be processed in any way.
-      //   new ModuleScopePlugin(
-      //     paths.appSrc,
-      //     [
-      //       paths.appPackageJson,
-      //       hasOptional('react-refresh/runtime') && reactRefreshRuntimeEntry,
-      //       hasOptional(ReactRefreshName) && reactRefreshWebpackPluginRuntimeEntry,
-      //       babelRuntimeEntry,
-      //       babelRuntimeEntryHelpers,
-      //       babelRuntimeRegenerator,
-      //     ].filter((plugin) => !!plugin),
-      //   ),
-      // ],
+      plugins: [
+        // Prevents users from importing files from outside of src/ (or node_modules/).
+        // This often causes confusion because we only process files within src/ with babel.
+        // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
+        // please link the files into your node_modules/ and let module-resolution kick in.
+        // Make sure your source files are compiled, as they will not be processed in any way.
+        new ModuleScopePlugin(
+          paths.appSrc,
+          [
+            paths.appPackageJson,
+            hasOptional('react-refresh/runtime') && reactRefreshRuntimeEntry,
+            hasOptional(ReactRefreshName) && reactRefreshWebpackPluginRuntimeEntry,
+            babelRuntimeEntry,
+            babelRuntimeEntryHelpers,
+            babelRuntimeRegenerator,
+            require.resolve('script-loader'),
+          ].filter((plugin) => !!plugin),
+        ),
+      ],
     },
     module: {
       strictExportPresence: true,
@@ -739,5 +764,23 @@ module.exports = function (webpackEnv) {
     // Turn off performance processing because we utilize
     // our own hints via the FileSizeReporter
     performance: false,
+    ignoreWarnings: [
+      // Ignore warnings raised by source-map-loader.
+      // some third party packages may ship miss-configured sourcemaps, that interrupts the build
+      // See: https://github.com/facebook/create-react-app/discussions/11278#discussioncomment-1780169
+      /**
+       *
+       * @param {import('webpack').WebpackError} warning
+       * @returns {boolean}
+       */
+      function ignoreSourcemapsloaderWarnings(warning) {
+        return (
+          warning.module &&
+          warning.module.resource.includes('node_modules') &&
+          warning.details &&
+          warning.details.includes('source-map-loader')
+        )
+      },
+    ],
   }
 }
