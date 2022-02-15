@@ -3,7 +3,6 @@
 const {
   buildConfig: { get: getProjectConfig },
 } = require('@nimbu-cli/command')
-const debug = require('debug')('nimbu')
 
 const fs = require('fs')
 const path = require('path')
