@@ -94,9 +94,14 @@ function htmlWebPackPlugins(entries, options = {}) {
       template: template,
       templateParameters: {
         prefix: `${name}_`,
+        cdnRoot: options.cdnRoot,
       },
     })
   })
+}
+
+function ensureTrailingSlash(url) {
+  return url.endsWith('/') ? url : `${url}/`
 }
 
 // This is the production and development configuration.
@@ -125,12 +130,14 @@ module.exports = function (webpackEnv) {
 
   // Support for legacy custom svg loaders
   const shouldUseCustomSVGLoader = projectConfig.SVG_LOADER_INCLUDE != null
-
+  const publicUrlOrPath = ensureTrailingSlash(
+    isEnvProduction ? projectConfig.CDN_ROOT ?? process.env.PUBLIC_URL ?? '../' : '/',
+  )
   // We will provide `paths.publicUrlOrPath` to our app
   // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
   // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
   // Get environment variables to inject into our app.
-  const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1))
+  const env = getClientEnvironment(publicUrlOrPath)
 
   const shouldUseReactRefresh = hasOptional(ReactRefreshName) && env.raw.FAST_REFRESH
 
@@ -140,9 +147,7 @@ module.exports = function (webpackEnv) {
       isEnvDevelopment && require.resolve('style-loader'),
       isEnvProduction && {
         loader: MiniCssExtractPlugin.loader,
-        // css is located in `static/css`, use '../../' to locate index.html folder
-        // in production `paths.publicUrlOrPath` can be a relative path
-        options: paths.publicUrlOrPath.startsWith('.') ? { publicPath: '../../' } : {},
+        options: { publicPath: publicUrlOrPath },
       },
       {
         loader: require.resolve('css-loader'),
@@ -239,7 +244,7 @@ module.exports = function (webpackEnv) {
       // webpack uses `publicPath` to determine where the app is being served from.
       // It requires a trailing slash, or the file assets will get an incorrect path.
       // We inferred the "public path" (such as / or /my-project) from homepage.
-      publicPath: paths.publicUrlOrPath,
+      publicPath: publicUrlOrPath,
       // Point sourcemap entries to original disk location (format as URL on Windows)
       devtoolModuleFilenameTemplate: isEnvProduction
         ? (info) => path.relative(paths.appSrc, info.absoluteResourcePath).replace(/\\/g, '/')
@@ -642,7 +647,7 @@ module.exports = function (webpackEnv) {
     },
     plugins: [
       // Generates an `index.html` file with the <script> injected.
-      ...htmlWebPackPlugins(Object.keys(entry), { alwaysWriteToDisk: isEnvDevelopment }),
+      ...htmlWebPackPlugins(Object.keys(entry), { alwaysWriteToDisk: isEnvDevelopment, cdnRoot: publicUrlOrPath }),
       isEnvDevelopment && new HtmlWebpackHarddiskPlugin(),
       // This gives some necessary context to module not found errors, such as
       // the requesting resource.

@@ -47,8 +47,6 @@ export default class Build extends Command {
     const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages')
     const FileSizeReporter = require('react-dev-utils/FileSizeReporter')
     const printBuildError = require('react-dev-utils/printBuildError')
-
-    const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild
     const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild
 
     const isInteractive = process.stdout.isTTY
@@ -60,13 +58,6 @@ export default class Build extends Command {
     const { checkBrowsers } = require('react-dev-utils/browsersHelper')
     checkBrowsers(paths.appPath, isInteractive)
       .then(() => {
-        spinner.text = 'Measuring current build sizes...'
-
-        // First, read the current file sizes in build directory.
-        // This lets us display how much they changed later.
-        return measureFileSizesBeforeBuild(paths.appBuild)
-      })
-      .then((previousFileSizes) => {
         spinner.text = 'Creating an optimized production build...'
         spinner.color = 'yellow'
 
@@ -122,7 +113,6 @@ export default class Build extends Command {
 
             const resolveArgs = {
               stats,
-              previousFileSizes,
               warnings: messages.warnings,
             }
 
@@ -138,7 +128,7 @@ export default class Build extends Command {
         })
       })
       .then(
-        ({ stats, previousFileSizes, warnings }) => {
+        ({ stats, warnings }) => {
           if (warnings.length) {
             spinner.warn(chalk.yellow('Compiled with warnings.\n'))
             console.log(warnings.join('\n\n'))
@@ -153,7 +143,11 @@ export default class Build extends Command {
           console.log('File sizes after gzip:\n')
           printFileSizesAfterBuild(
             stats,
-            previousFileSizes,
+            {
+              // we skip the beforeBuildSize as it can take a loooong time to recursively walk the whole project
+              root: paths.appBuild,
+              sizes: {},
+            },
             paths.appBuild,
             WARN_AFTER_BUNDLE_GZIP_SIZE,
             WARN_AFTER_CHUNK_GZIP_SIZE,
