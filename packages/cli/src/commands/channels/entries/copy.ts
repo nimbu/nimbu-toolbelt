@@ -929,4 +929,8 @@ export default class CopyChannels extends Command {
       }
     }
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }

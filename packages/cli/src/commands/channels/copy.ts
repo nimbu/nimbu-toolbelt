@@ -378,4 +378,8 @@ export default class CopyChannels extends Command {
       return outputStream
     })
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }

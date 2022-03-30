@@ -215,4 +215,8 @@ export default class DiffChannels extends Command {
       }
     }
   }
+
+  get needsConfig(): boolean {
+    return false
+  }
 }
