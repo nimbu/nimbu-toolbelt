@@ -2,4 +2,4 @@
 source "https://rubygems.org"
 
 gem "nimbu", "~> 0.13.1"
-gem 'haml', "< 5"
+gem 'haml', "< 6"
