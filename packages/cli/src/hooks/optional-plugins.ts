@@ -41,6 +41,12 @@ const hook: Hook<'init'> = async function (options) {
 
       if (options.config.plugins.find((p) => p.name === instance.name)) return
       options.config.plugins.push(instance)
+
+      //@ts-ignore: yes, we are deliberately using a private method here...
+      options.config.loadCommands(instance)
+
+      //@ts-ignore: this too
+      options.config.loadTopics(instance)
     }
   }
 }

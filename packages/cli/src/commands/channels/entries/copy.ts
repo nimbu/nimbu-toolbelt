@@ -421,8 +421,8 @@ export default class CopyChannels extends Command {
     let perPage = 30
     if (perPageFromCtx !== undefined && parseInt(perPageFromCtx, 10) > 0) {
       perPage = parseInt(perPageFromCtx, 10)
-      queryParts.push(`per_page=${perPage}`)
     }
+    queryParts.push(`per_page=${perPage}`)
 
     let queries: string[] = []
     if (Object.keys(containedInParts).length > 0) {
