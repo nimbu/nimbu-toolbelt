@@ -30,7 +30,7 @@ export const publicUrlOrPath = getPublicUrlOrPath(
 
 const buildPath = process.env.BUILD_PATH || NIMBU_DIRECTORY
 
-const moduleFileExtensions = [
+export const moduleFileExtensions = [
   'web.mjs',
   'mjs',
   'web.js',
@@ -56,23 +56,21 @@ const resolveModule = (resolveFn, filePath) => {
   return resolveFn(`${filePath}.js`)
 }
 
-export const dotenv = resolveApp('.env'),
-export const appPath = resolveApp('.'),
-export const appBuild = resolveApp(buildPath),
-export const appPublic = resolveApp('public'),
-export const appHtml = resolveApp('public/index.html'),
-export const appIndexJs = resolveModule(resolveApp, 'src/index.js'),
-export const appIndexScss = resolveModule(resolveApp, 'src/index.scss'),
-export const appPackageJson = resolveApp('package.json'),
-export const appSrc = resolveApp('src'),
-export const appTsConfig = resolveApp('tsconfig.json'),
-export const appJsConfig = resolveApp('jsconfig.json'),
-export const yarnLockFile = resolveApp('yarn.lock'),
-export const testsSetup = resolveModule(resolveApp, 'src/setupTests'),
-export const proxySetup = resolveApp('src/setupProxy.js'),
-export const appNodeModules = resolveApp('node_modules'),
-export const appWebpackCache = resolveApp('node_modules/.cache'),
-export const appTsBuildInfoFile = resolveApp('node_modules/.cache/tsconfig.tsbuildinfo'),
-export const swSrc = resolveModule(resolveApp, 'src/service-worker'),
-
-export const moduleFileExtensions = moduleFileExtensions
+export const dotenv = resolveApp('.env')
+export const appPath = resolveApp('.')
+export const appBuild = resolveApp(buildPath)
+export const appPublic = resolveApp('public')
+export const appHtml = resolveApp('public/index.html')
+export const appIndexJs = resolveModule(resolveApp, 'src/index.js')
+export const appIndexScss = resolveModule(resolveApp, 'src/index.scss')
+export const appPackageJson = resolveApp('package.json')
+export const appSrc = resolveApp('src')
+export const appTsConfig = resolveApp('tsconfig.json')
+export const appJsConfig = resolveApp('jsconfig.json')
+export const yarnLockFile = resolveApp('yarn.lock')
+export const testsSetup = resolveModule(resolveApp, 'src/setupTests')
+export const proxySetup = resolveApp('src/setupProxy.js')
+export const appNodeModules = resolveApp('node_modules')
+export const appWebpackCache = resolveApp('node_modules/.cache')
+export const appTsBuildInfoFile = resolveApp('node_modules/.cache/tsconfig.tsbuildinfo')
+export const swSrc = resolveModule(resolveApp, 'src/service-worker')
