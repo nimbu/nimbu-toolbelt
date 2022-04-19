@@ -469,7 +469,7 @@ module.exports = function (webpackEnv) {
                 {
                   loader: require.resolve('file-loader'),
                   options: {
-                    name: 'images/[name][ext]?h=[hash:8]',
+                    name: 'images/[name].[ext]?h=[hash:8]',
                   },
                 },
               ],
