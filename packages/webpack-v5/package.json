@@ -1,6 +1,6 @@
 {
   "name": "@nimbu-cli/plugin-webpack-v5",
-  "version": "5.2.2",
+  "version": "5.2.3",
   "author": "Zenjoy Engineering",
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "main": "lib/index.js",
@@ -64,7 +64,7 @@
     "typescript": ">= 4",
     "tslib": "^1",
     "webpack": "^5.68.0",
-    "webpack-dev-server": "^4.7.4",
+    "webpack-dev-server": "^4.10.0",
     "webpack-merge": "^5.8.0",
     "workbox-webpack-plugin": "^6.4.1"
   },
@@ -76,7 +76,6 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.8",
     "@types/node-fetch": "^2.1.2",
-    "@types/webpack-dev-server": "^4.3.1",
     "chai": "^4.2.0",
     "chai-match": "^1.1.1",
     "codecov": "^3.2.0",
