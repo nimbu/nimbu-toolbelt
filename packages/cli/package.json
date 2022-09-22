@@ -8,7 +8,7 @@
   },
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "dependencies": {
-    "@nimbu-cli/command": "^5.1.0",
+    "@nimbu-cli/command": "^5.2.0",
     "@oclif/plugin-autocomplete": "^1.3.0",
     "@oclif/plugin-commands": "^2.2.0",
     "@oclif/plugin-help": "^5.1.12",
