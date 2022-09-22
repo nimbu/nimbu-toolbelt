@@ -91,34 +91,47 @@ export default class Server extends Command {
   }
 
   async initialize() {
-    if (!this.initialized) {
-      await super.initialize()
-      this._nimbuServer = new NimbuServer(this.nimbu, this.log.bind(this), this.warn.bind(this))
+    this.debug('Initializing server command')
+    try {
+      if (!this.initialized) {
+        await super.initialize()
+        this._nimbuServer = new NimbuServer(this.nimbu, this.log.bind(this), this.warn.bind(this))
+      }
+    } catch (error) {
+      console.error(error)
+      process.exit(1)
     }
   }
 
   async execute() {
     this.registerSignalHandlers()
 
-    const { flags } = await this.parse(Server)
+    try {
+      this.debug('Starting server command')
 
-    const nimbuPort = flags.nowebpack ? flags.port : flags['nimbu-port']!
+      const { flags } = await this.parse(Server)
 
-    await this.checkPort(nimbuPort)
-    await this.spawnNimbuServer(nimbuPort, {
-      nocookies: flags.nocookies,
-      compass: flags.compass,
-      haml: flags.haml,
-    })
+      const nimbuPort = flags.nowebpack ? flags.port : flags['nimbu-port']!
 
-    if (!flags.nowebpack) {
-      await this.checkPort(flags.port)
-      await this.startWebpackDevServer(flags.host, flags.port, flags['nimbu-port']!, !flags.noopen, {
-        poll: flags.poll,
+      await this.checkPort(nimbuPort)
+      await this.spawnNimbuServer(nimbuPort, {
+        nocookies: flags.nocookies,
+        compass: flags.compass,
+        haml: flags.haml,
       })
-    }
 
-    await this.waitForStopSignals()
+      if (!flags.nowebpack) {
+        await this.checkPort(flags.port)
+        await this.startWebpackDevServer(flags.host, flags.port, flags['nimbu-port']!, !flags.noopen, {
+          poll: flags.poll,
+        })
+      }
+
+      await this.waitForStopSignals()
+    } catch (error) {
+      console.error(error)
+      process.exit(1)
+    }
 
     // Explicitly exit the process to make sure all subprocesses started by webpack plugins are gone
     process.exit(0)
