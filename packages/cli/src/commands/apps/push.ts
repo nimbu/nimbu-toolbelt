@@ -63,6 +63,7 @@ export default class AppsPush extends Command {
       const { argv } = await this.parse(AppsPush)
       const appConfig = await this.appConfig()
       const filesFound = await findMatchingFiles(appConfig.dir, appConfig.glob)
+      this.debug('Found: %s', filesFound)
 
       if (argv.length > 0) {
         this._files = intersection(argv.slice(), filesFound)
@@ -127,6 +128,7 @@ export default class AppsPush extends Command {
   }
 
   async execute() {
+    this.debug('Getting app config')
     const appConfig = await this.appConfig()
 
     try {

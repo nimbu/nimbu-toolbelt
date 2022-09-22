@@ -1,18 +1,29 @@
 import { http, https } from 'follow-redirects'
 import * as fs from 'fs-extra'
 import { basename } from 'path'
-import glob = require('glob')
+import { glob } from 'glob-gitignore'
+import ignore, { Ignore } from 'ignore'
+import Debug from 'debug'
+const debug = Debug('nimbu')
 
 const TIMEOUT = 10000
 
 const promiseGlob = function (pattern: string, options: any = {}): Promise<string[]> {
-  return new Promise((resolve, reject) => {
-    glob(pattern, options, (err, files) => (err === null ? resolve(files) : reject(err)))
-  })
+  return glob(pattern, options)
 }
 
 export async function findMatchingFiles(dir: string, pattern: string): Promise<string[]> {
-  return promiseGlob(`${dir}/${pattern}`)
+  debug('Looking for files in %s matching %s', dir, pattern)
+  return promiseGlob(`${dir}/${pattern}`).then((files) => {
+    const filenameOfIgnoreFile = `${dir}/.nimbuignore`
+    if (fs.existsSync(filenameOfIgnoreFile)) {
+      debug('Found .nimbuignore file, using it to filter files.')
+      const ignoreObj = ignore().add(fs.readFileSync(filenameOfIgnoreFile).toString())
+      return files.filter((file) => !ignoreObj.ignores(file.replace(`${dir}/`, '')))
+    } else {
+      return files
+    }
+  })
 }
 
 export function download(url, path, callback, debug = (msg: string) => {}) {
