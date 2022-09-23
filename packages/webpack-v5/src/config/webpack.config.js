@@ -653,11 +653,12 @@ module.exports = function (webpackEnv) {
       // the requesting resource.
       new ModuleNotFoundPlugin(paths.appPath),
       // Make backwards compatible with projects using jQuery
-      new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
-        'window.jQuery': 'jquery',
-      }),
+      hasOptional('jquery') &&
+        new webpack.ProvidePlugin({
+          $: require.resolve('jquery'),
+          jQuery: require.resolve('jquery'),
+          'window.jQuery': require.resolve('jquery'),
+        }),
       // Makes some environment variables available to the JS code, for example:
       // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
       // It is absolutely essential that NODE_ENV is set to production

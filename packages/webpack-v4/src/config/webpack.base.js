@@ -1,6 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const paths = require('./paths')
+const { hasOptional } = require('./utils')
 
 const {
   buildConfig: { get: getProjectConfig },
@@ -31,12 +32,13 @@ const config = () => {
       publicPath: '/',
     },
     plugins: [
-      new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
-        'window.jQuery': 'jquery',
-      }),
-    ],
+      hasOptional('jquery') &&
+        new webpack.ProvidePlugin({
+          $: require.resolve('jquery'),
+          jQuery: require.resolve('jquery'),
+          'window.jQuery': require.resolve('jquery'),
+        }),
+    ].filter(Boolean),
     resolve: {
       extensions: ['.js', '.jsx', '.coffee', '.ts', '.tsx'],
     },
