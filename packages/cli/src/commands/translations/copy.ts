@@ -4,6 +4,15 @@ import { CliUx, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 
+const timeUnitMapping = {
+  s: 1,
+  min: 60,
+  h: 60 * 60,
+  d: 24 * 60 * 60,
+  w: 7 * 24 * 60 * 60,
+  m: (365.25 / 12) * 24 * 60 * 60,
+  y: 365.25 * 24 * 60 * 60,
+}
 export default class CopyTranslations extends Command {
   static description = 'copy translations from one site to another'
 
@@ -24,6 +33,21 @@ export default class CopyTranslations extends Command {
     to: Flags.string({
       char: 't', // shorter flag version
       description: 'subdomain of the destination site',
+    }),
+    since: Flags.string({
+      char: 's', // shorter flag version
+      description:
+        'copy translations updated since the given date (use ISO 8601 format or a time unit like 1d, 1w, 1m, 1y)',
+      parse: async (input) => {
+        const match = input.match(/(?<number>[0-9]*)(?<unit>[s|min|h|d|w|m|y])/)
+        if (match) {
+          const { number, unit } = match.groups as any
+          const offset = number * timeUnitMapping[unit] * 1000
+          return new Date(Date.now() - offset).toISOString()
+        } else {
+          return new Date(input).toISOString()
+        }
+      },
     }),
     toHost: Flags.string({
       description: 'hostname of target Nimbu API',
@@ -70,6 +94,7 @@ export default class CopyTranslations extends Command {
         toHost,
         files: {},
         query: args.query,
+        since: flags.since,
       })
       .catch((error) => this.error(error))
   }
@@ -82,13 +107,23 @@ export default class CopyTranslations extends Command {
     }
     try {
       let query = ''
+      let queryParts: string[] = []
       if (ctx.query === '*') {
         // fetch all translations
       } else if (ctx.query.indexOf('*') !== -1) {
-        query = `?key.start=${ctx.query.replace('*', '')}`
+        queryParts.push(`key.start=${ctx.query.replace('*', '')}`)
       } else {
-        query = `?key=${ctx.query}`
+        queryParts.push(`key=${ctx.query}`)
       }
+
+      if (ctx.since != null) {
+        queryParts.push(`updated_at.gte=${ctx.since}`)
+      }
+
+      if (queryParts.length > 0) {
+        query = `?${queryParts.join('&')}`
+      }
+
       ctx.translations = await this.nimbu.get(`/translations${query}`, options)
     } catch (error) {
       if (error instanceof APIError && error.body != null && error.body.code === 101) {
