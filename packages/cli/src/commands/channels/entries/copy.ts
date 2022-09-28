@@ -44,6 +44,7 @@ type CopySingle = {
   query?: string
   where?: string
   per_page?: string
+  dryRun?: boolean
   upsert?: string
   files: {
     [k: string]: { path: string; cleanup: any }
@@ -106,6 +107,9 @@ export default class CopyChannels extends Command {
     'allow-errors': Flags.boolean({
       description: 'do not stop when an item fails and continue with the other',
     }),
+    'dry-run': Flags.boolean({
+      description: 'log which translations would be copied without actually copying them',
+    }),
   }
 
   // mapping of ids in source site to newly created items in target site
@@ -138,36 +142,44 @@ export default class CopyChannels extends Command {
 
   async executeSingleCopy(channel?: string) {
     const Listr = require('listr')
+    const ListrMultilineRenderer = require('listr-multiline-renderer')
     const { flags } = await this.parse(CopyChannels)
 
     const { fromChannel, toChannel, fromSite, toSite } = await this.getFromTo()
 
-    const tasks = new Listr([
-      {
-        title: `Fetching channel information ${chalk.bold(channel || fromChannel)} from site ${chalk.bold(fromSite)}`,
-        task: (ctx: CopySingle) => this.fetchChannel(ctx),
-      },
-      {
-        title: `Querying entries from channel ${chalk.bold(channel || fromChannel)}`,
-        task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
-      },
-      {
-        title: `Downloading attachments from channel ${chalk.bold(channel || fromChannel)}`,
-        enabled: (ctx: CopySingle) =>
-          (ctx.fileFields && ctx.fileFields.length > 0) || (ctx.galleryFields && ctx.galleryFields.length > 0),
-        task: (ctx: CopySingle) => this.downloadAttachments(ctx),
-      },
-      {
-        title: `Creating entries in channel ${chalk.bold(toChannel)} for site ${chalk.bold(toSite)}`,
-        skip: (ctx: CopySingle) => ctx.entries.length === 0,
-        task: (ctx: CopySingle) => this.createEntries(ctx),
-      },
-      {
-        title: `Updating self-references for new entries in channel ${chalk.bold(toChannel)}`,
-        enabled: (ctx: CopySingle) => ctx.selfReferences && ctx.selfReferences.length > 0,
-        task: (ctx: CopySingle) => this.updateEntries(ctx),
-      },
-    ])
+    const tasks = new Listr(
+      [
+        {
+          title: `Fetching channel information ${chalk.bold(channel || fromChannel)} from site ${chalk.bold(fromSite)}`,
+          task: (ctx: CopySingle) => this.fetchChannel(ctx),
+        },
+        {
+          title: `Querying entries from channel ${chalk.bold(channel || fromChannel)}`,
+          task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
+        },
+        {
+          title: `Downloading attachments from channel ${chalk.bold(channel || fromChannel)}`,
+          enabled: (ctx: CopySingle) =>
+            (ctx.fileFields && ctx.fileFields.length > 0) || (ctx.galleryFields && ctx.galleryFields.length > 0),
+          task: (ctx: CopySingle) => this.downloadAttachments(ctx),
+        },
+        {
+          title: `Creating entries in channel ${chalk.bold(toChannel)} for site ${chalk.bold(toSite)}`,
+          task: (ctx: CopySingle) => this.createEntries(ctx),
+          skip: (ctx) => {
+            if (ctx.entries.length === 0) return true
+            if (ctx.dryRun) return this.generateDryRun(ctx)
+          },
+        },
+        {
+          title: `Updating self-references for new entries in channel ${chalk.bold(toChannel)}`,
+          enabled: (ctx: CopySingle) => ctx.selfReferences && ctx.selfReferences.length > 0,
+          task: (ctx: CopySingle) => this.updateEntries(ctx),
+          skip: (ctx) => ctx.dryRun,
+        },
+      ],
+      { renderer: ListrMultilineRenderer },
+    )
 
     await tasks
       .run({
@@ -179,6 +191,7 @@ export default class CopyChannels extends Command {
         where: flags.where,
         per_page: flags['per-page'],
         upsert: flags.upsert,
+        dryRun: flags['dry-run'],
       })
       .catch((error) => this.error(error))
 
@@ -187,6 +200,7 @@ export default class CopyChannels extends Command {
 
   async executeRecursiveCopy() {
     const Listr = require('listr')
+    const ListrMultilineRenderer = require('listr-multiline-renderer')
     const { flags } = await this.parse(CopyChannels)
 
     const { fromChannel, toChannel, fromSite, toSite } = await this.getFromTo()
@@ -239,26 +253,30 @@ export default class CopyChannels extends Command {
                         },
                         {
                           title: `Creating entries in site ${chalk.bold(toSite)}`,
-                          skip: (ctx: CopySingle) => ctx.entries.length === 0,
                           task: (ctx: CopySingle) => this.createEntries(ctx),
+                          skip: (ctx: CopySingle) => {
+                            if (ctx.entries.length === 0) return true
+                            if (ctx.dryRun) return this.generateDryRun(ctx)
+                          },
                         },
                         {
                           title: `Updating self-references`,
                           enabled: (ctx: CopySingle) => ctx.selfReferences && ctx.selfReferences.length > 0,
                           task: (ctx: CopySingle) => this.updateEntries(ctx),
+                          skip: (ctx) => ctx.dryRun,
                         },
                       ],
-                      { collapse: false },
+                      { collapse: false, renderer: ListrMultilineRenderer },
                     )
                   },
                 })),
               ],
-              { collapse: false },
+              { collapse: false, renderer: ListrMultilineRenderer },
             )
           },
         },
       ],
-      { collapse: false },
+      { collapse: false, renderer: ListrMultilineRenderer },
     )
 
     await tasks
@@ -273,10 +291,26 @@ export default class CopyChannels extends Command {
         per_page: flags['per-page'],
         upsert: flags.upsert,
         only: flags.only,
+        dryRun: flags['dry-run'],
       })
       .catch((error) => this.error(error))
 
     this.printWarnings()
+  }
+
+  private generateDryRun(ctx?: any) {
+    const nbEntries = ctx.entries.length
+    const dryRunLogs: string[] = []
+    let crntIndex = 1
+    for (let entry of ctx.entries) {
+      dryRunLogs.push(
+        `[${crntIndex}/${nbEntries}] Dry-run: would copy entry ${chalk.bold(entry.title_field_value)} (${
+          entry.id
+        }) to ${chalk.bold(ctx.toSite)}`,
+      )
+      crntIndex++
+    }
+    return dryRunLogs.join('\n')
   }
 
   private async getFromTo() {

@@ -1,5 +1,4 @@
 import Command, { APIError } from '@nimbu-cli/command'
-
 import { CliUx, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
@@ -55,10 +54,14 @@ export default class CopyTranslations extends Command {
     fromHost: Flags.string({
       description: 'hostname of origin Nimbu API',
     }),
+    'dry-run': Flags.boolean({
+      description: 'log which translations would be copied without actually copying them',
+    }),
   }
 
   async execute() {
     const Listr = require('listr')
+    const ListrMultilineRenderer = require('listr-multiline-renderer')
     const { flags, args } = await this.parse(CopyTranslations)
 
     let fromSite = flags.from !== undefined ? flags.from! : this.nimbuConfig.site!
@@ -68,23 +71,43 @@ export default class CopyTranslations extends Command {
 
     if (fromSite === toSite) {
       CliUx.ux.error('The source site needs to differ from the destination.')
-      return
     }
 
     let fetchTitle = `Querying translations from site ${chalk.bold(fromSite)}`
     let createTitle = `Copying translations to site ${chalk.bold(toSite)}`
 
-    const tasks = new Listr([
+    const tasks = new Listr(
+      [
+        {
+          title: fetchTitle,
+          task: (ctx) => this.fetchTranslations(ctx),
+        },
+        {
+          title: createTitle,
+          task: (ctx) => this.createTranslations(ctx),
+          skip: (ctx) => {
+            if (ctx.translations.length === 0) return true
+            if (ctx.dryRun) {
+              const nbtranslations = ctx.translations.length
+              const dryRunLogs: string[] = []
+              let crntIndex = 1
+              for (let translation of ctx.translations) {
+                dryRunLogs.push(
+                  `[${crntIndex}/${nbtranslations}] Dry-run: would copy translation ${chalk.bold(
+                    translation.key,
+                  )} to ${chalk.bold(ctx.toSite)}`,
+                )
+                crntIndex++
+              }
+              return dryRunLogs.join('\n')
+            }
+          },
+        },
+      ],
       {
-        title: fetchTitle,
-        task: (ctx) => this.fetchTranslations(ctx),
+        renderer: ListrMultilineRenderer,
       },
-      {
-        title: createTitle,
-        task: (ctx) => this.createTranslations(ctx),
-        skip: (ctx) => ctx.translations.length === 0,
-      },
-    ])
+    )
 
     tasks
       .run({
@@ -95,6 +118,7 @@ export default class CopyTranslations extends Command {
         files: {},
         query: args.query,
         since: flags.since,
+        dryRun: flags['dry-run'],
       })
       .catch((error) => this.error(error))
   }
