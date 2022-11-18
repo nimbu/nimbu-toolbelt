@@ -71,7 +71,7 @@ export default class CopyPages extends Command {
       },
     ])
 
-    tasks
+    await tasks
       .run({
         fromSite,
         toSite,

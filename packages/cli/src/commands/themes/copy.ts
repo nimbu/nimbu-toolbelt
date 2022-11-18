@@ -106,8 +106,6 @@ export default class CopyThemes extends Command {
         files: {},
       })
       .catch((error) => this.error(error))
-
-    this.log('\n★  Done! ★')
   }
 
   private async fetchType(type: string, ctx: any) {

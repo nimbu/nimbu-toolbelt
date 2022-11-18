@@ -64,7 +64,7 @@ type CopySingleRecursive = {
   channels: Channel[]
 }
 
-export default class CopyChannels extends Command {
+export default class CopyChannelEntries extends Command {
   static description = 'copy channel entries from one to another'
 
   static flags = {
@@ -123,7 +123,7 @@ export default class CopyChannels extends Command {
   private warnings: string[] = []
 
   async execute() {
-    const { flags } = await this.parse(CopyChannels)
+    const { flags } = await this.parse(CopyChannelEntries)
 
     if (process.env.DEBUG != null) {
       process.stdout.isTTY = false
@@ -143,7 +143,7 @@ export default class CopyChannels extends Command {
   async executeSingleCopy(channel?: string) {
     const Listr = require('listr')
     const ListrMultilineRenderer = require('listr-multiline-renderer')
-    const { flags } = await this.parse(CopyChannels)
+    const { flags } = await this.parse(CopyChannelEntries)
 
     const { fromChannel, toChannel, fromSite, toSite } = await this.getFromTo()
 
@@ -201,7 +201,7 @@ export default class CopyChannels extends Command {
   async executeRecursiveCopy() {
     const Listr = require('listr')
     const ListrMultilineRenderer = require('listr-multiline-renderer')
-    const { flags } = await this.parse(CopyChannels)
+    const { flags } = await this.parse(CopyChannelEntries)
 
     const { fromChannel, toChannel, fromSite, toSite } = await this.getFromTo()
 
@@ -314,7 +314,7 @@ export default class CopyChannels extends Command {
   }
 
   private async getFromTo() {
-    const { flags } = await this.parse(CopyChannels)
+    const { flags } = await this.parse(CopyChannelEntries)
 
     let fromChannel: string
     let toChannel: string

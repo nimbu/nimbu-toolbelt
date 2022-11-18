@@ -47,7 +47,7 @@ export default class CopyProductsConfig extends Command {
       },
     ])
 
-    tasks
+    await tasks
       .run({
         fromSite,
         toSite,

@@ -55,7 +55,7 @@ export default class CopyMenus extends Command {
       },
     ])
 
-    tasks
+    await tasks
       .run({
         fromSite,
         toSite,

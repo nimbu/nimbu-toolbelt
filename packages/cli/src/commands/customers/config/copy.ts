@@ -46,7 +46,7 @@ export default class CopyCustomerConfig extends Command {
       },
     ])
 
-    tasks
+    await tasks
       .run({
         fromSite,
         toSite,

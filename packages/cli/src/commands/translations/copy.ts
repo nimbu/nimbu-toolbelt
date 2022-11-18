@@ -109,7 +109,7 @@ export default class CopyTranslations extends Command {
       },
     )
 
-    tasks
+    await tasks
       .run({
         fromSite,
         toSite,
