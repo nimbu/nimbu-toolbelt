@@ -55,7 +55,7 @@ GEM
       rack (>= 1.2, < 3)
     optimist (3.0.1)
     paint (2.2.1)
-    rack (2.2.3)
+    rack (2.2.6.2)
     rack-protection (2.1.0)
       rack
     rack-streaming-proxy (2.0.2)
