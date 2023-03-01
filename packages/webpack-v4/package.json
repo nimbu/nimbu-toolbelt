@@ -35,15 +35,15 @@
     "postcss-loader": "^3.0.0",
     "react-dev-utils": "^9.0.1",
     "react-svg-core": "^3.0.3",
-    "sass-loader": "^10.0.3",
     "sass": "^1.50.0",
+    "sass-loader": "^10.0.3",
     "script-loader": "^0.7.2",
     "style-loader": "^0.23.0",
-    "tslib": "^1",
     "terser-webpack-plugin": "^4.2.3",
+    "tslib": "^1",
+    "webpack": "^4.46.0",
     "webpack-dev-server": "^3.11.2",
-    "webpack-merge": "^4.2.1",
-    "webpack": "^4.46.0"
+    "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
     "@oclif/test": "^2.3.8",
@@ -110,5 +110,5 @@
     "version": "oclif readme && git add README.md",
     "yalc:publish": "yalc publish --push"
   },
-  "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
+  "gitHead": "2e7445ad3eeeca3e937a8c42c81673f0e706beb0"
 }

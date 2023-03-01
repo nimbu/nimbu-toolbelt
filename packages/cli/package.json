@@ -15,9 +15,9 @@
     "@oclif/plugin-not-found": "^2.3.21",
     "@oclif/plugin-plugins": "^2.3.2",
     "@oclif/plugin-update": "^3.1.6",
+    "@oclif/plugin-version": "^1",
     "@oclif/plugin-warn-if-update-available": "^2.0.29",
     "@oclif/plugin-which": "^2.2.16",
-    "@oclif/plugin-version": "^1",
     "date-fns": "^2",
     "deep-object-diff": "^1.1.0",
     "dependency-graph": "^0.11.0",
@@ -27,9 +27,9 @@
     "glob": "^7.2.0",
     "glob-gitignore": "^1.0.14",
     "hyperlinker": "^1",
+    "ignore": "^5.2.0",
     "inquirer": "^6.2.2",
     "inquirer-autocomplete-prompt": "^1.0.1",
-    "ignore": "^5.2.0",
     "js-yaml": "^3.13.1",
     "listr": "^0.14.3",
     "listr-multiline-renderer": "^1.1.0",
@@ -179,5 +179,5 @@
     "sourceMap": true,
     "instrument": true
   },
-  "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
+  "gitHead": "2e7445ad3eeeca3e937a8c42c81673f0e706beb0"
 }

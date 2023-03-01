@@ -61,5 +61,5 @@
     "yalc:publish": "yalc publish --push"
   },
   "types": "./lib/index.d.ts",
-  "gitHead": "3b3f56a6a1ea7dc79b83daaf9493d85324857816"
+  "gitHead": "2e7445ad3eeeca3e937a8c42c81673f0e706beb0"
 }
