@@ -306,13 +306,21 @@ function tsWebpackPlugins(options = {}) {
   return plugins
 }
 
+function getNodeVersions() {
+  const m = process.version.match(/(\d+)\.(\d+)\.(\d+)/);
+  const [major, minor, patch] = m.slice(1).map(_ => parseInt(_));
+
+  return { major, minor, patch };
+}
+
 module.exports = {
   codeLoaders,
   fileLoaders,
+  getNodeVersions,
   getOptional,
   hasOptional,
   htmlWebPackPlugins,
-  tsWebpackPlugins,
   styleConfig,
   styleLoaders,
+  tsWebpackPlugins,
 }
