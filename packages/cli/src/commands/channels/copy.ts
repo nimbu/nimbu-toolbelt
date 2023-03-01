@@ -1,5 +1,5 @@
 import Command, { APIOptions, APIError } from '@nimbu-cli/command'
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import { Channel } from '../../nimbu/types'
@@ -64,11 +64,13 @@ export default class CopyChannels extends Command {
     const { channel: toChannel, site: toSite } = this.extractSiteAndChannel(flags.to, flags.all)
 
     if (fromSite == null) {
-      CliUx.ux.error('You need to specify the source site.')
+      ux.error('You need to specify the source site.')
+      return
     }
 
     if (toSite == null) {
-      CliUx.ux.error('You need to specify the destination site.')
+      ux.error('You need to specify the destination site.')
+      return
     }
 
     if (fromChannel != null && toChannel != null) {
@@ -169,6 +171,10 @@ export default class CopyChannels extends Command {
     } else {
       site = this.nimbuConfig.site
       channel = fromParts[0]
+    }
+
+    if(site == null) {
+      throw new Error('You need to specify the site.')
     }
 
     return { channel, site }

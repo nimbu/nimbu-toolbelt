@@ -1,6 +1,6 @@
 import Command from '@nimbu-cli/command'
 
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 const through = require('through')
@@ -28,7 +28,7 @@ export default class CopyProductsConfig extends Command {
     let toSite = flags.to !== undefined ? flags.to! : this.nimbuConfig.site!
 
     if (fromSite === toSite) {
-      CliUx.ux.error('The source site needs to differ from the destination.')
+      ux.error('The source site needs to differ from the destination.')
       return
     }
 

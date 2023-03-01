@@ -1,7 +1,7 @@
 import Command, { APITypes as Nimbu, APIError, APIOptions } from '@nimbu-cli/command'
 import { download, generateRandom } from '../../../utils/files'
 
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
@@ -339,11 +339,13 @@ export default class CopyChannelEntries extends Command {
     }
 
     if (fromSite === undefined) {
-      CliUx.ux.error('You need to specify the source site.')
+      ux.error('You need to specify the source site.')
+      throw new Error('You need to specify the source site.')
     }
 
     if (toSite === undefined) {
-      CliUx.ux.error('You need to specify the destination site.')
+      ux.error('You need to specify the destination site.')
+      throw new Error('You need to specify the destination site.')
     }
 
     return { fromChannel, toChannel, fromSite, toSite }
@@ -498,7 +500,7 @@ export default class CopyChannelEntries extends Command {
       queryFromCtx != null &&
       (ctx.fromChannelOriginal == null || ctx.fromChannelOriginal === ctx.fromChannel)
     ) {
-      CliUx.ux.error('Please specify a query that returns entries to copy...')
+      ux.error('Please specify a query that returns entries to copy...')
     }
 
     let nbPages = 1
@@ -613,7 +615,7 @@ export default class CopyChannelEntries extends Command {
             )}`
 
             if (this.abortOnError) {
-              CliUx.ux.error(errorMessage)
+              ux.error(errorMessage)
             } else {
               this.warnings.push(errorMessage)
             }
@@ -957,9 +959,9 @@ export default class CopyChannelEntries extends Command {
 
   private printWarnings() {
     if (this.warnings.length > 0) {
-      CliUx.ux.warn('Some entries could not be created due to validation errors:')
+      ux.warn('Some entries could not be created due to validation errors:')
       for (const message of this.warnings) {
-        CliUx.ux.warn(message)
+        ux.warn(message)
       }
     }
   }

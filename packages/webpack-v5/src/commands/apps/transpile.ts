@@ -1,14 +1,15 @@
-import Command from '@nimbu-cli/command'
 import { transformFileAsync } from '@babel/core'
+import Command from '@nimbu-cli/command'
+import { Args } from '@oclif/core'
 import { outputFile } from 'fs-extra'
 
 export default class AppsTranspile extends Command {
   static description = 'Transpile a file from ES6 to ES5 for compatiblity with Nimbu Cloud applications'
 
-  static args = [
-    { name: 'source', required: true },
-    { name: 'target', required: true },
-  ]
+  static args = {
+    source: Args.string({ name: 'source', required: true }),
+    target: Args.string({ name: 'target', required: true }),
+  }
 
   async execute() {
     const { args } = await this.parse(AppsTranspile)

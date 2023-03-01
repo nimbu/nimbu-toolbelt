@@ -1,15 +1,16 @@
 import Command from '@nimbu-cli/command'
+import { Args } from '@oclif/core'
 import proxy from '../../nimbu-gem/command'
 
 export default class ThemesList extends Command {
   static description = 'list all layouts, templates and assets'
 
-  static args = [
-    {
+  static args = {
+    theme: Args.string({
       name: 'theme',
       description: 'The name of the theme to list',
-    },
-  ]
+    }),
+  }
 
   async execute() {
     await this.nimbu.validateLogin()

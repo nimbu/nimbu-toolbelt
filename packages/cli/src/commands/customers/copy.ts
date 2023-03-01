@@ -1,7 +1,7 @@
 import Command, { APITypes as Nimbu, APIError, APIOptions, color } from '@nimbu-cli/command'
 import { download, generateRandom } from '../../utils/files'
 
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
@@ -177,15 +177,17 @@ export default class CopyCustomers extends Command {
     let toSite = flags.to ?? this.nimbuConfig.site
 
     if (fromSite === undefined) {
-      CliUx.ux.error('You need to specify the source site.')
+      ux.error('You need to specify the source site.')
+      throw new Error('You need to specify the source site.')
     }
 
     if (toSite === undefined) {
-      CliUx.ux.error('You need to specify the destination site.')
+      ux.error('You need to specify the destination site.')
+      throw new Error('You need to specify the destination site.')
     }
 
     if (fromSite === toSite) {
-      CliUx.ux.error('You can not copy to the same site.')
+      ux.error('You can not copy to the same site.')
     }
 
     return { fromSite, toSite }
@@ -256,7 +258,7 @@ export default class CopyCustomers extends Command {
 
     // halt further execution if the first query does not result in any entries to copy
     if (ctx.nbEntries === 0 && queryFromCtx != null) {
-      CliUx.ux.error('Please specify a query that returns customers to copy...')
+      ux.error('Please specify a query that returns customers to copy...')
     }
 
     let nbPages = 1
@@ -662,9 +664,9 @@ export default class CopyCustomers extends Command {
 
   private printWarnings() {
     if (this.warnings.length > 0) {
-      CliUx.ux.warn('Some entries could not be created due to validation errors:')
+      ux.warn('Some entries could not be created due to validation errors:')
       for (const message of this.warnings) {
-        CliUx.ux.warn(message)
+        ux.warn(message)
       }
     }
   }
@@ -674,7 +676,7 @@ export default class CopyCustomers extends Command {
       const supports = require('supports-hyperlinks')
       const hyperlinker = require('hyperlinker')
 
-      let columns: CliUx.Table.table.Columns<Customer> = {
+      let columns: ux.Table.table.Columns<Customer> = {
         email: {
           header: 'Email',
           get: (row) => row.email,
@@ -700,8 +702,8 @@ export default class CopyCustomers extends Command {
         },
       }
 
-      CliUx.ux.info('\n✨ Following cusomers were created ✨\n')
-      CliUx.ux.table(this.createdCustomers, columns)
+      ux.info('\n✨ Following cusomers were created ✨\n')
+      ux.table(this.createdCustomers, columns)
     }
   }
 

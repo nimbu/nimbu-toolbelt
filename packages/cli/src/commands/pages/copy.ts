@@ -1,23 +1,23 @@
 import Command, { APIError } from '@nimbu-cli/command'
 import { download, generateRandom } from '../../utils/files'
 
-import { CliUx, Flags } from '@oclif/core'
+import { Args, Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
-import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
 import { cloneDeep } from 'lodash'
+import { Observable } from 'rxjs'
 
 export default class CopyPages extends Command {
   static description = 'copy page from one site to another'
 
-  static args = [
-    {
+  static args = {
+    fullpath: Args.string({
       name: 'fullpath',
       required: false,
       description: 'fullpath of pages to be copied',
       default: '*',
-    },
-  ]
+    })
+  }
 
   static flags = {
     from: Flags.string({
@@ -46,7 +46,7 @@ export default class CopyPages extends Command {
     let toHost = flags.toHost !== undefined ? flags.toHost! : this.nimbuConfig.apiUrl
 
     if (fromSite === toSite) {
-      CliUx.ux.error('The source site needs to differ from the destination.')
+      ux.error('The source site needs to differ from the destination.')
       return
     }
 

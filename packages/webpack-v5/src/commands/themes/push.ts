@@ -43,12 +43,7 @@ export default class ThemesPush extends Command {
 
   static strict = false
 
-  static args = [
-    {
-      name: 'files',
-      description: 'The files to push with --only',
-    },
-  ]
+  static args = {}
 
   async execute() {
     await this.nimbu.validateLogin()

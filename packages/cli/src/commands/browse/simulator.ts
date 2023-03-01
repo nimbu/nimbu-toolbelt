@@ -1,11 +1,12 @@
 import Command from '@nimbu-cli/command'
-import { CliUx } from '@oclif/core'
+import open from 'open'
+
 
 export default class BrowseSimulator extends Command {
   static description = 'open the simulator for your current site'
 
   async execute() {
-    await CliUx.ux.open('http://localhost:4567/')
+    await open('http://localhost:4567/') // TODO: the port should be configurable
   }
 
   get needsConfig(): boolean {

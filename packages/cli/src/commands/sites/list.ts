@@ -1,6 +1,6 @@
 import Command, { APITypes as Nimbu, color } from '@nimbu-cli/command'
 
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import { orderBy } from 'lodash'
 
 export default class SitesList extends Command {
@@ -17,15 +17,15 @@ export default class SitesList extends Command {
     const protocol = this.nimbuConfig.secureHost ? 'https://' : 'http://'
     const adminDomain = this.nimbuConfig.apiHost.replace(/^api\./, '')
 
-    CliUx.ux.action.start('Please wait while we get the list of sites...')
+    ux.action.start('Please wait while we get the list of sites...')
     let sites = await this.nimbu.get<Nimbu.Site[]>('/sites', { fetchAll: true })
-    CliUx.ux.action.stop()
+    ux.action.stop()
 
     if (sites && sites.length > 0) {
       this.log('\nYou have access to following sites:\n')
 
       sites = orderBy(sites, [(site) => site.name.toLowerCase()], ['asc'])
-      let columns: CliUx.Table.table.Columns<Nimbu.Site> = {
+      let columns: ux.Table.table.Columns<Nimbu.Site> = {
         name: {
           header: 'Site Name',
           get: (row) => (row.name.length > 30 ? row.name.substring(0, 40).trim() + '...' : row.name),
@@ -54,7 +54,7 @@ export default class SitesList extends Command {
           },
         }
       }
-      CliUx.ux.table(sites, columns)
+      ux.table(sites, columns)
     } else {
       this.log("\nYou don't have access to any sites.\n")
     }

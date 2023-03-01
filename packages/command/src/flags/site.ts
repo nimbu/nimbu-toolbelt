@@ -1,7 +1,7 @@
 import { Flags } from '@oclif/core'
-import { SiteCompletion } from './completions'
+// import { SiteCompletion } from './completions'
 
-export const site = Flags.build({
+export const site = Flags.custom({
   char: 's',
   // completion: SiteCompletion, FIXME: this worked before oclif@2
   description: 'site to run command against',

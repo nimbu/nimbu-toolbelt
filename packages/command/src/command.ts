@@ -1,6 +1,6 @@
-import { CliUx, Command } from '@oclif/core'
-import Client from './nimbu/client'
+import { Command } from '@oclif/core'
 import * as buildConfig from './config/config'
+import Client from './nimbu/client'
 import { Config } from './nimbu/config'
 
 export default abstract class extends Command {

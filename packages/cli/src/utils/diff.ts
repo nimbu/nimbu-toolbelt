@@ -1,9 +1,9 @@
-import { CliUx } from '@oclif/core'
+import { ux } from '@oclif/core'
 import chalk from 'chalk'
 
 export function convertChangesToTree(fields, tree?) {
   if (tree == null) {
-    tree = CliUx.ux.tree()
+    tree = ux.tree()
   }
 
   for (let key of Object.keys(fields)) {
@@ -35,7 +35,7 @@ export function convertChangesToTree(fields, tree?) {
 }
 
 export function addFieldNames(diff, from, to) {
-  if (diff.added === {}) {
+  if (Object.keys(diff.added ?? {}).length === 0) {
     delete diff.added
   } else if (diff.added != null) {
     for (let index of Object.keys(diff.added)) {
@@ -43,7 +43,7 @@ export function addFieldNames(diff, from, to) {
       delete diff.added[index]
     }
   }
-  if (diff.deleted === {}) {
+  if (Object.keys(diff.deleted ?? {}).length === 0) {
     delete diff.deleted
   } else if (diff.deleted != null) {
     for (let index of Object.keys(diff.deleted)) {
@@ -51,7 +51,7 @@ export function addFieldNames(diff, from, to) {
       delete diff.deleted[index]
     }
   }
-  if (diff.updated === {}) {
+  if (Object.keys(diff.updated ?? {}).length === 0) {
     delete diff.updated
   } else if (diff.updated != null) {
     for (let index of Object.keys(diff.updated)) {

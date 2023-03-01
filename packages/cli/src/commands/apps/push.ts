@@ -5,7 +5,7 @@ import Command, {
   IValidationError,
   isValidationError,
 } from '@nimbu-cli/command'
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import { findMatchingFiles } from '../../utils/files'
 
 import chalk from 'chalk'
@@ -24,13 +24,6 @@ export default class AppsPush extends Command {
   }
 
   static strict = false
-
-  static args = [
-    {
-      name: 'files',
-      description: 'The files to push.',
-    },
-  ]
 
   private _app?: AppConfig
   private _files?: string[]
@@ -60,7 +53,7 @@ export default class AppsPush extends Command {
 
   async files(): Promise<string[]> {
     if (!this._files) {
-      const { argv } = await this.parse(AppsPush)
+      const { argv } = await this.parse(AppsPush) as { argv: string[] }
       const appConfig = await this.appConfig()
       const filesFound = await findMatchingFiles(appConfig.dir, appConfig.glob)
       this.debug('Found: %s', filesFound)
@@ -141,7 +134,7 @@ export default class AppsPush extends Command {
     } catch (error) {
       if (error instanceof APIError) {
         if (error.body?.code === 142 && error.body.errors != null && error.body.errors.length > 0) {
-          CliUx.ux.error(
+          ux.error(
             error.body.errors
               .map((err: string | IValidationError) => (isValidationError(err) ? err.message : err))
               .join('\n'),
@@ -150,7 +143,7 @@ export default class AppsPush extends Command {
       }
       console.log('BOOM ERROR')
       if (error instanceof Error) {
-        CliUx.ux.error(error.message)
+        ux.error(error.message)
       }
     }
   }
@@ -162,7 +155,7 @@ export default class AppsPush extends Command {
     const { name, code } = await this.getCode(filename)
     const appConfig = await this.appConfig()
     await executor(appConfig.id, name, code)
-    CliUx.ux.action.stop(chalk.green('✓'))
+    ux.action.stop(chalk.green('✓'))
   }
 
   private async pushNewFile(filename: string) {
@@ -194,7 +187,7 @@ export default class AppsPush extends Command {
     const code = await this.code()
     const appConfig = await this.appConfig()
     const existing = code.find((f) => `${appConfig.dir}/${f.name}` === filename)
-    CliUx.ux.action.start(`  - ${filename}${existing ? '' : ' (new)'}`)
+    ux.action.start(`  - ${filename}${existing ? '' : ' (new)'}`)
     if (existing) {
       return this.pushExistingFile(filename)
     } else {

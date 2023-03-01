@@ -1,6 +1,6 @@
 import Command from '@nimbu-cli/command'
 
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import chalk from 'chalk'
 
 import CopyChannels from '../channels/copy'
@@ -58,7 +58,7 @@ export default class CopySite extends Command {
     let toSite = flags.to !== undefined ? flags.to! : this.nimbuConfig.site!
 
     if (fromSite === toSite) {
-      CliUx.ux.error('The source site needs to differ from the destination.')
+      ux.error('The source site needs to differ from the destination.')
     }
 
     const channelsWithEntriesToCopy = flags.include !== undefined ? flags.include!.split(',') : []

@@ -1,4 +1,4 @@
-import { CliUx } from '@oclif/core'
+import { ux } from '@oclif/core'
 import Command from '@nimbu-cli/command'
 import defaultWebpackConfig = require('../config/webpack.prod')
 import projectWebpack = require('../config/webpack.project')
@@ -29,10 +29,10 @@ export default class Build extends Command {
     try {
       process.env.NODE_ENV = 'production'
 
-      CliUx.ux.action.start(chalk.red('building for production (using webpack 4)'))
+      ux.action.start(chalk.red('building for production (using webpack 4)'))
       const webpackConfig = projectWebpack.customize(defaultWebpackConfig(), getProjectConfig())
       const stats = await this.webpack(webpackConfig)
-      CliUx.ux.action.stop()
+      ux.action.stop()
       this.log(
         stats.toString({
           colors: true,

@@ -1,9 +1,7 @@
-import { CliUx } from '@oclif/core'
-import Command from '@nimbu-cli/command'
+import Command, { buildConfig } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
-import { buildConfig } from '@nimbu-cli/command'
-const { get: getProjectConfig } = buildConfig
 import ora from 'ora'
+const { get: getProjectConfig } = buildConfig
 
 // These sizes are pretty large. We'll warn for bundles exceeding them.
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024

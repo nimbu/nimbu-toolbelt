@@ -1,5 +1,5 @@
 import Command, { APIError } from '@nimbu-cli/command'
-import { CliUx, Flags } from '@oclif/core'
+import { Args, Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 
@@ -15,14 +15,14 @@ const timeUnitMapping = {
 export default class CopyTranslations extends Command {
   static description = 'copy translations from one site to another'
 
-  static args = [
-    {
+  static args = {
+    query: Args.string({
       name: 'query',
       required: false,
       description: 'query to match subset of translations to be copied',
       default: '*',
-    },
-  ]
+    }),
+  }
 
   static flags = {
     from: Flags.string({
@@ -70,7 +70,7 @@ export default class CopyTranslations extends Command {
     let toHost = flags.toHost !== undefined ? flags.toHost! : this.nimbuConfig.apiUrl
 
     if (fromSite === toSite) {
-      CliUx.ux.error('The source site needs to differ from the destination.')
+      ux.error('The source site needs to differ from the destination.')
     }
 
     let fetchTitle = `Querying translations from site ${chalk.bold(fromSite)}`

@@ -1,4 +1,4 @@
-import { CliUx, Interfaces } from '@oclif/core'
+import { ux, Interfaces } from '@oclif/core'
 import { readFileSync, pathExistsSync } from 'fs-extra'
 import urlencode from 'urlencode'
 import Netrc from 'netrc-parser'
@@ -74,12 +74,12 @@ export class Credentials {
       // timeout after 10 minutes
       setTimeout(() => {
         if (!loggedIn) {
-          CliUx.ux.error('timed out')
+          ux.error('timed out')
         }
       }, 1000 * 60 * 10).unref()
 
       if (process.env.NIMBU_API_KEY) {
-        CliUx.ux.error('Cannot log in with NIMBU_API_KEY set')
+        ux.error('Cannot log in with NIMBU_API_KEY set')
       }
 
       await Netrc.load()
@@ -93,7 +93,7 @@ export class Credentials {
         }
       } catch (err) {
         if (err instanceof Error) {
-          CliUx.ux.warn(err)
+          ux.warn(err)
         }
       }
       let auth = await this.interactive(previousToken && previousToken.login, opts.expiresIn)
@@ -115,8 +115,8 @@ export class Credentials {
 
   private async interactive(login?: string, expiresIn?: number): Promise<NetrcEntry> {
     process.stderr.write('nimbu: Please enter your login credentials\n')
-    login = await CliUx.ux.prompt('Email or username', { default: login })
-    let password = await CliUx.ux.prompt('Password', { type: 'hide' })
+    login = await ux.prompt('Email or username', { default: login })
+    let password = await ux.prompt('Password', { type: 'hide' })
 
     let auth
     try {
@@ -125,7 +125,7 @@ export class Credentials {
       if (err instanceof HTTPError) {
         if (!err.body || err.body.code !== 210) throw err
       }
-      let secondFactor = await CliUx.ux.prompt('Two-factor code', { type: 'mask' })
+      let secondFactor = await ux.prompt('Two-factor code', { type: 'mask' })
       auth = await this.createOAuthToken(login!, password, { expiresIn, secondFactor })
     }
     this._auth = auth.password

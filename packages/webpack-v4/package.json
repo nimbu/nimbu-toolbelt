@@ -1,6 +1,6 @@
 {
   "name": "@nimbu-cli/plugin-webpack-v4",
-  "version": "5.2.4",
+  "version": "5.3.0",
   "author": "Zenjoy Engineering",
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "main": "lib/index.js",
@@ -29,7 +29,7 @@
     "html-webpack-plugin": "^4.5.0",
     "loader-utils": "^1.1.0",
     "mini-css-extract-plugin": "^1.6.2",
-    "nimbu": "^5.2.1",
+    "nimbu": "^5.3.0",
     "node-fetch": "^2.2.0",
     "postcss-flexbugs-fixes": "^4.1.0",
     "postcss-loader": "^3.0.0",
@@ -46,7 +46,7 @@
     "webpack": "^4.46.0"
   },
   "devDependencies": {
-    "@oclif/test": "^2.0.3",
+    "@oclif/test": "^2.3.8",
     "@types/babel__core": "^7.1.2",
     "@types/chai": "^4.1.7",
     "@types/glob": "^7.1.1",

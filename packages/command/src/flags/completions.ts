@@ -20,13 +20,14 @@ const fetchFromNimbu = async (
   return resources.map((a: any) => a[sortParam]).sort()
 }
 
-export const SiteCompletion: Interfaces.Completion = {
-  cacheDuration: day,
-  options: async (ctx) => {
-    let sites = await fetchFromNimbu('sites', ctx)
-    return sites
-  },
-}
+// FIXME: this worked before oclif@2
+// export const SiteCompletion: Interfaces.Completion = {
+//   cacheDuration: day,
+//   options: async (ctx) => {
+//     let sites = await fetchFromNimbu('sites', ctx)
+//     return sites
+//   },
+// }
 
 // export const SiteSubdomainCompletion: Interfaces.Completion = {
 //   skipCache: true,

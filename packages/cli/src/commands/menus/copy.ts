@@ -1,22 +1,22 @@
 import Command, { APIError } from '@nimbu-cli/command'
 
-import { CliUx, Flags } from '@oclif/core'
+import { Args, Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
-import { Observable } from 'rxjs'
 import { cloneDeep } from 'lodash'
+import { Observable } from 'rxjs'
 const through = require('through')
 const inquirer = require('inquirer')
 
 export default class CopyMenus extends Command {
   static description = 'copy menus from one site to another'
 
-  static args = [
-    {
+  static args = {
+    slug: Args.string({
       name: 'slug',
       required: false,
       description: 'permalink of menu to be copied',
-    },
-  ]
+    })
+  }
 
   static flags = {
     from: Flags.string({
@@ -38,7 +38,7 @@ export default class CopyMenus extends Command {
     let slug = args.slug
 
     if (fromSite === toSite) {
-      CliUx.ux.error('The source site needs to differ from the destination.')
+      ux.error('The source site needs to differ from the destination.')
     }
 
     let fetchTitle = `Querying ${slug != null ? "menu '" + slug + "'" : 'menus'} from site ${chalk.bold(fromSite)}`

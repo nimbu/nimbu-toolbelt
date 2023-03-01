@@ -1,4 +1,4 @@
-import { CliUx, Errors, Interfaces } from '@oclif/core'
+import { ux, Errors, Interfaces } from '@oclif/core'
 import Netrc from 'netrc-parser'
 import Nimbu from 'nimbu-client'
 import { HTTPError } from 'nimbu-client'
@@ -104,7 +104,7 @@ export default class Client {
 
       return true
     } catch {
-      CliUx.ux.warn('Sorry, you need to be authenticated to continue.')
+      ux.warn('Sorry, you need to be authenticated to continue.')
       return false
     }
   }
@@ -114,7 +114,7 @@ export default class Client {
       await this.credentials.logout()
     } catch (err) {
       if (err instanceof Error) {
-        CliUx.ux.warn(err)
+        ux.warn(err)
       }
     }
     delete Netrc.machines[this.config.apiHost]

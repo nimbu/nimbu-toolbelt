@@ -1,6 +1,6 @@
 import Command, { APITypes as Nimbu } from '@nimbu-cli/command'
 
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import * as fs from 'fs-extra'
 import yaml from 'js-yaml'
 
@@ -33,7 +33,7 @@ export default class PullMails extends Command {
     ])
 
     tasks.run().catch((err) => {
-      CliUx.ux.error(err)
+      ux.error(err)
     })
   }
 

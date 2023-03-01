@@ -1,7 +1,7 @@
 import Command, { APIError } from '@nimbu-cli/command'
 import { convertChangesToTree, addFieldNames, cleanUpIds } from '../../utils/diff'
 
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { detailedDiff } from 'deep-object-diff'
 
@@ -46,12 +46,14 @@ export default class DiffChannels extends Command {
       //toChannel = toParts[0]
     }
 
-    if (fromSite === undefined) {
-      CliUx.ux.error('You need to specify the source site.')
+    if (fromSite == null) {
+      ux.error('You need to specify the source site.')
+      return
     }
 
-    if (toSite === undefined) {
-      CliUx.ux.error('You need to specify the destination site.')
+    if (toSite == null) {
+      ux.error('You need to specify the destination site.')
+      return
     }
 
     let query = ''
@@ -67,7 +69,7 @@ export default class DiffChannels extends Command {
       description = `${chalk.bold('all channels')}`
     }
 
-    CliUx.ux.action.start(`Fetching ${description} from site ${chalk.bold(fromSite)}`)
+    ux.action.start(`Fetching ${description} from site ${chalk.bold(fromSite)}`)
 
     let options = {
       fetchAll: true,
@@ -75,10 +77,10 @@ export default class DiffChannels extends Command {
     }
 
     let channelSummaries: any = await this.nimbu.get(`/channels${query}`, options)
-    CliUx.ux.action.stop()
+    ux.action.stop()
 
     for (let channel of channelSummaries) {
-      CliUx.ux.action.start(`Comparing channel ${chalk.green(chalk.bold(channel.slug))}`)
+      ux.action.start(`Comparing channel ${chalk.green(chalk.bold(channel.slug))}`)
 
       let detailedFrom: any
       let detailedTo: any
@@ -107,10 +109,10 @@ export default class DiffChannels extends Command {
         }
       }
 
-      CliUx.ux.action.stop()
+      ux.action.stop()
 
       if (detailedTo == undefined) {
-        CliUx.ux.info(`Channel  ${chalk.bold(channel.slug)} is missing in site ${chalk.bold(toSite)}`)
+        ux.info(`Channel  ${chalk.bold(channel.slug)} is missing in site ${chalk.bold(toSite)}`)
       } else {
         this.cleanUpBeforeDiff(detailedFrom)
         this.cleanUpBeforeDiff(detailedTo)
@@ -126,10 +128,10 @@ export default class DiffChannels extends Command {
 
         addFieldNames(diff, fromCustomizations, toCustomizations)
 
-        CliUx.ux.log('')
+        ux.log('')
         if (diff.added != null && Object.keys(diff.added).length > 0) {
           anyDifferences = true
-          CliUx.ux.log(
+          ux.log(
             `Following fields or field attributes are present in ${chalk.bold(toSite)}, but not ${fromSite}:`,
           )
           convertChangesToTree(diff.added).display()
@@ -137,7 +139,7 @@ export default class DiffChannels extends Command {
 
         if (diff.deleted != null && Object.keys(diff.deleted).length > 0) {
           anyDifferences = true
-          CliUx.ux.log(
+          ux.log(
             `Following fields or field attributes are present in ${chalk.bold(fromSite)}, but not ${toSite}:`,
           )
           convertChangesToTree(diff.deleted).display()
@@ -145,35 +147,35 @@ export default class DiffChannels extends Command {
 
         if (diff.updated != null && Object.keys(diff.updated).length > 0) {
           anyDifferences = true
-          CliUx.ux.log(`Following fields or field attributes have differences:`)
+          ux.log(`Following fields or field attributes have differences:`)
           convertChangesToTree(diff.updated).display()
         }
 
-        CliUx.ux.log('')
+        ux.log('')
         if (otherDiff.added != null && Object.keys(otherDiff.added).length > 0) {
           anyDifferences = true
-          CliUx.ux.log(`Following channel attributes are present in ${chalk.bold(toSite)}, but not ${fromSite}:`)
+          ux.log(`Following channel attributes are present in ${chalk.bold(toSite)}, but not ${fromSite}:`)
           convertChangesToTree(otherDiff.added).display()
         }
 
         if (otherDiff.deleted != null && Object.keys(otherDiff.deleted).length > 0) {
           anyDifferences = true
-          CliUx.ux.log(`Following channel attributes are present in ${chalk.bold(fromSite)}, but not ${toSite}:`)
+          ux.log(`Following channel attributes are present in ${chalk.bold(fromSite)}, but not ${toSite}:`)
           convertChangesToTree(otherDiff.deleted).display()
         }
 
         if (otherDiff.updated != null && Object.keys(otherDiff.updated).length > 0) {
           anyDifferences = true
-          CliUx.ux.log(`Following channel attributes have differences:`)
+          ux.log(`Following channel attributes have differences:`)
           convertChangesToTree(otherDiff.updated).display()
         }
 
         if (!anyDifferences) {
-          CliUx.ux.log(`There are no differences.`)
+          ux.log(`There are no differences.`)
         }
       }
 
-      CliUx.ux.info(chalk.dim('===========================================================================\n'))
+      ux.info(chalk.dim('===========================================================================\n'))
     }
   }
 

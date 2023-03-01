@@ -1,10 +1,8 @@
 import Command from '@nimbu-cli/command'
-import { CliUx, Flags } from '@oclif/core'
+import { Args, Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
-import { fetchAllChannels } from '../../utils/channels'
 import { CustomField, isCalculatedField, isRelationalField, isSelectField } from '../../nimbu/types'
-
-const Listr = require('listr')
+import { fetchAllChannels } from '../../utils/channels'
 
 function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
@@ -55,16 +53,16 @@ const toInterfaceType = (field: CustomField) => {
 export default class ChannelsInfo extends Command {
   static description = 'list info about this channel'
 
-  static args = [
-    {
+  static args = {
+    channel: Args.string({
       name: 'channel',
       required: true,
       description: 'slug of your channel (optionally with the site, i.e. site/channel)',
-    },
-  ]
+    })
+  }
 
   static flags = {
-    ...CliUx.ux.table.flags(),
+    ...ux.table.flags(),
     output: Flags.string({
       exclusive: ['no-truncate', 'csv'],
       description: 'output in a more machine friendly format',
@@ -89,19 +87,22 @@ export default class ChannelsInfo extends Command {
     }
 
     if (site == null) {
-      CliUx.ux.error('You need to specify the source site.')
+      ux.error('You need to specify the source site.')
+      return
     }
 
-    CliUx.ux.action.start(`Fetching channel info from ${chalk.bold(site)}...`)
+    ux.action.start(`Fetching channel info from ${chalk.bold(site)}...`)
 
     const { channels, circularDependencies, graph } = await fetchAllChannels(this, site)
 
-    CliUx.ux.action.stop(chalk.green('✓'))
+    ux.action.stop(chalk.green('✓'))
 
     const channelForInfo = channels.find((c) => c.slug === channel)
 
     if (channelForInfo == null) {
-      CliUx.ux.error(`Channel ${chalk.bold(channel)} can not be found on site ${chalk.bold(site)}`)
+      const message = `Channel ${chalk.bold(channel)} can not be found on site ${chalk.bold(site)}`
+      ux.error(message)
+      throw new Error(message)
     }
 
     if (tty) {
@@ -120,7 +121,7 @@ export default class ChannelsInfo extends Command {
       this.log('}')
       return
     } else {
-      CliUx.ux.table(
+      ux.table(
         channelForInfo.customizations,
         {
           label: {
@@ -181,7 +182,7 @@ export default class ChannelsInfo extends Command {
 
   private generateDependencyTree(currentChannel: string, graph: any, parents?: string[], tree?: any) {
     if (tree == null) {
-      tree = CliUx.ux.tree()
+      tree = ux.tree()
     }
 
     if (parents == null) {

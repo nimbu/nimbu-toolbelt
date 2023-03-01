@@ -1,7 +1,7 @@
 import Command from '@nimbu-cli/command'
 import { convertChangesToTree, addFieldNames, cleanUpIds } from '../../../utils/diff'
 
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { detailedDiff } from 'deep-object-diff'
 
@@ -28,11 +28,11 @@ export default class ProductsConfigDiff extends Command {
     let toSite = flags.to!
 
     if (fromSite === toSite) {
-      CliUx.ux.error('The source site needs to differ from the destination.')
+      ux.error('The source site needs to differ from the destination.')
       return
     }
 
-    CliUx.ux.action.start(`Fetching product customizations from site ${chalk.bold(fromSite)}`)
+    ux.action.start(`Fetching product customizations from site ${chalk.bold(fromSite)}`)
     let detailedFrom = []
     let detailedTo = []
 
@@ -42,7 +42,7 @@ export default class ProductsConfigDiff extends Command {
         site: fromSite,
       })
     } catch (error) {
-      CliUx.ux.action.stop()
+      ux.action.stop()
 
       if (error instanceof Error) {
         throw new Error(error.message)
@@ -55,14 +55,14 @@ export default class ProductsConfigDiff extends Command {
         site: toSite,
       })
     } catch (error) {
-      CliUx.ux.action.stop()
+      ux.action.stop()
 
       if (error instanceof Error) {
         throw new Error(error.message)
       }
     }
 
-    CliUx.ux.action.stop()
+    ux.action.stop()
 
     this.cleanUpBeforeDiff(detailedFrom)
     this.cleanUpBeforeDiff(detailedTo)
@@ -70,27 +70,27 @@ export default class ProductsConfigDiff extends Command {
     let diff: any = detailedDiff(detailedFrom, detailedTo)
     let anyDifferences = false
     addFieldNames(diff, detailedFrom, detailedTo)
-    CliUx.ux.log('')
+    ux.log('')
     if (diff.added != null && Object.keys(diff.added).length > 0) {
       anyDifferences = true
-      CliUx.ux.log(`Following fields are present in ${chalk.bold(toSite)}, but not ${fromSite}:`)
+      ux.log(`Following fields are present in ${chalk.bold(toSite)}, but not ${fromSite}:`)
       convertChangesToTree(diff.added).display()
     }
 
     if (diff.deleted != null && Object.keys(diff.deleted).length > 0) {
       anyDifferences = true
-      CliUx.ux.log(`Following fields are present in ${chalk.bold(fromSite)}, but not ${toSite}:`)
+      ux.log(`Following fields are present in ${chalk.bold(fromSite)}, but not ${toSite}:`)
       convertChangesToTree(diff.deleted).display()
     }
 
     if (diff.updated != null && Object.keys(diff.updated).length > 0) {
       anyDifferences = true
-      CliUx.ux.log(`Following fields have differences:`)
+      ux.log(`Following fields have differences:`)
       convertChangesToTree(diff.updated).display()
     }
 
     if (!anyDifferences) {
-      CliUx.ux.log(`There are no differences.`)
+      ux.log(`There are no differences.`)
     }
   }
 

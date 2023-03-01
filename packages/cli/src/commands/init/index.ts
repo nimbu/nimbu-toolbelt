@@ -1,6 +1,6 @@
 import Command, { APITypes as Nimbu, color, completions } from '@nimbu-cli/command'
 
-import { CliUx, Flags } from '@oclif/core'
+import { ux, Flags } from '@oclif/core'
 import { orderBy } from 'lodash'
 import inquirer from 'inquirer'
 import logSymbols from 'log-symbols'
@@ -51,9 +51,9 @@ export default class Init extends Command {
   }
 
   private async askForSite() {
-    CliUx.ux.action.start('Please wait while we get the list of sites...')
+    ux.action.start('Please wait while we get the list of sites...')
     let sites = await this.nimbu.get<Nimbu.Site[]>('/sites', { fetchAll: true })
-    CliUx.ux.action.stop('done \n')
+    ux.action.stop('done \n')
 
     if (sites.length === 0) {
       this.error("You don't have access to any Nimbu sites.", { exit: 101 })
