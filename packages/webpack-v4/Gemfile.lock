@@ -2,7 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     daemons (1.4.1)
-    diffy (3.4.0)
+    diffy (3.4.2)
     eventmachine (1.2.7)
     excon (0.91.0)
     faraday (0.17.4)
