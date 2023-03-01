@@ -43,11 +43,10 @@
     "tmp-promise": "^2.0.2"
   },
   "devDependencies": {
-    "@oclif/test": "^2.0.3",
+    "@oclif/test": "^2.3.8",
     "@types/debug": "^4.1.7",
     "@types/follow-redirects": "^1.13.1",
-    "@types/glob": "^7.1.4",
-    "mocha-nock": "^1.0.2"
+    "@types/glob": "^7.1.4"
   },
   "engines": {
     "node": ">=10.0.0"

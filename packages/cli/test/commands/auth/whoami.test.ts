@@ -1,6 +1,5 @@
 import { expect } from '@oclif/test'
 import test, { nockActivate, nockCleanup } from '../../helpers/setup'
-import nock from 'nock'
 
 beforeEach(function (done) {
   nockActivate()
