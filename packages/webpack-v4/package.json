@@ -33,7 +33,7 @@
     "node-fetch": "^2.2.0",
     "postcss-flexbugs-fixes": "^4.1.0",
     "postcss-loader": "^3.0.0",
-    "react-dev-utils": "^9.0.1",
+    "react-dev-utils": "^11.0.4",
     "react-svg-core": "^3.0.3",
     "sass": "^1.50.0",
     "sass-loader": "^10.0.3",
