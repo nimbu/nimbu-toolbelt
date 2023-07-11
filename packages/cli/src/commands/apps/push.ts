@@ -53,7 +53,7 @@ export default class AppsPush extends Command {
 
   async files(): Promise<string[]> {
     if (!this._files) {
-      const { argv } = await this.parse(AppsPush) as { argv: string[] }
+      const { argv } = (await this.parse(AppsPush)) as { argv: string[] }
       const appConfig = await this.appConfig()
       const filesFound = await findMatchingFiles(appConfig.dir, appConfig.glob)
       this.debug('Found: %s', filesFound)
@@ -86,9 +86,10 @@ export default class AppsPush extends Command {
       }
 
       for (const filename of this._files) {
-        const { name, code } = namesWithCode[filename]
+        const { name, code: codeWithComments } = namesWithCode[filename]
+        // strip comments as there can be references to files in comments which are not in a loop
+        const code = codeWithComments.replace(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '')
         const matches = [...code.matchAll(regexp)]
-
         for (const match of matches) {
           const requiredFile = match[1]
           try {
