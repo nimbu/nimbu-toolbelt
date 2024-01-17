@@ -26,6 +26,10 @@ export default class PullThemes extends Command {
   }
 
   async execute() {
+    if (process.env.DEBUG != null) {
+      process.stdout.isTTY = false
+    }
+
     const Listr = require('listr')
     const { flags } = await this.parse(PullThemes)
 
@@ -71,8 +75,8 @@ export default class PullThemes extends Command {
         let nbItems = items.length
         let crntIndex = 1
         let itemsWithCode: any[] = []
+        let name: string
         for (let item of items) {
-          let name: string
           if (type === 'assets') {
             name = item.path.substring(1)
           } else {
@@ -80,19 +84,51 @@ export default class PullThemes extends Command {
           }
           let prefix = `[${crntIndex}/${nbItems}]`
           observer.next(`${prefix} Fetching ${type.slice(0, -1)} ${name}`)
-          let itemWithCode: any = await this.nimbu.get(`/themes/${ctx.fromTheme}/${type}/${name}`, options)
+          let itemWithCode: any
+          try {
+            itemWithCode = await this.nimbu.get(`/themes/${ctx.fromTheme}/${type}/${name}`, options)
+          } catch (error) {
+            if (error instanceof Error) {
+              console.error('could not fetch item', `/themes/${ctx.fromTheme}/${type}/${name}`)
+              this.error(error)
+            }
+          }
           if (itemWithCode.public_url != null) {
-            let { path, cleanup } = await this.downloadFile(observer, prefix, itemWithCode)
+            let path, cleanup: any
+            try {
+              const result = await this.downloadFile(observer, prefix, itemWithCode)
+              path = result.path
+              cleanup = result.cleanup
+            } catch (error) {
+              if (error instanceof Error) {
+                console.error('could not download file', itemWithCode.public_url)
+                this.error(error)
+              }
+            }
             let targetFile = this.nimbuConfig.projectPath + item.path
             let targetPath = pathFinder.dirname(targetFile)
-            await fs.mkdirp(targetPath)
-            await fs.copyFile(path, targetFile)
+            try {
+              await fs.mkdirp(targetPath)
+              await fs.copyFile(path, targetFile)
+            } catch (error) {
+              if (error instanceof Error) {
+                console.error('could not write file', targetFile)
+                this.error(error)
+              }
+            }
             cleanup()
           } else {
             let targetFile = this.nimbuConfig.projectPath + '/' + type + '/' + itemWithCode.name
             let targetPath = pathFinder.dirname(targetFile)
-            await fs.mkdirp(targetPath)
-            await fs.writeFile(targetFile, itemWithCode.code)
+            try {
+              await fs.mkdirp(targetPath)
+              await fs.writeFile(targetFile, itemWithCode.code ?? '')
+            } catch (error) {
+              if (error instanceof Error) {
+                console.error('could not write file', targetFile)
+                this.error(error)
+              }
+            }
           }
           crntIndex++
         }
