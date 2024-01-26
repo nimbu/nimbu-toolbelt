@@ -68,9 +68,9 @@
     "mocha": "^6.0.2",
     "mock-fs": "^4.8.0",
     "nock": "^13",
+    "ts-node": "^10.9.2",
     "tslint": "^5",
     "tslint-config-prettier": "^1.18.0",
-    "ts-node": "^10.9.2",
     "typescript": "^5",
     "unionfs": "^4.2.0"
   },
@@ -111,5 +111,5 @@
     "version": "oclif readme && git add README.md",
     "yalc:publish": "yalc publish --push"
   },
-  "gitHead": "2e7445ad3eeeca3e937a8c42c81673f0e706beb0"
+  "gitHead": "f9d5b8f084e75a4aa8a29f9930f8da36a6ad258f"
 }
