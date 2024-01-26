@@ -1,13 +1,16 @@
-import Command, { APITypes as Nimbu, color } from '@nimbu-cli/command'
-
-import { ux, Flags } from '@oclif/core'
+import { Command, APITypes as Nimbu, color } from '@nimbu-cli/command'
+import { Flags, ux } from '@oclif/core'
 import { orderBy } from 'lodash'
 
 export default class SitesList extends Command {
-  static description = 'list sites you can edit'
   static aliases = ['sites']
+  static description = 'list sites you can edit'
   static flags = {
     subdomain: Flags.boolean({ char: 's', description: 'show Nimbu subdomain for each site' }),
+  }
+
+  get needsConfig(): boolean {
+    return false
   }
 
   async execute() {
@@ -25,42 +28,39 @@ export default class SitesList extends Command {
       this.log('\nYou have access to following sites:\n')
 
       sites = orderBy(sites, [(site) => site.name.toLowerCase()], ['asc'])
-      let columns: ux.Table.table.Columns<Nimbu.Site> = {
+      const columns: ux.Table.table.Columns<Nimbu.Site> = {
         name: {
+          get: (row) => (row.name.length > 30 ? row.name.slice(0, 40).trim() + '...' : row.name),
           header: 'Site Name',
-          get: (row) => (row.name.length > 30 ? row.name.substring(0, 40).trim() + '...' : row.name),
         },
         url: {
-          header: 'Primary Domain',
-          get: (row) => {
+          get(row) {
             if (supports.stdout) {
               return hyperlinker(color.dim(row.domain), row.domain_url)
-            } else {
-              return color.dim(row.domain)
             }
+
+            return color.dim(row.domain)
           },
+          header: 'Primary Domain',
         },
       }
 
       if (flags.subdomain) {
         columns.subdomain = {
-          header: 'Admin Subdomain',
-          get: (row) => {
+          get(row) {
             if (supports.stdout) {
               return hyperlinker(color.dim(row.subdomain), protocol + row.subdomain + '.' + adminDomain + '/admin')
-            } else {
-              return color.dim(row.subdomain)
             }
+
+            return color.dim(row.subdomain)
           },
+          header: 'Admin Subdomain',
         }
       }
+
       ux.table(sites, columns)
     } else {
       this.log("\nYou don't have access to any sites.\n")
     }
-  }
-
-  get needsConfig(): boolean {
-    return false
   }
 }

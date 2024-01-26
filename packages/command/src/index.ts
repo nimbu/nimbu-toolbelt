@@ -1,29 +1,29 @@
-import Command from './command'
+/* eslint-disable unicorn/prefer-export-from */
+import { HTTPError } from 'nimbu-client'
 
+import Command from './command'
+import * as buildConfig from './config/config'
+import * as paths from './config/paths'
 import * as flags from './flags'
 import * as completions from './flags/completions'
-import * as paths from './config/paths'
-import * as buildConfig from './config/config'
+import APIClient, { APIError, IOptions, IValidationError, isValidationError } from './nimbu/client'
 import * as APITypes from './nimbu/types'
-
-import { HTTPError } from 'nimbu-client'
-import APIClient, { APIError, IOptions, isValidationError, IValidationError } from './nimbu/client'
 
 export type APIOptions = IOptions
 
-export { Config, AppConfig } from './nimbu/config'
 export { color } from './nimbu/color'
+export { AppConfig, Config } from './nimbu/config'
 export {
-  Command,
   APIClient,
   APIError,
-  HTTPError,
-  paths,
-  flags,
-  completions,
   APITypes,
-  buildConfig,
-  isValidationError,
+  Command,
+  HTTPError,
   IValidationError,
+  buildConfig,
+  completions,
+  flags,
+  isValidationError,
+  paths,
 }
 export default Command

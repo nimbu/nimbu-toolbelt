@@ -1,4 +1,6 @@
-import Command, { buildConfig } from '@nimbu-cli/command'
+/* eslint-disable unicorn/no-process-exit */
+/* eslint-disable no-process-exit */
+import { Command, buildConfig } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import ora from 'ora'
 const { get: getProjectConfig } = buildConfig
@@ -45,11 +47,11 @@ export default class Build extends Command {
     const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages')
     const FileSizeReporter = require('react-dev-utils/FileSizeReporter')
     const printBuildError = require('react-dev-utils/printBuildError')
-    const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild
+    const { printFileSizesAfterBuild } = FileSizeReporter
 
     const isInteractive = process.stdout.isTTY
 
-    const writeStatsJson = !!flags.stats
+    const writeStatsJson = Boolean(flags.stats)
 
     // We require that you explicitly set browsers and do not fall back to
     // browserslist defaults.
@@ -73,7 +75,7 @@ export default class Build extends Command {
 
               // Add additional information for postcss errors
               if (Object.prototype.hasOwnProperty.call(err, 'postcssNode')) {
-                errMessage += '\nCompileError: Begins at CSS selector ' + err['postcssNode'].selector
+                errMessage += '\nCompileError: Begins at CSS selector ' + err.postcssNode.selector
               }
 
               messages = formatWebpackMessages({
@@ -81,24 +83,27 @@ export default class Build extends Command {
                 warnings: [],
               })
             } else {
-              messages = formatWebpackMessages(stats.toJson({ all: false, warnings: true, errors: true }))
+              messages = formatWebpackMessages(stats.toJson({ all: false, errors: true, warnings: true }))
             }
-            if (messages.errors.length) {
+
+            if (messages.errors.length > 0) {
               // Only keep the first error. Others are often indicative
               // of the same problem, but confuse the reader with noise.
               if (messages.errors.length > 1) {
                 messages.errors.length = 1
               }
+
               return reject(new Error(messages.errors.join('\n\n')))
             }
+
             if (
               process.env.CI &&
               (typeof process.env.CI !== 'string' || process.env.CI.toLowerCase() !== 'false') &&
-              messages.warnings.length
+              messages.warnings.length > 0
             ) {
               // Ignore sourcemap warnings in CI builds. See #8227 for more info.
               const filteredWarnings = messages.warnings.filter((w) => !/Failed to parse source map/.test(w))
-              if (filteredWarnings.length) {
+              if (filteredWarnings.length > 0) {
                 console.log(
                   chalk.yellow(
                     '\nTreating warnings as errors because process.env.CI = true.\n' +
@@ -127,7 +132,7 @@ export default class Build extends Command {
       })
       .then(
         ({ stats, warnings }) => {
-          if (warnings.length) {
+          if (warnings.length > 0) {
             spinner.warn(chalk.yellow('Compiled with warnings.\n'))
             console.log(warnings.join('\n\n'))
             console.log(
@@ -152,7 +157,7 @@ export default class Build extends Command {
           )
           console.log()
         },
-        (err) => {
+        (error) => {
           const tscCompileOnError = process.env.TSC_COMPILE_ON_ERROR === 'true'
           if (tscCompileOnError) {
             spinner.warn(
@@ -161,19 +166,19 @@ export default class Build extends Command {
               ),
             )
 
-            printBuildError(err)
+            printBuildError(error)
           } else {
             spinner.fail(chalk.red('Failed to compile.\n'))
-            printBuildError(err)
+            printBuildError(error)
             process.exit(1)
           }
         },
       )
-      .catch((err) => {
+      .catch((error) => {
         spinner.fail('There was an unexpected error!')
 
-        if (err && err.message) {
-          console.log(err.message)
+        if (error && error.message) {
+          console.log(error.message)
         }
 
         process.exit(1)

@@ -1,0 +1,23 @@
+{
+  "root": true,
+  "extends": ["oclif", "oclif-typescript", "prettier"],
+  "rules": {
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "no-eq-null": "off",
+    "complexity": "off",
+    "camelcase": "off",
+    "max-depth": "off",
+    "no-warning-comments": "off",
+    "no-await-in-loop": "off",
+    "unicorn/prefer-module": "off",
+    "unicorn/no-array-callback-reference": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "node/no-extraneous-require": [
+      "error",
+      {
+        "allowModules": ["@nimbu-cli/command"]
+      }
+    ]
+  }
+}

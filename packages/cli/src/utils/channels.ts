@@ -1,29 +1,30 @@
-import Command, { APIOptions, APIError } from '@nimbu-cli/command'
-import { Channel, isRelationalField } from '../nimbu/types'
+import { APIError, APIOptions, Command } from '@nimbu-cli/command'
 import chalk from 'chalk'
+
+import { Channel, isRelationalField } from '../nimbu/types'
 
 type FetchChannelOptions = {
   includeBuiltIns?: boolean
 }
 
 export const fetchAllChannels = async (command: Command, site: string, options: FetchChannelOptions = {}) => {
-  let apiOptions: APIOptions = { fetchAll: true, site }
+  const apiOptions: APIOptions = { fetchAll: true, site }
 
   try {
-    let channels: Channel[] = await command.nimbu.get<Channel[]>(`/channels`, apiOptions)
+    const channels: Channel[] = await command.nimbu.get<Channel[]>(`/channels`, apiOptions)
 
-    // determine dependencies between channels using a dependency graph
-    let DependencyGraph = require('dependency-graph').DepGraph
-    let graph = new DependencyGraph({ circular: true })
+    // determine dependencies between channels using a dependency graphprefer-module
+    const DependencyGraph = require('dependency-graph').DepGraph
+    const graph = new DependencyGraph({ circular: true })
 
     // add all channels first
     const slugs: string[] = []
-    channels.forEach((channel) => {
+    for (const channel of channels) {
       graph.addNode(channel.slug)
       slugs.push(channel.slug)
-    })
+    }
 
-    if (!!options.includeBuiltIns) {
+    if (options.includeBuiltIns) {
       for (const slug of ['articles', 'customers', 'orders', 'products']) {
         graph.addNode(slug)
         slugs.push(slug)
@@ -31,13 +32,13 @@ export const fetchAllChannels = async (command: Command, site: string, options: 
     }
 
     // add dependencies
-    channels.forEach((channel) => {
+    for (const channel of channels) {
       const relationalFields = channel.customizations.filter(isRelationalField)
 
-      relationalFields.forEach((field) => {
+      for (const field of relationalFields) {
         if (slugs.includes(field.reference)) graph.addDependency(channel.slug, field.reference)
-      })
-    })
+      }
+    }
 
     // get the order in which to insert / update channels
     const channelsInOrder: string[] = graph.overallOrder()
@@ -55,18 +56,18 @@ export const fetchAllChannels = async (command: Command, site: string, options: 
     }
 
     // assign channels to context in this order
-    let sortedChannels = channelsInOrder
+    const sortedChannels = channelsInOrder
       .map((slug) => channels.find((c) => c.slug === slug))
       .filter((channel) => channel != null) as Channel[]
 
     return { channels: sortedChannels, circularDependencies, graph }
   } catch (error) {
     if (error instanceof APIError) {
-      if (error.body != null && error.body.code === 101) {
-        throw new Error(`could not find site ${chalk.bold(site)}`)
-      } else {
-        throw new Error(error.message)
-      }
+      const error_ =
+        error.body != null && error.body.code === 101
+          ? new Error(`could not find site ${chalk.bold(site)}`)
+          : new Error(error.message)
+      throw error_
     } else {
       throw error
     }

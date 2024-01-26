@@ -1,5 +1,5 @@
 import { paths } from '@nimbu-cli/command'
-import * as path from 'path'
+import * as path from 'node:path'
 
 const toolbeltDirectory = path.resolve(__dirname, '../..')
 

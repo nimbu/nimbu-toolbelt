@@ -1,6 +1,6 @@
-import Command, { APITypes as Nimbu } from '@nimbu-cli/command'
-
-import { ux, Flags } from '@oclif/core'
+/* eslint-disable import/namespace */
+import { Command, APITypes as Nimbu } from '@nimbu-cli/command'
+import { Flags, ux } from '@oclif/core'
 import * as fs from 'fs-extra'
 import yaml from 'js-yaml'
 
@@ -23,17 +23,17 @@ export default class PullMails extends Command {
 
     const tasks = new Listr([
       {
-        title: 'Fetching notifications',
         task: (ctx) => this.fetchAll(ctx),
+        title: 'Fetching notifications',
       },
       {
-        title: 'Writing all templates to disk',
         task: (ctx) => this.writeAll(ctx, flags),
+        title: 'Writing all templates to disk',
       },
     ])
 
-    tasks.run().catch((err) => {
-      ux.error(err)
+    tasks.run().catch((error) => {
+      ux.error(error)
     })
   }
 
@@ -43,62 +43,62 @@ export default class PullMails extends Command {
 
   private async writeAll(ctx: any, flags: any) {
     const { Observable } = require('rxjs')
-    const notifications: Nimbu.Notification[] = ctx.notifications
+    const { notifications } = ctx
     const mailsPath = this.nimbuConfig.projectPath + '/content/notifications/'
 
     await fs.mkdirp(mailsPath)
 
     return new Observable((observer) => {
-      notifications.forEach((notification) => {
-        if (flags.only && flags.only.length > 0 && flags.only.indexOf(notification.slug) === -1) {
-          return
+      for (const notification of notifications) {
+        if (flags.only && flags.only.length > 0 && !flags.only.includes(notification.slug)) {
+          continue
         }
 
         let filename = `${notification.slug}.txt`
         observer.next(filename)
 
-        let fm = yaml.dump({
-          name: notification.name,
+        const fm = yaml.dump({
           description: notification.description,
+          name: notification.name,
           subject: notification.subject,
         })
 
-        let content = '---\n' + fm + '---\n\n' + notification.text
+        const content = '---\n' + fm + '---\n\n' + notification.text
         fs.writeFileSync(mailsPath + filename, content)
 
         if (notification.html_enabled && notification.html) {
           filename = `${notification.slug}.html`
-          fs.writeFileSync(mailsPath + filename, notification.html!)
+          fs.writeFileSync(mailsPath + filename, notification.html)
         }
 
         if (notification.translations !== undefined) {
-          Object.keys(notification.translations).forEach(function (locale) {
-            let translation = notification.translations![locale]
+          for (const locale of Object.keys(notification.translations)) {
+            const translation = notification.translations[locale]
 
             if (
               translation.text !== notification.text ||
               translation.html !== notification.html ||
               translation.subject !== notification.subject
             ) {
-              let localePath = mailsPath + locale
+              const localePath = mailsPath + locale
               fs.mkdirpSync(localePath)
 
               filename = `${notification.slug}.txt`
-              let fm = yaml.dump({
+              const fm = yaml.dump({
                 subject: translation.subject,
               })
 
-              let content = '---\n' + fm + '---\n\n' + translation.text
+              const content = '---\n' + fm + '---\n\n' + translation.text
               fs.writeFileSync(localePath + '/' + filename, content)
 
               if (notification.html_enabled && translation.html) {
                 filename = `${notification.slug}.html`
-                fs.writeFileSync(localePath + '/' + filename, translation.html!)
+                fs.writeFileSync(localePath + '/' + filename, translation.html)
               }
             }
-          })
+          }
         }
-      })
+      }
 
       observer.complete()
     })

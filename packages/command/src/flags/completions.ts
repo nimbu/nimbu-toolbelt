@@ -1,11 +1,12 @@
 import { Interfaces } from '@oclif/core'
-import Client from '../nimbu/client'
-import buildConfig = require('../config/config')
+
+import * as buildConfig from '../config/config'
+import Client from '../nimbu/client.js'
 import { Config as NimbuConfig } from '../nimbu/config'
 
-const day = 60 * 60 * 24
+// const day = 60 * 60 * 24
 
-const fetchFromNimbu = async (
+export const fetchFromNimbu = async (
   resource: string,
   ctx: { config: Interfaces.Config },
   sortParam = 'name',

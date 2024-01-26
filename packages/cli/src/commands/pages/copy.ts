@@ -1,28 +1,31 @@
-import Command, { APIError } from '@nimbu-cli/command'
-import { download, generateRandom } from '../../utils/files'
-
+import { APIError, Command } from '@nimbu-cli/command'
 import { Args, Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
 import { cloneDeep } from 'lodash'
 import { Observable } from 'rxjs'
 
-export default class CopyPages extends Command {
-  static description = 'copy page from one site to another'
+import { download, generateRandom } from '../../utils/files'
 
+export default class CopyPages extends Command {
   static args = {
     fullpath: Args.string({
+      default: '*',
+      description: 'fullpath of pages to be copied',
       name: 'fullpath',
       required: false,
-      description: 'fullpath of pages to be copied',
-      default: '*',
-    })
+    }),
   }
+
+  static description = 'copy page from one site to another'
 
   static flags = {
     from: Flags.string({
       char: 'f', // shorter flag version
       description: 'subdomain of the source site',
+    }),
+    fromHost: Flags.string({
+      description: 'hostname of origin Nimbu API',
     }),
     to: Flags.string({
       char: 't', // shorter flag version
@@ -31,88 +34,56 @@ export default class CopyPages extends Command {
     toHost: Flags.string({
       description: 'hostname of target Nimbu API',
     }),
-    fromHost: Flags.string({
-      description: 'hostname of origin Nimbu API',
-    }),
   }
 
   async execute() {
     const Listr = require('listr')
-    const { flags, args } = await this.parse(CopyPages)
+    const { args, flags } = await this.parse(CopyPages)
 
-    let fromSite = flags.from !== undefined ? flags.from! : this.nimbuConfig.site!
-    let toSite = flags.to !== undefined ? flags.to! : this.nimbuConfig.site!
-    let fromHost = flags.fromHost !== undefined ? flags.fromHost! : this.nimbuConfig.apiUrl
-    let toHost = flags.toHost !== undefined ? flags.toHost! : this.nimbuConfig.apiUrl
+    const fromSite = flags.from === undefined ? this.nimbuConfig.site : flags.from
+    const toSite = flags.to === undefined ? this.nimbuConfig.site : flags.to
+    const fromHost = flags.fromHost === undefined ? this.nimbuConfig.apiUrl : flags.fromHost
+    const toHost = flags.toHost === undefined ? this.nimbuConfig.apiUrl : flags.toHost
 
     if (fromSite === toSite) {
       ux.error('The source site needs to differ from the destination.')
-      return
     }
 
-    let fetchTitle = `Querying pages from site ${chalk.bold(fromSite)}`
-    let downloadTitle = `Downloading attachments`
-    let createTitle = `Creating pages in site ${chalk.bold(toSite)}`
+    if (fromSite == null || toSite == null) {
+      ux.error('You need to specify both the source and destination site.')
+    }
+
+    const fetchTitle = `Querying pages from site ${chalk.bold(fromSite)}`
+    const downloadTitle = `Downloading attachments`
+    const createTitle = `Creating pages in site ${chalk.bold(toSite)}`
 
     const tasks = new Listr([
       {
-        title: fetchTitle,
         task: (ctx) => this.fetchPages(ctx),
+        title: fetchTitle,
       },
       {
-        title: downloadTitle,
         skip: (ctx) => ctx.pages.length === 0,
         task: (ctx) => this.downloadAttachments(ctx),
+        title: downloadTitle,
       },
       {
-        title: createTitle,
-        task: (ctx) => this.createPages(ctx),
         skip: (ctx) => ctx.pages.length === 0,
+        task: (ctx) => this.createPages(ctx),
+        title: createTitle,
       },
     ])
 
     await tasks
       .run({
-        fromSite,
-        toSite,
-        fromHost,
-        toHost,
         files: {},
+        fromHost,
+        fromSite,
         query: args.fullpath,
+        toHost,
+        toSite,
       })
       .catch((error) => this.error(error))
-  }
-
-  private async fetchPages(ctx: any) {
-    let options: any = { fetchAll: true }
-    if (ctx.fromSite != null) {
-      options.site = ctx.fromSite
-      options.host = ctx.fromHost
-    }
-    try {
-      let query = ''
-      if (ctx.query !== undefined && ctx.query.charAt(0) === '/') {
-        ctx.query = ctx.query.substring(1) // fullpath does not have a slash at the start
-      }
-      if (ctx.query === '*') {
-        // fetch all pages
-      } else if (ctx.query.indexOf('*') !== -1) {
-        query = `?fullpath.start=${ctx.query.replace('*', '')}`
-      } else {
-        query = `?fullpath=${ctx.query}`
-      }
-      ctx.pages = await this.nimbu.get(`/pages${query}`, options)
-    } catch (error) {
-      if (error instanceof APIError) {
-        if (error.body != null && error.body.code === 101) {
-          throw new Error(`could not find page matching ${chalk.bold(ctx.query)}`)
-        } else {
-          throw new Error(error.message)
-        }
-      } else {
-        throw error
-      }
-    }
   }
 
   private async createPages(ctx: any) {
@@ -121,19 +92,20 @@ export default class CopyPages extends Command {
       let crntIndex = 1
 
       const nbPages = ctx.pages.length
-      for (let page of ctx.pages) {
+      for (const page of ctx.pages) {
         if (page.depth > maxDepth) {
           maxDepth = page.depth
         }
       }
+
       for (let i = 0; i <= maxDepth; i++) {
-        for (let page of ctx.pages.filter((p) => p.depth === i)) {
+        for (const page of ctx.pages.filter((p) => p.depth === i)) {
           let targetPage: any
           ctx.currentPage = page
 
           try {
             observer.next(`[${crntIndex}/${nbPages}] Check if page ${page.fullpath} exists in site ${ctx.toSite}`)
-            targetPage = await this.nimbu.get(`/pages/${page.fullpath}`, { site: ctx.toSite, host: ctx.toHost })
+            targetPage = await this.nimbu.get(`/pages/${page.fullpath}`, { host: ctx.toHost, site: ctx.toSite })
           } catch (error) {
             if (error instanceof APIError) {
               if (error.body === undefined || error.body.code !== 101) {
@@ -144,27 +116,27 @@ export default class CopyPages extends Command {
             }
           }
 
-          let data = await this.prepareUpload(crntIndex, ctx, page)
+          const data = await this.prepareUpload(crntIndex, ctx, page)
 
           try {
-            if (targetPage != null) {
-              observer.next(`[${crntIndex}/${nbPages}] Updating page ${page.fullpath} in site ${ctx.toSite}`)
-              await this.nimbu.patch(`/pages/${page.fullpath}?replace=1`, {
-                body: data,
-                site: ctx.toSite,
-                host: ctx.toHost,
-              })
-            } else {
+            if (targetPage == null) {
               observer.next(`[${crntIndex}/${nbPages}] Creating page ${page.fullpath} in site ${ctx.toSite}`)
               await this.nimbu.post(`/pages`, {
                 body: data,
-                site: ctx.toSite,
                 host: ctx.toHost,
+                site: ctx.toSite,
+              })
+            } else {
+              observer.next(`[${crntIndex}/${nbPages}] Updating page ${page.fullpath} in site ${ctx.toSite}`)
+              await this.nimbu.patch(`/pages/${page.fullpath}?replace=1`, {
+                body: data,
+                host: ctx.toHost,
+                site: ctx.toSite,
               })
             }
           } catch (error) {
             if (error instanceof Error) {
-              throw new Error(`Error for page ${chalk.bold(ctx.currentPage.fullpath)}: ${error.message}`)
+              throw new TypeError(`Error for page ${chalk.bold(ctx.currentPage.fullpath)}: ${error.message}`)
             }
           }
 
@@ -182,24 +154,25 @@ export default class CopyPages extends Command {
 
   private async downloadAttachments(ctx: any) {
     const scanEditables = async (i, editables, observer) => {
-      for (let editableName of Object.keys(editables)) {
-        let editable = editables[editableName]
-        let fileObject = editable.file
+      for (const editableName of Object.keys(editables)) {
+        const editable = editables[editableName]
+        const fileObject = editable.file
         if (fileObject != null) {
           await this.downloadFile(observer, i, ctx, fileObject, editableName)
         }
 
-        let repeatables = editable.repeatables
+        const { repeatables } = editable
         if (repeatables != null && repeatables.length > 0) {
-          for (let repeatable of repeatables) {
+          for (const repeatable of repeatables) {
             await scanEditables(i, repeatable.items, observer)
           }
         }
       }
     }
+
     const perform = async (observer) => {
       let i = 1
-      for (let page of ctx.pages) {
+      for (const page of ctx.pages) {
         await scanEditables(i, page.items, observer)
         i++
       }
@@ -212,15 +185,16 @@ export default class CopyPages extends Command {
     })
   }
 
+  // eslint-disable-next-line max-params
   private async downloadFile(observer, i, ctx, fileObject, fieldName) {
-    let tmp = require('tmp-promise')
-    let prettyBytes = require('pretty-bytes')
-    let pathFinder = require('path')
+    const tmp = require('tmp-promise')
+    const prettyBytes = require('pretty-bytes')
+    const pathFinder = require('node:path')
 
     if (fileObject != null && fileObject !== null && fileObject.url != null) {
-      let url = `${fileObject.url}${fileObject.url.indexOf('?') !== -1 ? '&v=' : '?'}${generateRandom(6)}`
-      const { path, cleanup } = await tmp.file({ prefix: `${fieldName}-` })
-      let filename = pathFinder.basename(url)
+      const url = `${fileObject.url}${fileObject.url.includes('?') ? '&v=' : '?'}${generateRandom(6)}`
+      const { cleanup, path } = await tmp.file({ prefix: `${fieldName}-` })
+      const filename = pathFinder.basename(url)
 
       try {
         await download(url, path, (bytes, percentage) => {
@@ -234,27 +208,62 @@ export default class CopyPages extends Command {
         observer.error(error)
       }
 
-      ctx.files[fileObject.url] = { path, cleanup }
+      ctx.files[fileObject.url] = { cleanup, path }
+    }
+  }
+
+  private async fetchPages(ctx: any) {
+    const options: any = { fetchAll: true }
+    if (ctx.fromSite != null) {
+      options.site = ctx.fromSite
+      options.host = ctx.fromHost
+    }
+
+    try {
+      let query = ''
+      if (ctx.query !== undefined && ctx.query.charAt(0) === '/') {
+        ctx.query = ctx.query.slice(1) // fullpath does not have a slash at the start
+      }
+
+      if (ctx.query === '*') {
+        // fetch all pages
+      } else if (ctx.query.includes('*')) {
+        query = `?fullpath.start=${ctx.query.replace('*', '')}`
+      } else {
+        query = `?fullpath=${ctx.query}`
+      }
+
+      ctx.pages = await this.nimbu.get(`/pages${query}`, options)
+    } catch (error) {
+      if (error instanceof APIError) {
+        const error_ =
+          error.body != null && error.body.code === 101
+            ? new Error(`could not find page matching ${chalk.bold(ctx.query)}`)
+            : new Error(error.message)
+        throw error_
+      } else {
+        throw error
+      }
     }
   }
 
   private async prepareUpload(i: number, ctx: any, page: any) {
-    let data = cloneDeep(page)
+    const data = cloneDeep(page)
     data.parent = data.parent_path
 
     const scanEditables = async (i, ctx, editables) => {
-      for (let editableName of Object.keys(editables)) {
-        let editable = editables[editableName]
-        let fileObject = editable.file
+      for (const editableName of Object.keys(editables)) {
+        const editable = editables[editableName]
+        const fileObject = editable.file
 
         if (fileObject != null && fileObject.url != null && ctx.files[fileObject.url] != null) {
           fileObject.attachment = await fs.readFile(ctx.files[fileObject.url].path, { encoding: 'base64' })
           delete fileObject.url
         }
 
-        let repeatables = editable.repeatables
+        const { repeatables } = editable
         if (repeatables != null && repeatables.length > 0) {
-          for (let repeatable of repeatables) {
+          for (const repeatable of repeatables) {
             await scanEditables(i, ctx, repeatable.items)
           }
         }

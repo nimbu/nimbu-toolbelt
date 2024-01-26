@@ -1,12 +1,12 @@
 import { Hook, Plugin } from '@oclif/core'
-import Debug from 'debug'
+import debug from 'debug'
 
 const optionals = {}
 
 function resolveOptional(moduleName) {
   try {
     optionals[moduleName] = require.resolve(moduleName)
-  } catch (error) {
+  } catch {
     optionals[moduleName] = false
   }
 }
@@ -15,6 +15,7 @@ function getOptional(moduleName) {
   if (optionals[moduleName] == null) {
     resolveOptional(moduleName)
   }
+
   return optionals[moduleName]
 }
 
@@ -23,7 +24,7 @@ function hasOptional(moduleName) {
 }
 
 const hook: Hook<'init'> = async function (options) {
-  const debug = Debug('nimbu')
+  const log = debug('nimbu')
 
   // do not load optional plugins while testing
   if (process.env.NODE_ENV === 'test') return
@@ -33,19 +34,20 @@ const hook: Hook<'init'> = async function (options) {
 
   for (const plugin of oclifConfig.optionalPlugins) {
     if (hasOptional(plugin)) {
-      debug(`Loading ${plugin}...`)
+      log(`Loading ${plugin}...`)
       // the optional plugin is present in this project, let's load it!
 
-      const instance = new Plugin({ root: options.config.root, type: 'user', name: plugin })
+      const instance = new Plugin({ name: plugin, root: options.config.root, type: 'user' })
       await instance.load()
 
-      if (options.config.plugins.find((p) => p.name === instance.name)) return
-      options.config.plugins.push(instance)
+      // this is a hack to get the commands and topics to load
+      if (options.config.plugins[instance.name]) return
+      options.config.plugins[instance.name] = instance
 
-      //@ts-ignore: yes, we are deliberately using a private method here...
+      // @ts-ignore: yes, we are deliberately using a private method here...
       options.config.loadCommands(instance)
 
-      //@ts-ignore: this too
+      // @ts-ignore: this too
       options.config.loadTopics(instance)
     }
   }

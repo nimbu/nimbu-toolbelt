@@ -1,95 +1,95 @@
-type ACLScope = 'public' | 'shared' | 'private' | 'none'
+type ACLScope = 'none' | 'private' | 'public' | 'shared'
 
 export type ChannelACL = {
   create: ACLScope
+  delete: ACLScope
   read: ACLScope
   update: ACLScope
-  delete: ACLScope
 }
 
 export type ChannelEntryACL = {
   [k: string]: {
     create?: boolean
+    delete?: boolean
     read?: boolean
     update?: boolean
-    delete?: boolean
   }
 }
 
 export enum FieldType {
-  STRING = 'string',
-  TEXT = 'text',
-  EMAIL = 'email',
-  INTEGER = 'integer',
-  FLOAT = 'float',
-  BOOLEAN = 'boolean',
-  FILE = 'file',
-  DATE = 'date',
-  TIME = 'time',
-  DATE_TIME = 'date_time',
-  SELECT = 'select',
-  MULTI_SELECT = 'multi_select',
-  CALCULATED = 'calculated',
   BELONGS_TO = 'belongs_to',
   BELONGS_TO_MANY = 'belongs_to_many',
+  BOOLEAN = 'boolean',
+  CALCULATED = 'calculated',
   CUSTOMER = 'customer',
+  DATE = 'date',
+  DATE_TIME = 'date_time',
+  EMAIL = 'email',
+  FILE = 'file',
+  FLOAT = 'float',
   GALLERY = 'gallery',
   GEO = 'geo',
+  INTEGER = 'integer',
   JSON = 'json',
+  MULTI_SELECT = 'multi_select',
+  SELECT = 'select',
+  STRING = 'string',
+  TEXT = 'text',
+  TIME = 'time',
 }
 
 export type GeoType =
   | 'Coordinate'
-  | 'Point'
-  | 'MultiPoint'
+  | 'Geometry'
+  | 'GeometryCollection'
   | 'Line'
   | 'LineString'
   | 'MultiLineString'
-  | 'Polygon'
+  | 'MultiPoint'
   | 'MultiPolygon'
+  | 'Point'
+  | 'Polygon'
   | 'Rect'
   | 'Triangle'
-  | 'GeometryCollection'
-  | 'Geometry'
 
 export type SelectOption = {
   id: string
-  position: number
   name: string
+  position: number
   slug: string
 }
 
 interface BaseNimbuObject extends Record<string, unknown> {
-  id: string
   created_at: Date
+  id: string
   updated_at: Date
 }
 interface BaseCustomField extends BaseNimbuObject {
-  hint: string | null
+  encrypted: boolean
+  hint: null | string
   label: string
   localized: boolean
-  unique: boolean
-  encrypted: boolean
   name: string
   required: boolean
   required_expression?: string
   type: FieldType
+  unique: boolean
 }
 
 export interface RegularField extends BaseCustomField {
   type:
+    | FieldType.BOOLEAN
+    | FieldType.CUSTOMER
+    | FieldType.DATE
+    | FieldType.DATE_TIME
+    | FieldType.EMAIL
+    | FieldType.FLOAT
+    | FieldType.GALLERY
+    | FieldType.INTEGER
+    | FieldType.JSON
     | FieldType.STRING
     | FieldType.TEXT
-    | FieldType.EMAIL
-    | FieldType.INTEGER
-    | FieldType.FLOAT
-    | FieldType.BOOLEAN
-    | FieldType.DATE
     | FieldType.TIME
-    | FieldType.DATE_TIME
-    | FieldType.CUSTOMER
-    | FieldType.GALLERY
-    | FieldType.JSON
 }
 
 export function isRegularField(field: CustomField): field is RegularField {
@@ -110,8 +110,8 @@ export function isRegularField(field: CustomField): field is RegularField {
 }
 
 export interface RelationalField extends BaseCustomField {
-  type: FieldType.BELONGS_TO | FieldType.BELONGS_TO_MANY
   reference: string
+  type: FieldType.BELONGS_TO | FieldType.BELONGS_TO_MANY
 }
 
 export function isRelationalField(field: CustomField): field is RelationalField {
@@ -119,8 +119,8 @@ export function isRelationalField(field: CustomField): field is RelationalField 
 }
 
 export interface SelectField extends BaseCustomField {
-  type: FieldType.SELECT | FieldType.MULTI_SELECT
   select_options: SelectOption[]
+  type: FieldType.MULTI_SELECT | FieldType.SELECT
 }
 
 export function isSelectField(field: CustomField): field is SelectField {
@@ -128,8 +128,8 @@ export function isSelectField(field: CustomField): field is SelectField {
 }
 
 export interface GeoField extends BaseCustomField {
-  type: FieldType.GEO
   geo_type: GeoType
+  type: FieldType.GEO
 }
 
 export function isGeoField(field: CustomField): field is GeoField {
@@ -137,9 +137,9 @@ export function isGeoField(field: CustomField): field is GeoField {
 }
 
 export interface CalculatedField extends BaseCustomField {
-  type: FieldType.CALCULATED
   calculated_expression: string
-  calculation_type: 'string' | 'integer' | 'float'
+  calculation_type: 'float' | 'integer' | 'string'
+  type: FieldType.CALCULATED
 }
 
 export function isCalculatedField(field: CustomField): field is CalculatedField {
@@ -147,30 +147,30 @@ export function isCalculatedField(field: CustomField): field is CalculatedField 
 }
 
 export interface FileField extends BaseCustomField {
-  type: FieldType.FILE
   private_storage: boolean
+  type: FieldType.FILE
 }
 
 export function isFileField(field: CustomField): field is FileField {
   return field.type === FieldType.FILE
 }
 
-export type CustomField = RegularField | RelationalField | SelectField | GeoField | CalculatedField | FileField
+export type CustomField = CalculatedField | FileField | GeoField | RegularField | RelationalField | SelectField
 
 export function isFieldOf(
   type:
+    | FieldType.BOOLEAN
+    | FieldType.CUSTOMER
+    | FieldType.DATE
+    | FieldType.DATE_TIME
+    | FieldType.EMAIL
+    | FieldType.FLOAT
+    | FieldType.GALLERY
+    | FieldType.INTEGER
+    | FieldType.JSON
     | FieldType.STRING
     | FieldType.TEXT
-    | FieldType.EMAIL
-    | FieldType.INTEGER
-    | FieldType.FLOAT
-    | FieldType.BOOLEAN
-    | FieldType.DATE
-    | FieldType.TIME
-    | FieldType.DATE_TIME
-    | FieldType.CUSTOMER
-    | FieldType.GALLERY
-    | FieldType.JSON,
+    | FieldType.TIME,
 ): (field: CustomField) => field is RegularField
 
 export function isFieldOf(
@@ -180,7 +180,7 @@ export function isFieldOf(
 export function isFieldOf(type: FieldType.FILE): (field: CustomField) => field is FileField
 export function isFieldOf(type: FieldType.CALCULATED): (field: CustomField) => field is CalculatedField
 export function isFieldOf(type: FieldType.GEO): (field: CustomField) => field is GeoField
-export function isFieldOf(type: FieldType.SELECT | FieldType.MULTI_SELECT): (field: CustomField) => field is SelectField
+export function isFieldOf(type: FieldType.MULTI_SELECT | FieldType.SELECT): (field: CustomField) => field is SelectField
 
 export function isFieldOf(type: FieldType) {
   return function (field: CustomField): field is CustomField {
@@ -191,7 +191,7 @@ export function isFieldOf(type: FieldType) {
 export interface Channel extends BaseNimbuObject {
   acl: ChannelACL
   customizations: CustomField[]
-  description: string | null
+  description: null | string
   entries_url: string
   label_field: string
   name: string
@@ -205,12 +205,12 @@ export interface Channel extends BaseNimbuObject {
 }
 
 export interface ChannelEntry extends BaseNimbuObject {
+  [k: string]: any
   _acl: ChannelEntryACL
+  _owner?: string
+  short_id: string
   slug: string
   url: string
-  short_id: string
-  _owner?: string
-  [k: string]: any
 }
 
 export type ChannelEntryReferenceSingle = {
@@ -231,11 +231,11 @@ type BaseChannelEntryFile = {
   content_type: string
   filename: string
   height: number
+  private: false
   size: number
   url: string
   version: string
   width: number
-  private: false
 }
 
 type BaseChannelEntryPrivateFile = BaseChannelEntryFile & {
@@ -248,14 +248,14 @@ type BaseChannelEntryPrivateFile = BaseChannelEntryFile & {
 export type ChannelEntryFile = BaseChannelEntryFile | BaseChannelEntryPrivateFile
 
 export interface Customer extends BaseNimbuObject {
-  name: string
-  firstname: string
-  lastname: string
+  [k: string]: any
   email: string
+  firstname: string
+  groups: string[]
   language: string
+  lastname: string
+  name: string
   number: number
   slug: string
   status: string
-  groups: string[]
-  [k: string]: any
 }

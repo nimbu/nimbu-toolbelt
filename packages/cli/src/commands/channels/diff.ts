@@ -1,9 +1,9 @@
-import Command, { APIError } from '@nimbu-cli/command'
-import { convertChangesToTree, addFieldNames, cleanUpIds } from '../../utils/diff'
-
-import { ux, Flags } from '@oclif/core'
+import { APIError, Command } from '@nimbu-cli/command'
+import { Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
 import { detailedDiff } from 'deep-object-diff'
+
+import { addFieldNames, cleanUpIds, convertChangesToTree } from '../../utils/diff'
 
 export default class DiffChannels extends Command {
   static description = 'check differences between channel settings from one to another'
@@ -21,15 +21,18 @@ export default class DiffChannels extends Command {
     }),
   }
 
+  get needsConfig(): boolean {
+    return false
+  }
+
   async execute() {
     const { flags } = await this.parse(DiffChannels)
 
     let fromChannel: string
-    //let toChannel: string
+    // let toChannel: string
     let fromSite: string | undefined
-    let toSite: string | undefined
 
-    let fromParts = flags.from.split('/')
+    const fromParts = flags.from.split('/')
     if (fromParts.length > 1) {
       fromSite = fromParts[0]
       fromChannel = fromParts[1]
@@ -37,14 +40,9 @@ export default class DiffChannels extends Command {
       fromSite = this.nimbuConfig.site
       fromChannel = fromParts[0]
     }
-    let toParts = flags.to.split('/')
-    if (toParts.length > 1) {
-      toSite = toParts[0]
-      //toChannel = toParts[1]
-    } else {
-      toSite = this.nimbuConfig.site
-      //toChannel = toParts[0]
-    }
+
+    const toParts = flags.to.split('/')
+    const toSite = toParts.length > 1 ? toParts[0] : this.nimbuConfig.site
 
     if (fromSite == null) {
       ux.error('You need to specify the source site.')
@@ -59,10 +57,10 @@ export default class DiffChannels extends Command {
     let query = ''
     let description = ''
 
-    if (fromChannel !== '*' && fromChannel.indexOf('*') === -1) {
+    if (fromChannel !== '*' && !fromChannel.includes('*')) {
       query = `?slug=${fromChannel}`
       description = `channel ${chalk.bold(fromChannel)}`
-    } else if (fromChannel !== '*' && fromChannel.indexOf('*') !== -1) {
+    } else if (fromChannel !== '*' && fromChannel.includes('*')) {
       query = `?slug.start=${fromChannel}`
       description = `channel where slug starts with ${chalk.bold(fromChannel.replace('*', '..'))}`
     } else {
@@ -71,15 +69,15 @@ export default class DiffChannels extends Command {
 
     ux.action.start(`Fetching ${description} from site ${chalk.bold(fromSite)}`)
 
-    let options = {
+    const options = {
       fetchAll: true,
       site: fromSite,
     }
 
-    let channelSummaries: any = await this.nimbu.get(`/channels${query}`, options)
+    const channelSummaries: any = await this.nimbu.get(`/channels${query}`, options)
     ux.action.stop()
 
-    for (let channel of channelSummaries) {
+    for (const channel of channelSummaries) {
       ux.action.start(`Comparing channel ${chalk.green(chalk.bold(channel.slug))}`)
 
       let detailedFrom: any
@@ -111,19 +109,19 @@ export default class DiffChannels extends Command {
 
       ux.action.stop()
 
-      if (detailedTo == undefined) {
+      if (detailedTo == null) {
         ux.info(`Channel  ${chalk.bold(channel.slug)} is missing in site ${chalk.bold(toSite)}`)
       } else {
         this.cleanUpBeforeDiff(detailedFrom)
         this.cleanUpBeforeDiff(detailedTo)
 
-        let fromCustomizations = detailedFrom.customizations
-        let toCustomizations = detailedTo.customizations
+        const fromCustomizations = detailedFrom.customizations
+        const toCustomizations = detailedTo.customizations
         delete detailedFrom.customizations
         delete detailedTo.customizations
 
-        let diff: any = detailedDiff(fromCustomizations, toCustomizations)
-        let otherDiff: any = detailedDiff(detailedFrom, detailedTo)
+        const diff: any = detailedDiff(fromCustomizations, toCustomizations)
+        const otherDiff: any = detailedDiff(detailedFrom, detailedTo)
         let anyDifferences = false
 
         addFieldNames(diff, fromCustomizations, toCustomizations)
@@ -131,17 +129,13 @@ export default class DiffChannels extends Command {
         ux.log('')
         if (diff.added != null && Object.keys(diff.added).length > 0) {
           anyDifferences = true
-          ux.log(
-            `Following fields or field attributes are present in ${chalk.bold(toSite)}, but not ${fromSite}:`,
-          )
+          ux.log(`Following fields or field attributes are present in ${chalk.bold(toSite)}, but not ${fromSite}:`)
           convertChangesToTree(diff.added).display()
         }
 
         if (diff.deleted != null && Object.keys(diff.deleted).length > 0) {
           anyDifferences = true
-          ux.log(
-            `Following fields or field attributes are present in ${chalk.bold(fromSite)}, but not ${toSite}:`,
-          )
+          ux.log(`Following fields or field attributes are present in ${chalk.bold(fromSite)}, but not ${toSite}:`)
           convertChangesToTree(diff.deleted).display()
         }
 
@@ -179,9 +173,23 @@ export default class DiffChannels extends Command {
     }
   }
 
+  private cleanUpBeforeDiff(data) {
+    cleanUpIds(data)
+
+    for (const field of data.customizations) {
+      cleanUpIds(field)
+
+      if (field.select_options != null) {
+        for (const option of field.select_options) {
+          cleanUpIds(option)
+        }
+      }
+    }
+  }
+
   private extractCustomizations(diff) {
-    let fieldDiff: any = {}
-    let otherDiff: any = {}
+    const fieldDiff: any = {}
+    const otherDiff: any = {}
 
     if (diff.added != null && diff.added.customizations != null) {
       fieldDiff.added = diff.added.customizations
@@ -202,23 +210,5 @@ export default class DiffChannels extends Command {
     }
 
     return { fieldDiff, otherDiff }
-  }
-
-  private cleanUpBeforeDiff(data) {
-    cleanUpIds(data)
-
-    for (let field of data.customizations) {
-      cleanUpIds(field)
-
-      if (field.select_options != null) {
-        for (let option of field.select_options) {
-          cleanUpIds(option)
-        }
-      }
-    }
-  }
-
-  get needsConfig(): boolean {
-    return false
   }
 }

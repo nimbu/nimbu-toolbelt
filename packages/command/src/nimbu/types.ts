@@ -3,16 +3,16 @@ export interface CountResult {
 }
 
 export interface App {
-  name: string
   key: string
+  name: string
   url?: string
 }
 
 export interface AppFile {
-  name: string
-  created_at: string
-  updated_at: string
   code?: string
+  created_at: string
+  name: string
+  updated_at: string
   url?: string
 }
 
@@ -26,46 +26,46 @@ export interface User {
 export interface Token {
   app: App
   created_at: string
-  updated_at: string
+  expired_at?: string
+  expires_in?: number
   note?: string
   note_url?: string
   scopes: string[]
   site?: string
   site_wide: boolean
   token: string
+  updated_at: string
   url?: string
-  expires_in?: number
-  expired_at?: string
 }
 
 export interface Site extends Record<string, unknown> {
-  id: string
-  url: string
-  name: string
   domain: string
   domain_url: string
+  id: string
+  name: string
   subdomain: string
+  url: string
 }
 
 export interface NotificationTranslation {
+  html?: string
   subject: string
   text: string
-  html?: string
 }
 
 export interface Notification {
-  id: string
-  url: string
   created_at: string
-  updated_at: string
-  slug: string
+  description: string
+  html?: string
   html_enabled: boolean
+  id: string
+  name: string
+  slug: string
   subject: string
   text: string
-  html?: string
-  description: string
-  name: string
   translations?: {
     [locale: string]: NotificationTranslation
   }
+  updated_at: string
+  url: string
 }

@@ -1,29 +1,17 @@
+import { Command, buildConfig } from '@nimbu-cli/command'
 import { ux } from '@oclif/core'
-import Command from '@nimbu-cli/command'
+
 import defaultWebpackConfig = require('../config/webpack.prod')
 import projectWebpack = require('../config/webpack.project')
-
-import { buildConfig } from '@nimbu-cli/command'
 const { get: getProjectConfig } = buildConfig
 
-import webpack = require('webpack')
 import chalk from 'chalk'
+
+import webpack = require('webpack')
 
 export default class Build extends Command {
   static aliases = ['build:v4']
   static description = 'build a production bundle of your JS and CSS (using webpack 4)'
-
-  webpack(config: webpack.Configuration): Promise<webpack.Stats> {
-    return new Promise((resolve, reject) => {
-      webpack(config, (err, stats) => {
-        if (err || stats == null) {
-          reject(err)
-        } else {
-          resolve(stats)
-        }
-      })
-    })
-  }
 
   async execute() {
     try {
@@ -35,11 +23,11 @@ export default class Build extends Command {
       ux.action.stop()
       this.log(
         stats.toString({
+          children: false,
+          chunkModules: false,
+          chunks: false,
           colors: true,
           modules: false,
-          children: false,
-          chunks: false,
-          chunkModules: false,
         }) + '\n\n',
       )
       this.log(chalk.cyan('  Build complete.\n'))
@@ -56,5 +44,17 @@ export default class Build extends Command {
         this.log(error.message)
       }
     }
+  }
+
+  webpack(config: webpack.Configuration): Promise<webpack.Stats> {
+    return new Promise((resolve, reject) => {
+      webpack(config, (err, stats) => {
+        if (err || stats == null) {
+          reject(err)
+        } else {
+          resolve(stats)
+        }
+      })
+    })
   }
 }

@@ -1,9 +1,9 @@
-import Command, { APIError } from '@nimbu-cli/command'
-import { convertChangesToTree, addFieldNames, cleanUpIds } from '../../../utils/diff'
-
-import { ux, Flags } from '@oclif/core'
+import { APIError, Command } from '@nimbu-cli/command'
+import { Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
 import { detailedDiff } from 'deep-object-diff'
+
+import { addFieldNames, cleanUpIds, convertChangesToTree } from '../../../utils/diff'
 
 export default class CustomerConfigDiff extends Command {
   static description = 'check differences between customer customizations from one to another'
@@ -24,8 +24,8 @@ export default class CustomerConfigDiff extends Command {
   async execute() {
     const { flags } = await this.parse(CustomerConfigDiff)
 
-    let fromSite = flags.from!
-    let toSite = flags.to!
+    const fromSite = flags.from
+    const toSite = flags.to
 
     if (fromSite === toSite) {
       ux.error('The source site needs to differ from the destination.')
@@ -43,11 +43,8 @@ export default class CustomerConfigDiff extends Command {
     } catch (error) {
       ux.action.stop()
 
-      if (error instanceof APIError) {
-        throw new Error(error.message)
-      } else {
-        throw error
-      }
+      const error_ = error instanceof APIError ? new TypeError(error.message) : error
+      throw error_
     }
 
     try {
@@ -58,11 +55,8 @@ export default class CustomerConfigDiff extends Command {
     } catch (error) {
       ux.action.stop()
 
-      if (error instanceof APIError) {
-        throw new Error(error.message)
-      } else {
-        throw error
-      }
+      const error_ = error instanceof APIError ? new TypeError(error.message) : error
+      throw error_
     }
 
     ux.action.stop()
@@ -70,7 +64,7 @@ export default class CustomerConfigDiff extends Command {
     this.cleanUpBeforeDiff(detailedFrom)
     this.cleanUpBeforeDiff(detailedTo)
 
-    let diff: any = detailedDiff(detailedFrom, detailedTo)
+    const diff: any = detailedDiff(detailedFrom, detailedTo)
     let anyDifferences = false
 
     addFieldNames(diff, detailedFrom, detailedTo)
@@ -99,11 +93,11 @@ export default class CustomerConfigDiff extends Command {
   }
 
   private cleanUpBeforeDiff(data) {
-    for (let field of data) {
+    for (const field of data) {
       cleanUpIds(field)
 
       if (field.select_options != null) {
-        for (let option of field.select_options) {
+        for (const option of field.select_options) {
           cleanUpIds(option)
         }
       }

@@ -1,9 +1,9 @@
-import Command from '@nimbu-cli/command'
-import { convertChangesToTree, addFieldNames, cleanUpIds } from '../../../utils/diff'
-
-import { ux, Flags } from '@oclif/core'
+import { Command } from '@nimbu-cli/command'
+import { Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
 import { detailedDiff } from 'deep-object-diff'
+
+import { addFieldNames, cleanUpIds, convertChangesToTree } from '../../../utils/diff'
 
 export default class ProductsConfigDiff extends Command {
   static description = 'check differences between product customizations from one to another'
@@ -24,8 +24,8 @@ export default class ProductsConfigDiff extends Command {
   async execute() {
     const { flags } = await this.parse(ProductsConfigDiff)
 
-    let fromSite = flags.from!
-    let toSite = flags.to!
+    const fromSite = flags.from
+    const toSite = flags.to
 
     if (fromSite === toSite) {
       ux.error('The source site needs to differ from the destination.')
@@ -45,7 +45,7 @@ export default class ProductsConfigDiff extends Command {
       ux.action.stop()
 
       if (error instanceof Error) {
-        throw new Error(error.message)
+        throw new TypeError(error.message)
       }
     }
 
@@ -58,7 +58,7 @@ export default class ProductsConfigDiff extends Command {
       ux.action.stop()
 
       if (error instanceof Error) {
-        throw new Error(error.message)
+        throw new TypeError(error.message)
       }
     }
 
@@ -67,7 +67,7 @@ export default class ProductsConfigDiff extends Command {
     this.cleanUpBeforeDiff(detailedFrom)
     this.cleanUpBeforeDiff(detailedTo)
 
-    let diff: any = detailedDiff(detailedFrom, detailedTo)
+    const diff: any = detailedDiff(detailedFrom, detailedTo)
     let anyDifferences = false
     addFieldNames(diff, detailedFrom, detailedTo)
     ux.log('')
@@ -95,11 +95,11 @@ export default class ProductsConfigDiff extends Command {
   }
 
   private cleanUpBeforeDiff(data) {
-    for (let field of data) {
+    for (const field of data) {
       cleanUpIds(field)
 
       if (field.select_options != null) {
-        for (let option of field.select_options) {
+        for (const option of field.select_options) {
           cleanUpIds(option)
         }
       }

@@ -1,4 +1,4 @@
-import Command from '@nimbu-cli/command'
+import { Command } from '@nimbu-cli/command'
 import open from 'open'
 
 export default class BrowseAdmin extends Command {

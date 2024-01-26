@@ -1,24 +1,28 @@
+import { buildConfig } from '@nimbu-cli/command'
+import globalDebug from 'debug'
+
+import path = require('path')
 import webpack = require('webpack')
 import DevServer = require('webpack-dev-server')
-import path = require('path')
-
-import Debug from 'debug'
-
-import { buildConfig } from '@nimbu-cli/command'
 const { get: getProjectConfig } = buildConfig
 
-const debug = Debug('nimbu')
+const debug = globalDebug('nimbu')
 
 export default class WebpackDevServer {
   private server?: DevServer
 
+  isRunning(): boolean {
+    return this.server !== undefined
+  }
+
+  // eslint-disable-next-line max-params
   async start(
     host: string,
     defaultPort: number,
     nimbuPort: number,
     protocol: string,
     open: boolean,
-    options?: { poll?: boolean },
+    _options?: { poll?: boolean },
   ): Promise<void> {
     debug('Starting webpack-dev-server...')
 
@@ -26,7 +30,7 @@ export default class WebpackDevServer {
     this.setupEnv()
 
     // load all dependencies at runtime
-    const fs = require('fs')
+    const fs = require('node:fs')
 
     const { choosePort, createCompiler, prepareUrls } = require('react-dev-utils/WebpackDevServerUtils')
     const openBrowser = require('react-dev-utils/openBrowser')
@@ -36,7 +40,7 @@ export default class WebpackDevServer {
     const projectWebpack = require('../config/webpack.project')
 
     const createDevServerConfig = require('../config/webpackDevServer.config')
-    const getClientEnvironment = require('../config/env')
+    // const getClientEnvironment = require('../config/env')
 
     const useYarn = fs.existsSync(paths.yarnLockFile)
     const isInteractive = process.stdout.isTTY
@@ -50,7 +54,7 @@ export default class WebpackDevServer {
     const port = await choosePort(host, defaultPort)
     if (port == null) {
       // We have not found a port.
-      return Promise.reject(new Error('Could not find a port to run on.'))
+      throw new Error('Could not find a port to run on.')
     }
 
     debug(`Port ${port} is available`)
@@ -79,15 +83,15 @@ export default class WebpackDevServer {
     debug('Create devserver config')
     const proxyConfig = {
       '*': {
-        target: `http://127.0.0.1:${nimbuPort}`,
         onError(err: any) {
           console.log('Could not proxy to Nimbu Dev Server:', err)
         },
+        target: `http://127.0.0.1:${nimbuPort}`,
       },
     }
     const serverConfig = {
       ...createDevServerConfig(proxyConfig, [urls.lanUrlForConfig, 'localhost', '.localhost']),
-      host: host,
+      host,
       port,
     }
 
@@ -104,9 +108,9 @@ export default class WebpackDevServer {
   async stop(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.server) {
-        this.server.stop().catch((err: Error | null) => {
-          if (err) {
-            reject(err)
+        this.server.stop().catch((error: Error | null) => {
+          if (error) {
+            reject(error)
           } else {
             this.server = undefined
             resolve()
@@ -118,21 +122,12 @@ export default class WebpackDevServer {
     })
   }
 
-  isRunning(): boolean {
-    return this.server !== undefined
-  }
-
-  private setupEnv() {
-    process.env.BABEL_ENV = 'development'
-    process.env.NODE_ENV = 'development'
-  }
-
-  private async listen(host: string, port: number): Promise<void> {
+  private async listen(_host: string, _port: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.server) {
-        this.server.start().catch((err: Error | null) => {
-          if (err) {
-            reject(err)
+        this.server.start().catch((error: Error | null) => {
+          if (error) {
+            reject(error)
           } else {
             resolve()
           }
@@ -141,5 +136,10 @@ export default class WebpackDevServer {
         reject(new Error('Server is not set.'))
       }
     })
+  }
+
+  private setupEnv() {
+    process.env.BABEL_ENV = 'development'
+    process.env.NODE_ENV = 'development'
   }
 }

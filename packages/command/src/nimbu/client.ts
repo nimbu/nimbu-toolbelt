@@ -1,32 +1,33 @@
-import { ux, Errors, Interfaces } from '@oclif/core'
-import Netrc from 'netrc-parser'
-import Nimbu from 'nimbu-client'
-import { HTTPError } from 'nimbu-client'
+/* eslint-disable import/no-named-as-default */
 
-import { Credentials } from './credentials'
+import { Errors, Interfaces, ux } from '@oclif/core'
+import Netrc from 'netrc-parser'
+import Nimbu, { HTTPError } from 'nimbu-client'
+
 import { Config } from './config'
+import { Credentials, CredentialsOptions } from './credentials'
 import { User } from './types'
 
-type HTTPVerbs = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS'
+type HTTPVerbs = 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT'
 
 export interface IOptions {
-  retryAuth?: boolean
-  fetchAll?: boolean
-  headers?: any
-  formData?: any
-  site?: string
-  host?: string
-  body?: object
   auth?: string
+  body?: object
+  fetchAll?: boolean
+  formData?: any
+  headers?: any
+  host?: string
   onNextPage?: (nextPage: string, lastPage: string) => void
+  retryAuth?: boolean
+  site?: string
 }
 
 export interface IValidationError {
-  resource: string
-  resource_id: string
+  code: string
   field: string
   message: string
-  code: string
+  resource: string
+  resource_id: string
   value: string
 }
 
@@ -35,35 +36,37 @@ export function isValidationError(error: any): error is IValidationError {
 }
 
 export interface IAPIErrorOptions {
+  code?: number
+  errors?: IValidationError[] | string[]
+  message?: string
   resource?: string
   site?: { id: string; name: string }
-  message?: string
-  code?: number
-  errors?: string[] | IValidationError[]
 }
 
 export class APIError extends Errors.CLIError {
-  http: HTTPError
   body: IAPIErrorOptions
+  http: HTTPError
 
   constructor(error: HTTPError) {
     if (!error) throw new Error('invalid error')
-    let options: IAPIErrorOptions = error.body
+    const options: IAPIErrorOptions = error.body
     if (!options || options instanceof String || !options.message) throw error
 
-    let info: string[] = []
+    const info: string[] = []
     if (options.code) {
       info.push(`Error Code: ${options.code}`)
     }
+
     if (options.site && options.site.name) {
       info.push(`Site: ${options.site.name}`)
     }
+
     if (options.errors) {
       info.push(`Error Information: ${JSON.stringify(options.errors)}`)
     }
 
     if (info.length > 0) {
-      super([options.message, ''].concat(info).join('\n'))
+      super([options.message, '', ...info].join('\n'))
     } else {
       super(options.message)
     }
@@ -75,8 +78,8 @@ export class APIError extends Errors.CLIError {
 
 export default class Client {
   public readonly config: Config
-  private readonly credentials: Credentials
   private client: Nimbu
+  private readonly credentials: Credentials
 
   constructor(protected oclifConfig: Interfaces.Config, config: Config) {
     this.oclifConfig = oclifConfig
@@ -85,16 +88,79 @@ export default class Client {
     this.client = this.createClient()
   }
 
-  refreshClient() {
-    this.client = this.createClient()
-  }
-
   get token(): string | undefined {
     return this.credentials.token
   }
 
-  login(options: Credentials.Options = {}) {
+  delete<T>(path: string, options: IOptions = {}) {
+    return this.request<T>('DELETE', path, options)
+  }
+
+  get<T>(path: string, options: IOptions = {}) {
+    return this.request<T>('GET', path, options)
+  }
+
+  login(options: CredentialsOptions = {}) {
     return this.credentials.login(options)
+  }
+
+  async logout() {
+    try {
+      await this.credentials.logout()
+    } catch (error) {
+      if (error instanceof Error) {
+        ux.warn(error)
+      }
+    }
+
+    delete Netrc.machines[this.config.apiHost]
+    await Netrc.save()
+  }
+
+  patch<T>(path: string, options: IOptions = {}) {
+    return this.request<T>('PATCH', path, options)
+  }
+
+  post<T>(path: string, options: IOptions = {}) {
+    return this.request<T>('POST', path, options)
+  }
+
+  put<T>(path: string, options: IOptions = {}) {
+    return this.request<T>('PUT', path, options)
+  }
+
+  refreshClient() {
+    this.client = this.createClient()
+  }
+
+  async request<T>(method: HTTPVerbs, path: string, options: IOptions = {}, retries = 3): Promise<T> {
+    retries--
+
+    try {
+      const result = (await this.client.request<T>({ ...options, method, path })) as T
+      return result
+    } catch (error) {
+      if (error instanceof HTTPError) {
+        if (!error.statusCode) {
+          // this is no regular http client error
+          throw error
+        }
+
+        if (retries > 0 && options.retryAuth !== false && error.statusCode === 401) {
+          await this.login()
+          if (!options.headers) {
+            options.headers = {}
+          }
+
+          options.headers.authorization = `Bearer ${this.token}`
+          return this.request<T>(method, path, options, retries)
+        }
+
+        throw new APIError(error)
+      } else {
+        throw error
+      }
+    }
   }
 
   async validateLogin(): Promise<boolean> {
@@ -109,74 +175,13 @@ export default class Client {
     }
   }
 
-  async logout() {
-    try {
-      await this.credentials.logout()
-    } catch (err) {
-      if (err instanceof Error) {
-        ux.warn(err)
-      }
-    }
-    delete Netrc.machines[this.config.apiHost]
-    await Netrc.save()
-  }
-
-  get<T>(path: string, options: IOptions = {}) {
-    return this.request<T>('GET', path, options)
-  }
-
-  post<T>(path: string, options: IOptions = {}) {
-    return this.request<T>('POST', path, options)
-  }
-
-  put<T>(path: string, options: IOptions = {}) {
-    return this.request<T>('PUT', path, options)
-  }
-
-  patch<T>(path: string, options: IOptions = {}) {
-    return this.request<T>('PATCH', path, options)
-  }
-
-  delete<T>(path: string, options: IOptions = {}) {
-    return this.request<T>('DELETE', path, options)
-  }
-
-  async request<T>(method: HTTPVerbs, path: string, options: IOptions = {}, retries = 3): Promise<T> {
-    retries--
-
-    try {
-      let result = (await this.client.request<T>(Object.assign({}, options, { method, path }))) as T
-      return result
-    } catch (error) {
-      if (error instanceof HTTPError) {
-        if (!error.statusCode) {
-          // this is no regular http client error
-          throw error
-        }
-        if (retries > 0) {
-          if (options.retryAuth !== false && error.statusCode === 401) {
-            await this.login()
-            if (!options.headers) {
-              options.headers = {}
-            }
-            options.headers.authorization = `Bearer ${this.token}`
-            return this.request<T>(method, path, options, retries)
-          }
-        }
-        throw new APIError(error)
-      } else {
-        throw error
-      }
-    }
-  }
-
   private createClient(): Nimbu {
     return new Nimbu({
-      token: this.credentials.token,
+      clientVersion: this.oclifConfig.version,
       host: this.config.apiUrl,
       site: this.config.site,
+      token: this.credentials.token,
       userAgent: this.oclifConfig.userAgent,
-      clientVersion: this.oclifConfig.version,
     })
   }
 }

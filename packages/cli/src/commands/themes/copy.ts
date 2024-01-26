@@ -1,12 +1,12 @@
-import Command from '@nimbu-cli/command'
-import { download } from '../../utils/files'
-
+import { Command } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
-import { Observable } from 'rxjs'
 import * as fs from 'fs-extra'
-import * as pathFinder from 'path'
 import { capitalize } from 'lodash'
+import * as pathFinder from 'node:path'
+import { Observable } from 'rxjs'
+
+import { download } from '../../utils/files'
 
 export default class CopyThemes extends Command {
   static description = 'copy themes from one site to another'
@@ -17,6 +17,12 @@ export default class CopyThemes extends Command {
       description: 'slug of the source theme',
       required: true,
     }),
+    fromHost: Flags.string({
+      description: 'hostname of origin Nimbu API',
+    }),
+    'liquid-only': Flags.boolean({
+      description: 'only copy the templates',
+    }),
     to: Flags.string({
       char: 't',
       description: 'slug of the target theme',
@@ -24,12 +30,6 @@ export default class CopyThemes extends Command {
     }),
     toHost: Flags.string({
       description: 'hostname of target Nimbu API',
-    }),
-    fromHost: Flags.string({
-      description: 'hostname of origin Nimbu API',
-    }),
-    'liquid-only': Flags.boolean({
-      description: 'only copy the templates',
     }),
   }
 
@@ -41,10 +41,10 @@ export default class CopyThemes extends Command {
     let toTheme: string
     let fromSite: string | undefined
     let toSite: string | undefined
-    let fromHost = flags.fromHost !== undefined ? flags.fromHost! : this.nimbuConfig.apiUrl
-    let toHost = flags.toHost !== undefined ? flags.toHost! : this.nimbuConfig.apiUrl
+    const fromHost = flags.fromHost === undefined ? this.nimbuConfig.apiUrl : flags.fromHost
+    const toHost = flags.toHost === undefined ? this.nimbuConfig.apiUrl : flags.toHost
 
-    let fromParts = flags.from.split('/')
+    const fromParts = flags.from.split('/')
     if (fromParts.length > 1) {
       fromSite = fromParts[0]
       fromTheme = fromParts[1]
@@ -52,7 +52,8 @@ export default class CopyThemes extends Command {
       fromSite = fromParts[0]
       fromTheme = 'default-theme'
     }
-    let toParts = flags.to.split('/')
+
+    const toParts = flags.to.split('/')
     if (toParts.length > 1) {
       toSite = toParts[0]
       toTheme = toParts[1]
@@ -61,34 +62,35 @@ export default class CopyThemes extends Command {
       toTheme = 'default-theme'
     }
 
-    let types = ['snippets', 'layouts', 'templates']
+    const types = ['snippets', 'layouts', 'templates']
     if (!flags['liquid-only']) {
       types.unshift('assets')
     }
-    let taskList: any[] = []
+
+    const taskList: any[] = []
     this.log(
       `Copying theme ${chalk.bold(fromTheme)} from ${chalk.bold(fromSite)} to ${
-        toTheme !== fromTheme ? `theme ${chalk.bold(toTheme)} in ` : ''
+        toTheme === fromTheme ? '' : `theme ${chalk.bold(toTheme)} in `
       }site ${chalk.bold(toSite)}:\n`,
     )
 
-    for (let type of types) {
+    for (const type of types) {
       taskList.push({
-        title: capitalize(type),
-        task: (ctx, task) =>
+        task: (_ctx, _task) =>
           new Listr([
             {
-              title: `Downloading ${type}`,
-              task: (ctx) => this.fetchType(type, ctx),
               enabled: (ctx) => ctx[type] != null || types.indexOf(type) === ctx.currentStep,
+              task: (ctx) => this.fetchType(type, ctx),
+              title: `Downloading ${type}`,
             },
             {
-              title: `Uploading ${type}`,
-              task: (ctx) => this.uploadType(type, ctx),
-              skip: (ctx) => ctx[type].length === 0,
               enabled: (ctx) => ctx[type] != null,
+              skip: (ctx) => ctx[type].length === 0,
+              task: (ctx) => this.uploadType(type, ctx),
+              title: `Uploading ${type}`,
             },
           ]),
+        title: capitalize(type),
       })
     }
 
@@ -96,61 +98,74 @@ export default class CopyThemes extends Command {
 
     await tasks
       .run({
-        fromSite,
-        toSite,
-        fromTheme,
-        toTheme,
-        fromHost,
-        toHost,
         currentStep: 0,
         files: {},
+        fromHost,
+        fromSite,
+        fromTheme,
+        toHost,
+        toSite,
+        toTheme,
       })
       .catch((error) => this.error(error))
   }
 
+  private async downloadFile(observer, prefix, item) {
+    const tmp = require('tmp-promise')
+    const prettyBytes = require('pretty-bytes')
+
+    const { cleanup, path } = await tmp.file({ prefix: `nimbu-asset-` })
+    try {
+      await download(item.file, path, (bytes, percentage) => {
+        observer.next(`${prefix} Downloading ${item.name} (${percentage}% of ${prettyBytes(bytes)})`)
+      })
+    } catch (error) {
+      observer.error(error)
+    }
+
+    return { cleanup, path }
+  }
+
   private async fetchType(type: string, ctx: any) {
-    let options: any = {
+    const options: any = {
       fetchAll: true,
-      site: ctx.fromSite,
       host: ctx.fromHost,
+      site: ctx.fromSite,
     }
 
     const perform = async (observer) => {
       try {
-        let items: any[] = await this.nimbu.get(`/themes/${ctx.fromTheme}/${type}`, options)
-        let nbItems = items.length
+        const items: any[] = await this.nimbu.get(`/themes/${ctx.fromTheme}/${type}`, options)
+        const nbItems = items.length
         let crntIndex = 1
-        let itemsWithCode: any[] = []
-        for (let item of items) {
-          let name: string
-          if (type === 'assets') {
-            name = item.path.substring(1)
-          } else {
-            name = item.name
-          }
-          let prefix = `[${crntIndex}/${nbItems}]`
+        const itemsWithCode: any[] = []
+        for (const item of items) {
+          const name: string = type === 'assets' ? item.path.slice(1) : item.name
+          const prefix = `[${crntIndex}/${nbItems}]`
           observer.next(`${prefix} Fetching ${type.slice(0, -1)} ${name}`)
-          let itemWithCode: any = await this.nimbu.get(`/themes/${ctx.fromTheme}/${type}/${name}`, options)
-          if (itemWithCode.public_url != null) {
+          const itemWithCode: any = await this.nimbu.get(`/themes/${ctx.fromTheme}/${type}/${name}`, options)
+          if (itemWithCode.public_url == null) {
             itemsWithCode.push({
-              name: itemWithCode.path,
-              file: itemWithCode.public_url,
+              code: itemWithCode.code,
+              name: itemWithCode.name,
             })
           } else {
             itemsWithCode.push({
-              name: itemWithCode.name,
-              code: itemWithCode.code,
+              file: itemWithCode.public_url,
+              name: itemWithCode.path,
             })
           }
+
           crntIndex++
         }
+
         ctx[type] = itemsWithCode
         if (itemsWithCode.length === 0) {
           ctx.currentStep++
         }
       } catch (error) {
         if (error instanceof Error) {
-          throw new Error(error.message)
+          throw new TypeError(error.message)
         }
       }
     }
@@ -164,41 +179,41 @@ export default class CopyThemes extends Command {
 
   private async uploadType(type: string, ctx: any) {
     const perform = async (observer) => {
-      let items = ctx[type]
-      let nbItems = items.length
+      const items = ctx[type]
+      const nbItems = items.length
       let crntIndex = 1
 
-      for (let item of items) {
-        let prefix = `[${crntIndex}/${nbItems}]`
+      for (const item of items) {
+        const prefix = `[${crntIndex}/${nbItems}]`
         try {
           observer.next(`${prefix} Updating ${type.slice(0, -1)} ${item.name} in site ${ctx.toSite}`)
-          if (item.file != null) {
-            let { path, cleanup } = await this.downloadFile(observer, prefix, item)
-            let filename = pathFinder.basename(item.file.split('?')[0])
-            let base64 = await fs.readFile(path, { encoding: 'base64' })
-            await this.nimbu.post(`/themes/${ctx.toTheme}/${type}`, {
-              body: {
-                name: item.name,
-                file: {
-                  __type: 'File',
-                  filename,
-                  attachment: base64,
-                },
-              },
-              site: ctx.toSite,
-              host: ctx.toHost,
-            })
-            cleanup()
-          } else {
+          if (item.file == null) {
             await this.nimbu.post(`/themes/${ctx.toTheme}/${type}`, {
               body: item,
-              site: ctx.toSite,
               host: ctx.toHost,
+              site: ctx.toSite,
             })
+          } else {
+            const { cleanup, path } = await this.downloadFile(observer, prefix, item)
+            const filename = pathFinder.basename(item.file.split('?')[0])
+            const base64 = await fs.readFile(path, { encoding: 'base64' })
+            await this.nimbu.post(`/themes/${ctx.toTheme}/${type}`, {
+              body: {
+                file: {
+                  __type: 'File',
+                  attachment: base64,
+                  filename,
+                },
+                name: item.name,
+              },
+              host: ctx.toHost,
+              site: ctx.toSite,
+            })
+            cleanup()
           }
         } catch (error) {
           if (error instanceof Error) {
-            throw new Error(`Error with ${chalk.bold(item.name)}: ${error.message}`)
+            throw new TypeError(`Error with ${chalk.bold(item.name)}: ${error.message}`)
           }
         }
 
@@ -213,21 +228,5 @@ export default class CopyThemes extends Command {
         .then(() => observer.complete())
         .catch((error) => observer.error(error))
     })
-  }
-
-  private async downloadFile(observer, prefix, item) {
-    let tmp = require('tmp-promise')
-    let prettyBytes = require('pretty-bytes')
-
-    const { path, cleanup } = await tmp.file({ prefix: `nimbu-asset-` })
-    try {
-      await download(item.file, path, (bytes, percentage) => {
-        observer.next(`${prefix} Downloading ${item.name} (${percentage}% of ${prettyBytes(bytes)})`)
-      })
-    } catch (error) {
-      observer.error(error)
-    }
-
-    return { path, cleanup }
   }
 }

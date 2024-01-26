@@ -7,12 +7,14 @@ import * as flags from '../src/flags'
 const test = base.add('config', () => Config.load())
 
 class MyCommand extends Command {
-  async execute() {}
+  async execute() {
+    // noop
+  }
 }
 
 describe('cli base command', () => {
-  it('has a flag to set the site', async () => {
-    return class SiteCommand extends Command {
+  it('has a flag to set the site', async () =>
+    class SiteCommand extends Command {
       static flags = {
         site: flags.site(),
       }
@@ -21,11 +23,10 @@ describe('cli base command', () => {
         const { flags } = await this.parse(SiteCommand)
         expect(flags.site).to.equal('mysite')
       }
-    }.run(['--site=mysite'])
-  })
+    }.run(['--site=mysite']))
 
   test.it('has a nimbu API client', async (ctx) => {
-    let cmd = new MyCommand([], ctx.config)
+    const cmd = new MyCommand([], ctx.config)
     await cmd.initialize()
     expect(cmd.nimbu).to.be.ok
   })

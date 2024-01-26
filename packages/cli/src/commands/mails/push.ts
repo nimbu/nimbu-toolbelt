@@ -1,13 +1,13 @@
-import Command, { APIError } from '@nimbu-cli/command'
+/* eslint-disable import/namespace */
+import { APIError, Command } from '@nimbu-cli/command'
+import { Flags, ux } from '@oclif/core'
+import chalk from 'chalk'
+import fm from 'front-matter'
+import * as fs from 'fs-extra'
+import logSymbols from 'log-symbols'
+import path from 'node:path'
 
 import { findMatchingFiles } from '../../utils/files'
-
-import { ux, Flags } from '@oclif/core'
-import * as fs from 'fs-extra'
-import chalk from 'chalk'
-import path from 'path'
-import fm from 'front-matter'
-import logSymbols from 'log-symbols'
 
 export default class PushMails extends Command {
   static description = 'upload all notification templates'
@@ -32,75 +32,72 @@ export default class PushMails extends Command {
       return
     }
 
-    let notifications = await findMatchingFiles(mailsPath, '*.txt')
-    let allFiles = await findMatchingFiles(mailsPath, '**/*.txt')
+    const notifications = await findMatchingFiles(mailsPath, '*.txt')
+    const allFiles = await findMatchingFiles(mailsPath, '**/*.txt')
 
-    let translations = allFiles.filter(function (e) {
-      let i = notifications.indexOf(e)
-      if (i === -1) {
-        return true
-      } else {
-        return false
-      }
+    const translations = allFiles.filter((e) => {
+      const i = notifications.indexOf(e)
+      return i === -1
     })
 
     ux.log('Updating notifications:')
 
-    for (let filename of notifications) {
-      let slug = path.basename(filename, '.txt')
-      if (flags.only && flags.only.length > 0 && flags.only.indexOf(slug) === -1) {
+    for (const filename of notifications) {
+      const slug = path.basename(filename, '.txt')
+      if (flags.only && flags.only.length > 0 && !flags.only.includes(slug)) {
         continue
       }
+
       ux.action.start(` - ${slug} `)
-      let raw = await fs.readFile(filename)
+      const raw = await fs.readFile(filename)
       let content: any
       try {
-        content = fm(raw.toString('utf-8'))
+        content = fm(raw.toString('utf8'))
       } catch (error) {
         ux.action.stop(chalk.red(`${logSymbols.error} ${error}`))
         break
       }
 
-      if (content.attributes.name == undefined) {
+      if (content.attributes.name == null) {
         ux.action.stop(chalk.red(`${logSymbols.error} name is missing!`))
         break
       }
 
-      if (content.attributes.description == undefined) {
+      if (content.attributes.description == null) {
         ux.action.stop(chalk.red(`${logSymbols.error} description is missing!`))
         break
       }
 
-      if (content.attributes.subject == undefined) {
+      if (content.attributes.subject == null) {
         ux.action.stop(chalk.red(`${logSymbols.error} subject is missing!`))
         break
       }
 
-      let body: any = {
-        slug,
-        name: content.attributes.name,
+      const body: any = {
         description: content.attributes.description,
+        name: content.attributes.name,
+        slug,
         subject: content.attributes.subject,
         text: content.body,
       }
 
-      let htmlPath = `${mailsPath}${slug}.html`
+      const htmlPath = `${mailsPath}${slug}.html`
       if (fs.existsSync(htmlPath)) {
         body.html_enabled = true
-        let html = await fs.readFile(htmlPath)
-        body.html = html.toString('utf-8')
+        const html = await fs.readFile(htmlPath)
+        body.html = html.toString('utf8')
       }
 
-      let applicableTranslations = translations.filter((f) => f.includes(`${slug}.txt`))
-      let translationData = {}
+      const applicableTranslations = translations.filter((f) => f.includes(`${slug}.txt`))
+      const translationData = {}
 
-      for (let translationFilename of applicableTranslations) {
-        let locale = translationFilename.replace(mailsPath, '').replace(`/${slug}.txt`, '')
+      for (const translationFilename of applicableTranslations) {
+        const locale = translationFilename.replace(mailsPath, '').replace(`/${slug}.txt`, '')
         if (this.nimbuConfig.possibleLocales.includes(locale)) {
-          let raw = await fs.readFile(translationFilename)
-          let content: any = fm(raw.toString('utf-8'))
+          const raw = await fs.readFile(translationFilename)
+          const content: any = fm(raw.toString('utf8'))
 
-          let translation: any = {
+          const translation: any = {
             text: content.body,
           }
 
@@ -108,10 +105,10 @@ export default class PushMails extends Command {
             translation.subject = content.attributes.subject
           }
 
-          let htmlPath = `${mailsPath}${locale}/${slug}.html`
+          const htmlPath = `${mailsPath}${locale}/${slug}.html`
           if (fs.existsSync(htmlPath)) {
-            let html = await fs.readFile(htmlPath)
-            translation.html = html.toString('utf-8')
+            const html = await fs.readFile(htmlPath)
+            translation.html = html.toString('utf8')
           }
 
           translationData[locale] = translation

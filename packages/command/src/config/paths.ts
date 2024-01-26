@@ -1,10 +1,10 @@
-import * as fs from 'fs'
-import * as path from 'path'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 
 const projectDirectory = fs.realpathSync(process.cwd())
 const toolbeltDirectory = path.resolve(__dirname, '../..')
 const nimbuDirectory =
-  process.env.NIMBU_DIRECTORY != null ? path.resolve(process.env.NIMBU_DIRECTORY) : projectDirectory
+  process.env.NIMBU_DIRECTORY == null ? projectDirectory : path.resolve(process.env.NIMBU_DIRECTORY)
 
 export const NIMBU_DIRECTORY = nimbuDirectory
 export const PROJECT_DIRECTORY = projectDirectory

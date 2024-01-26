@@ -1,5 +1,4 @@
-import Command, { APITypes as Nimbu, color } from '@nimbu-cli/command'
-
+import { Command, APITypes as Nimbu, color } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import { formatRelative } from 'date-fns'
 
@@ -11,14 +10,18 @@ By default, the CLI auth token is only valid for 1 year. To generate a long-live
     help: Flags.help({ char: 'h' }),
   }
 
+  get needsConfig(): boolean {
+    return false
+  }
+
   async execute() {
     this.parse(Token)
 
     if (!this.nimbu.token) this.error('not logged in')
     try {
       const tokens = await this.nimbu.get<Nimbu.Token[]>('/tokens', {
-        retryAuth: false,
         fetchAll: true,
+        retryAuth: false,
       })
       const token = tokens.find((t: any) => t.token && t.token === this.nimbu.token)
       if (token && token.expires_in) {
@@ -30,16 +33,12 @@ By default, the CLI auth token is only valid for 1 year. To generate a long-live
           )} to generate a long-term token`,
         )
       }
-    } catch (err) {
-      if (err instanceof Error) {
-        this.warn(err.message)
+    } catch (error) {
+      if (error instanceof Error) {
+        this.warn(error.message)
       }
     }
 
     this.log(this.nimbu.token)
-  }
-
-  get needsConfig(): boolean {
-    return false
   }
 }

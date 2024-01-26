@@ -1,6 +1,7 @@
-import Command from '@nimbu-cli/command'
+import { Command } from '@nimbu-cli/command'
 import { Args, Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
+
 import { CustomField, isCalculatedField, isRelationalField, isSelectField } from '../../nimbu/types'
 import { fetchAllChannels } from '../../utils/channels'
 
@@ -8,64 +9,83 @@ function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-const toPascalCase = (s: string) => {
-  return capitalizeFirstLetter(
-    s.replace(/([-_][a-z])/gi, ($1) => {
-      return $1.toUpperCase().replace('-', '').replace('_', '')
-    }),
-  )
-}
+const toPascalCase = (s: string) =>
+  capitalizeFirstLetter(s.replaceAll(/([_-][a-z])/gi, ($1) => $1.toUpperCase().replace('-', '').replace('_', '')))
 
 const toInterfaceType = (field: CustomField) => {
   switch (field.type) {
     case 'string':
     case 'text':
     case 'email':
-    case 'calculated':
+    case 'calculated': {
       return 'string'
+    }
+
     case 'integer':
-    case 'float':
+    case 'float': {
       return 'number'
-    case 'boolean':
+    }
+
+    case 'boolean': {
       return 'boolean'
-    case 'file':
+    }
+
+    case 'file': {
       return 'Nimbu.File'
-    case 'date':
+    }
+
+    case 'date': {
       return 'Nimbu.Date'
+    }
+
     case 'time':
-    case 'date_time':
+    case 'date_time': {
       return 'Nimbu.DateTime'
-    case 'select':
+    }
+
+    case 'select': {
       return `Nimbu.Select<'${field.select_options.map((o) => o.name).join("' | '")}'>`
-    case 'multi_select':
+    }
+
+    case 'multi_select': {
       return `Nimbu.MultiSelect<'${field.select_options.map((o) => o.name).join("' | '")}'>`
+    }
+
     case 'belongs_to':
-    case 'customer':
+    case 'customer': {
       return 'Nimbu.ReferenceTo'
-    case 'belongs_to_many':
+    }
+
+    case 'belongs_to_many': {
       return 'Nimbu.ReferenceMany'
-    case 'gallery':
+    }
+
+    case 'gallery': {
       return 'Nimbu.Gallery'
-    default:
+    }
+
+    default: {
       return 'any'
+    }
   }
 }
-export default class ChannelsInfo extends Command {
-  static description = 'list info about this channel'
 
+export default class ChannelsInfo extends Command {
   static args = {
     channel: Args.string({
+      description: 'slug of your channel (optionally with the site, i.e. site/channel)',
       name: 'channel',
       required: true,
-      description: 'slug of your channel (optionally with the site, i.e. site/channel)',
-    })
+    }),
   }
+
+  static description = 'list info about this channel'
 
   static flags = {
     ...ux.table.flags(),
     output: Flags.string({
-      exclusive: ['no-truncate', 'csv'],
       description: 'output in a more machine friendly format',
+      exclusive: ['no-truncate', 'csv'],
       options: ['csv', 'json', 'yaml', 'ts'],
     }),
   }
@@ -77,7 +97,7 @@ export default class ChannelsInfo extends Command {
     let channel: string
     let site: string | undefined
 
-    let fromParts = args.channel.split('/')
+    const fromParts = args.channel.split('/')
     if (fromParts.length > 1) {
       site = fromParts[0]
       channel = fromParts[1]
@@ -93,7 +113,7 @@ export default class ChannelsInfo extends Command {
 
     ux.action.start(`Fetching channel info from ${chalk.bold(site)}...`)
 
-    const { channels, circularDependencies, graph } = await fetchAllChannels(this, site)
+    const { channels, graph } = await fetchAllChannels(this, site)
 
     ux.action.stop(chalk.green('✓'))
 
@@ -118,56 +138,57 @@ export default class ChannelsInfo extends Command {
       for (const field of channelForInfo.customizations) {
         this.log(`  ${field.name}${field.required ? '' : '?'}: ${toInterfaceType(field)};`)
       }
+
       this.log('}')
       return
-    } else {
-      ux.table(
-        channelForInfo.customizations,
-        {
-          label: {
-            get: (row) => (tty && row.required ? row.label + '*' : row.label),
-          },
-          name: {},
-          type: {},
-          reference: {
-            get: (row) => (isRelationalField(row) ? row.reference ?? '' : ''),
-          },
-          required: {
-            get: (row) => (tty ? (row.required ? '✓' : '') : !!row.required),
-          },
-          options: {
-            extended: true,
-            get: (row) => {
-              if (isSelectField(row)) {
-                return row.select_options.map((o) => `${o.name} (${o.slug} / ${o.id})\n`).join('')
-              } else {
-                return ''
-              }
-            },
-          },
-          hint: {
-            extended: true,
-            get: (row) => row.hint ?? '',
-          },
-          calculated_expression: {
-            extended: true,
-            get: (row) => (isCalculatedField(row) ? row.calculated_expression ?? '' : ''),
-          },
-          required_expression: {
-            extended: true,
-            get: (row) => row.required_expression ?? '',
-          },
-          unique: {
-            extended: true,
-            get: (row) => (tty ? (row.unique ? '✓' : '') : !!row.unique),
-          },
-        },
-        {
-          printLine: this.log.bind(this),
-          ...flags, // parsed flags
-        },
-      )
     }
+
+    ux.table(
+      channelForInfo.customizations,
+      {
+        calculated_expression: {
+          extended: true,
+          get: (row) => (isCalculatedField(row) ? row.calculated_expression ?? '' : ''),
+        },
+        hint: {
+          extended: true,
+          get: (row) => row.hint ?? '',
+        },
+        label: {
+          get: (row) => (tty && row.required ? row.label + '*' : row.label),
+        },
+        name: {},
+        options: {
+          extended: true,
+          get(row) {
+            if (isSelectField(row)) {
+              return row.select_options.map((o) => `${o.name} (${o.slug} / ${o.id})\n`).join('')
+            }
+
+            return ''
+          },
+        },
+        reference: {
+          get: (row) => (isRelationalField(row) ? row.reference ?? '' : ''),
+        },
+        required: {
+          get: (row) => (tty ? (row.required ? '✓' : '') : Boolean(row.required)),
+        },
+        required_expression: {
+          extended: true,
+          get: (row) => row.required_expression ?? '',
+        },
+        type: {},
+        unique: {
+          extended: true,
+          get: (row) => (tty ? (row.unique ? '✓' : '') : Boolean(row.unique)),
+        },
+      },
+      {
+        printLine: this.log.bind(this),
+        ...flags, // parsed flags
+      },
+    )
 
     if (tty) {
       const dependants = graph.dependantsOf(channel)

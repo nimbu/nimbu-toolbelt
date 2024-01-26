@@ -6,20 +6,20 @@ export function convertChangesToTree(fields, tree?) {
     tree = ux.tree()
   }
 
-  for (let key of Object.keys(fields)) {
+  for (const key of Object.keys(fields)) {
     tree.insert(key)
   }
 
-  for (let key of Object.keys(fields)) {
-    let changes = fields[key]
+  for (const key of Object.keys(fields)) {
+    const changes = fields[key]
 
     if (typeof changes === 'object' && changes.constructor === Object) {
-      for (let changedField of Object.keys(changes)) {
-        let value = changes[changedField]
+      for (const changedField of Object.keys(changes)) {
+        const value = changes[changedField]
         if (Array.isArray(value)) {
-          let label = `${chalk.bold(changedField)}`
+          const label = `${chalk.bold(changedField)}`
           tree.nodes[key].insert(label)
-          for (let option of value) {
+          for (const option of value) {
             tree.nodes[key].nodes[label].insert(option)
           }
         } else if (value && typeof value === 'object' && value.constructor === Object) {
@@ -38,23 +38,25 @@ export function addFieldNames(diff, from, to) {
   if (Object.keys(diff.added ?? {}).length === 0) {
     delete diff.added
   } else if (diff.added != null) {
-    for (let index of Object.keys(diff.added)) {
+    for (const index of Object.keys(diff.added)) {
       diff.added[to[index].name] = diff.added[index]
       delete diff.added[index]
     }
   }
+
   if (Object.keys(diff.deleted ?? {}).length === 0) {
     delete diff.deleted
   } else if (diff.deleted != null) {
-    for (let index of Object.keys(diff.deleted)) {
+    for (const index of Object.keys(diff.deleted)) {
       diff.deleted[from[index].name] = diff.deleted[index]
       delete diff.deleted[index]
     }
   }
+
   if (Object.keys(diff.updated ?? {}).length === 0) {
     delete diff.updated
   } else if (diff.updated != null) {
-    for (let index of Object.keys(diff.updated)) {
+    for (const index of Object.keys(diff.updated)) {
       diff.updated[to[index].name] = diff.updated[index]
       delete diff.updated[index]
     }

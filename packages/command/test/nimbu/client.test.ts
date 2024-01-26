@@ -1,22 +1,24 @@
-import nock from 'nock'
 import { Config } from '@oclif/core'
 import base, { expect } from 'fancy-test'
+import nock, { disableNetConnect } from 'nock'
 
 import { default as CommandBase } from '../../src/command'
 
 const test = base.add('config', () => Config.load())
 
 class Command extends CommandBase {
-  async execute() {}
+  async execute() {
+    // noop
+  }
 }
 
 const token = 'YTljNzExMjYwNzAyYWQ2MmZjNDA4Yzdi'
-
 const netrc = require('netrc-parser').default
+
 netrc.loadSync = function (this: typeof netrc) {
   netrc.machines = {
-    'api.nimbu.io': { login: 'nimbu', password: token },
     'api.nimbu.dev': { login: 'nimbu', password: token },
+    'api.nimbu.io': { login: 'nimbu', password: token },
   }
 }
 
@@ -24,7 +26,7 @@ let api: nock.Scope
 
 describe('cli api client', () => {
   before(() => {
-    nock.disableNetConnect()
+    disableNetConnect()
   })
 
   test.it('makes an HTTP request', async (ctx) => {
@@ -71,13 +73,13 @@ describe('cli api client', () => {
     })
 
   test.it('can fetch all pages', async (ctx) => {
-    let api1 = nock('https://api.nimbu.io')
+    const api1 = nock('https://api.nimbu.io')
       .get('/channels')
       .reply(200, [{ name: 'foo' }], {
         Link: '<https://api.nimbu.io/channels?page=2>; rel="next", <https://api.nimbu.io/channels?page=2>; rel="last"',
       })
 
-    let api2 = nock('https://api.nimbu.io')
+    const api2 = nock('https://api.nimbu.io')
       .get('/channels')
       .query({ page: 2 })
       .reply(200, [{ name: 'bar' }], {
