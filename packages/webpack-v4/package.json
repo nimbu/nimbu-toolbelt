@@ -111,5 +111,5 @@
     "version": "oclif readme && git add README.md",
     "yalc:publish": "yalc publish --push"
   },
-  "gitHead": "f9d5b8f084e75a4aa8a29f9930f8da36a6ad258f"
+  "gitHead": "e2b07c50f99f5bf9e0d166db35504ff466e59360"
 }
