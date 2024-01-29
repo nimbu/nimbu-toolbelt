@@ -14,13 +14,14 @@ function svgoOpts(self, content, pluginOpts) {
       {
         removeTitle: true,
       },
-    ].concat(pluginOpts),
+      ...(pluginOpts ?? []),
+    ],
   }
 }
 
 module.exports = function (content) {
   const loaderOpts = loaderUtils.getOptions(this) || {}
-  const pluginOpts = (loaderOpts != null ? loaderOpts.plugins : []) || []
+  const pluginOpts = (loaderOpts == null ? [] : loaderOpts.plugins) || []
 
   const cb = this.async()
 
@@ -28,5 +29,5 @@ module.exports = function (content) {
     .then(rsvgCore.optimize(svgoOpts(this, content, pluginOpts)))
     .then(rsvgCore.transform({ jsx: loaderOpts.jsx }))
     .then((result) => cb(null, result.code))
-    .catch((err) => cb(err))
+    .catch((error) => cb(error))
 }

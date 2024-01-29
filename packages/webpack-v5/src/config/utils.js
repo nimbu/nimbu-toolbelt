@@ -3,7 +3,7 @@ const optionals = {}
 export function resolveOptional(moduleName) {
   try {
     optionals[moduleName] = require.resolve(moduleName)
-  } catch (error) {
+  } catch {
     optionals[moduleName] = false
   }
 }
@@ -12,6 +12,7 @@ export function getOptional(moduleName) {
   if (optionals[moduleName] == null) {
     resolveOptional(moduleName)
   }
+
   return optionals[moduleName]
 }
 

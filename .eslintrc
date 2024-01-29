@@ -10,6 +10,7 @@
     "no-warning-comments": "off",
     "no-await-in-loop": "off",
     "unicorn/prefer-module": "off",
+    "unicorn/prefer-spread": "off",
     "unicorn/no-array-callback-reference": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/ban-ts-comment": "off",

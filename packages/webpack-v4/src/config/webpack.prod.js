@@ -15,7 +15,7 @@ const webpackConfig = () => {
   const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false'
   const shouldExtractCSS = true
 
-  const styleConfig = utils.styleConfig({ shouldUseSourceMap, shouldExtractCSS })
+  const styleConfig = utils.styleConfig({ shouldExtractCSS, shouldUseSourceMap })
 
   const loaders = utils
     .codeLoaders({
@@ -45,9 +45,9 @@ const webpackConfig = () => {
         new CssMinimizerPlugin(),
         new TerserPlugin({
           terserOptions: {
-            sourceMap: shouldUseSourceMap,
-            safari10: false,
             ie8: false,
+            safari10: false,
+            sourceMap: shouldUseSourceMap,
           },
         }),
       ],
@@ -58,7 +58,7 @@ const webpackConfig = () => {
             chunks: 'initial',
             name: 'polyfills',
             priority: 10,
-            test: function (module) {
+            test(module) {
               return (
                 /css/.test(module.type) === false &&
                 module.context &&
@@ -71,7 +71,7 @@ const webpackConfig = () => {
             chunks: 'initial',
             name: 'vendor',
             priority: 0,
-            test: function (module) {
+            test(module) {
               return (
                 /css/.test(module.type) === false &&
                 module.context &&

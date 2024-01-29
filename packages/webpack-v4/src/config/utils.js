@@ -1,5 +1,4 @@
 const autoprefixer = require('autoprefixer')
-const _ = require('lodash')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -14,7 +13,7 @@ const optionals = {}
 function resolveOptional(moduleName) {
   try {
     optionals[moduleName] = require.resolve(moduleName)
-  } catch (error) {
+  } catch {
     optionals[moduleName] = false
   }
 }
@@ -23,6 +22,7 @@ function getOptional(moduleName) {
   if (optionals[moduleName] == null) {
     resolveOptional(moduleName)
   }
+
   return optionals[moduleName]
 }
 
@@ -56,9 +56,11 @@ function babelLoader(loaderOptions = {}) {
   if (config.REACT && hasOptional('react-hot-loader/babel')) {
     options.plugins.push(require.resolve('react-hot-loader/babel'))
   }
+
   if (options.enableReactRefresh && config.REACT && hasOptional('react-refresh/babel')) {
     options.plugins.push(require.resolve('react-refresh/babel'))
   }
+
   return {
     loader: require.resolve('babel-loader'),
     options,
@@ -87,23 +89,23 @@ function codeLoaders(options) {
       /* tslint:disable:object-literal-sort-keys */
       options: {
         babelrc: true,
-        configFile: false,
-        compact: false,
-        presets: [[require.resolve('babel-preset-react-app/dependencies'), { helpers: true }]],
-        cacheDirectory: true,
         // See create-react-app#6846 for context on why cacheCompression is disabled
         cacheCompression: false,
+        cacheDirectory: true,
         cacheIdentifier: getCacheIdentifier(options.cachePrefix || 'non-app-js', [
           'babel-plugin-named-asset-import',
           'babel-preset-react-app',
           'react-dev-utils',
           'react-scripts',
         ]),
+        compact: false,
+        configFile: false,
+        inputSourceMap: options.shouldUseSourceMap,
         // Babel sourcemaps are needed for debugging into node_modules
         // code.  Without the options below, debuggers like VSCode
+        presets: [[require.resolve('babel-preset-react-app/dependencies'), { helpers: true }]],
         // show incorrect code and set breakpoints on the wrong lines.
         sourceMaps: options.shouldUseSourceMap,
-        inputSourceMap: options.shouldUseSourceMap,
       },
       /* tslint:enable:object-literal-sort-keys */
       test: /\.(js|mjs)$/,
@@ -119,21 +121,22 @@ function codeLoaders(options) {
         {
           loader: getOptional('ts-loader'),
           options: {
-            transpileOnly: true,
             compilerOptions: {
               noEmit: false,
             },
+            transpileOnly: true,
           },
         },
       ],
     })
   }
+
   return loaders
 }
 
 const fileloader = require.resolve('file-loader')
 const fileloaderOutputPath = (name) => {
-  let basename = name.split('?h=')[0]
+  const basename = name.split('?h=')[0]
   return `${basename}`
 }
 
@@ -143,10 +146,10 @@ function fileLoaders(options = {}) {
     {
       loader: fileloader,
       options: {
+        esModule: false,
         name: 'fonts/[name].[ext]?h=[hash:8]',
         outputPath: fileloaderOutputPath,
         publicPath: options.publicPath || '/',
-        esModule: false,
       },
       test: [/\.(eot|otf|woff|woff2|ttf)(\?\S*)?$/, /fonts.*\.svg(\?\S*)?$/],
     },
@@ -158,10 +161,10 @@ function fileLoaders(options = {}) {
       exclude: [/\.jsx?$/, /\.html$/, /\.json$/, /\.ejs$/, /\.tsx?$/],
       loader: fileloader,
       options: {
+        esModule: false,
         name: 'images/[name].[ext]?h=[hash:8]',
         outputPath: fileloaderOutputPath,
         publicPath: options.publicPath || '/',
-        esModule: false,
       },
     },
   ]
@@ -178,6 +181,7 @@ function fileLoaders(options = {}) {
       ],
     })
   }
+
   return loaders
 }
 
@@ -237,12 +241,12 @@ function styleConfigWithExtraction(options) {
   }
 }
 
-function styleConfigWithoutExtraction(options) {
+function styleConfigWithoutExtraction(options = []) {
   return {
     loaders: [
       {
         test: /.s?css$/,
-        use: [require.resolve('style-loader')].concat(styleLoaders(options)),
+        use: [require.resolve('style-loader'), ...styleLoaders(options)],
       },
     ],
     plugins: [],
@@ -252,9 +256,9 @@ function styleConfigWithoutExtraction(options) {
 function styleConfig(options) {
   if (options.shouldExtractCSS) {
     return styleConfigWithExtraction(options)
-  } else {
-    return styleConfigWithoutExtraction(options)
   }
+
+  return styleConfigWithoutExtraction(options)
 }
 
 function htmlWebPackPlugins(entries, options = {}) {
@@ -267,7 +271,7 @@ function htmlWebPackPlugins(entries, options = {}) {
       chunksSortMode: 'auto',
       filename: `snippets/webpack_${name}.liquid`,
       inject: false,
-      template: template,
+      template,
       templateParameters: {
         prefix: `${name}_`,
       },
@@ -275,42 +279,11 @@ function htmlWebPackPlugins(entries, options = {}) {
   })
 }
 
-function tsWebpackPlugins(options = {}) {
-  const plugins = []
-
-  // WIP: works first time, second time feedback seems swallowed by webpack clearing the screen each compile
-
-  // if (hasOptional('ts-loader')) {
-  //   if (hasOptional('fork-ts-checker-webpack-plugin')) {
-  //     const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
-  //     plugins.push(
-  //       new ForkTsCheckerWebpackPlugin(
-  //         options.production
-  //           ? {
-  //               async: false,
-  //               useTypescriptIncrementalApi: true,
-  //               memoryLimit: 4096,
-  //             }
-  //           : {
-  //               eslint: true,
-  //             },
-  //       ),
-  //     )
-  //   }
-  //   if (hasOptional('fork-ts-checker-notifier-webpack-plugin') && !options.production) {
-  //     const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin')
-  //     plugins.push(new ForkTsCheckerNotifierWebpackPlugin({ title: 'TypeScript', excludeWarnings: false }))
-  //   }
-  // }
-
-  return plugins
-}
-
 function getNodeVersions() {
-  const m = process.version.match(/(\d+)\.(\d+)\.(\d+)/);
-  const [major, minor, patch] = m.slice(1).map(_ => parseInt(_));
+  const m = process.version.match(/(\d+)\.(\d+)\.(\d+)/)
+  const [major, minor, patch] = m.slice(1).map((_) => Number.parseInt(_, 10))
 
-  return { major, minor, patch };
+  return { major, minor, patch }
 }
 
 module.exports = {
@@ -322,5 +295,4 @@ module.exports = {
   htmlWebPackPlugins,
   styleConfig,
   styleLoaders,
-  tsWebpackPlugins,
 }

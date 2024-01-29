@@ -29,7 +29,7 @@
     "html-webpack-plugin": "^4.5.0",
     "loader-utils": "^1.1.0",
     "mini-css-extract-plugin": "^1.6.2",
-    "nimbu": "^5.4.0-beta.0",
+    "nimbu": "^5.4.0-beta.1",
     "node-fetch": "^2.2.0",
     "postcss-flexbugs-fixes": "^4.1.0",
     "postcss-loader": "^3.0.0",

@@ -1,7 +1,7 @@
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 const paths = require('./paths')
 const chalk = require('react-dev-utils/chalk')
 const resolve = require('resolve')
@@ -12,7 +12,7 @@ const resolve = require('resolve')
  * @param {Object} options
  */
 function getAdditionalModulePaths(options = {}) {
-  const baseUrl = options.baseUrl
+  const { baseUrl } = options
 
   if (!baseUrl) {
     return ''
@@ -55,7 +55,7 @@ function getAdditionalModulePaths(options = {}) {
  * @param {*} options
  */
 function getWebpackAliases(options = {}) {
-  const baseUrl = options.baseUrl
+  const { baseUrl } = options
 
   if (!baseUrl) {
     return {}
@@ -76,7 +76,7 @@ function getWebpackAliases(options = {}) {
  * @param {*} options
  */
 function getJestAliases(options = {}) {
-  const baseUrl = options.baseUrl
+  const { baseUrl } = options
 
   if (!baseUrl) {
     return {}
@@ -124,10 +124,10 @@ function getModules() {
   const additionalModulePaths = getAdditionalModulePaths(options)
 
   return {
-    additionalModulePaths: additionalModulePaths,
-    webpackAliases: getWebpackAliases(options),
-    jestAliases: getJestAliases(options),
+    additionalModulePaths,
     hasTsConfig,
+    jestAliases: getJestAliases(options),
+    webpackAliases: getWebpackAliases(options),
   }
 }
 

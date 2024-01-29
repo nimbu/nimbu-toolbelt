@@ -9,7 +9,7 @@ const {
 } = require('@nimbu-cli/command')
 
 const { choosePort, createCompiler, prepareUrls } = require('react-dev-utils/WebpackDevServerUtils')
-const createDevServerConfig = require('../config/webpackDevServer.config.js')
+const createDevServerConfig = require('../config/webpack-dev-server.config.js')
 const openBrowser = require('react-dev-utils/openBrowser')
 
 export default class WebpackDevServer {

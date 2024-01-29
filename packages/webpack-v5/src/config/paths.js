@@ -1,14 +1,14 @@
 'use strict'
 
 import { paths } from '@nimbu-cli/command'
-import * as path from 'path'
+import * as path from 'node:path'
 
 const toolbeltDirectory = path.resolve(__dirname, '../..')
 
 export const { NIMBU_DIRECTORY, PROJECT_DIRECTORY } = paths
 export const GEMFILE = path.resolve(toolbeltDirectory, 'Gemfile')
 
-const fs = require('fs')
+const fs = require('node:fs')
 const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath')
 
 // Make sure any symlinks in the project folder are resolved:

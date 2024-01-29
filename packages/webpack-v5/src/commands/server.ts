@@ -4,6 +4,7 @@ import { Command } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import detectPort from 'detect-port'
+import { exit } from 'node:process'
 
 import NimbuServer, { NimbuGemServerOptions } from '../nimbu-gem/server'
 import WebpackDevServer from '../webpack/server'
@@ -19,7 +20,6 @@ export default class Server extends Command {
       description: 'Use legacy ruby HAML compiler.',
     }),
     host: Flags.string({
-      default: '0.0.0.0',
       description: 'The hostname/ip-address to bind on.',
       env: 'HOST',
     }),
@@ -50,6 +50,7 @@ export default class Server extends Command {
   }
 
   private _nimbuServer?: NimbuServer
+  private _shutdownPromise?: Promise<void>
   private readonly webpackServer: WebpackDevServer = new WebpackDevServer()
 
   get initialized() {
@@ -64,13 +65,14 @@ export default class Server extends Command {
     if (this.nimbuServer.isRunning()) {
       await this.stopNimbuServer()
     }
+
+    this.log(this.randomGreeting())
   }
 
   async execute() {
-    this.registerSignalHandlers()
-
     try {
       this.debug('Starting server command')
+      this.registerSignalHandlers()
 
       const { flags } = await this.parse(Server)
 
@@ -80,24 +82,29 @@ export default class Server extends Command {
       await this.spawnNimbuServer(nimbuPort, {
         compass: flags.compass,
         haml: flags.haml,
+        host: flags.host,
         nocookies: flags.nocookies,
       })
 
       if (!flags.nowebpack) {
         await this.checkPort(flags.port)
-        await this.startWebpackDevServer(flags.host, flags.port, flags['nimbu-port'] ?? 4567, !flags.noopen, {
-          poll: flags.poll,
-        })
+        await this.startWebpackDevServer(
+          flags.host ?? 'localhost',
+          flags.port,
+          flags['nimbu-port'] ?? 4567,
+          !flags.noopen,
+          {
+            poll: flags.poll,
+          },
+        )
       }
 
       await this.waitForStopSignals()
     } catch (error) {
       console.error(error)
-      process.exit(1)
+      await this.catch()
+      exit(1)
     }
-
-    // Explicitly exit the process to make sure all subprocesses started by webpack plugins are gone
-    process.exit(0)
   }
 
   async initialize() {
@@ -109,7 +116,7 @@ export default class Server extends Command {
       }
     } catch (error) {
       console.error(error)
-      process.exit(1)
+      exit(1)
     }
   }
 
@@ -132,7 +139,7 @@ export default class Server extends Command {
     } catch (error) {
       console.error('⚠️  Could not start webpack-dev-server ⚠️ \n\n', error, '\n')
       await this.catch()
-      process.exit(1)
+      exit(1)
     }
   }
 
@@ -150,7 +157,7 @@ export default class Server extends Command {
     if (suggestedPort !== port) {
       console.error(`\n⚠️  There is already a process listening on port ${port} ⚠️ \n`)
       await this.catch()
-      process.exit(1)
+      exit(1)
     }
   }
 
@@ -162,37 +169,73 @@ export default class Server extends Command {
     return this._nimbuServer
   }
 
-  private registerSignalHandlers() {
-    const exitHandler = async (options) => {
-      await this.catch()
+  private randomGreeting() {
+    const greetings = [
+      'My work is done here. Have a nice day!',
+      "I'm outta here. Have a nice day!",
+      "I'm done here. Happy coding!",
+      'This script is self-destructing in 3... 2... 1... Just kidding, happy coding!',
+      'That was fun! Have a nice day!',
+      'That was fun! Keep calm and code on!',
+      "Beep boop! I'm out of bytes. Have a nice day!",
+      'Script out, mic drop! Enjoy your day!',
+      'Logging off, stay variable!',
+      'Script terminated. Time for some coffee!',
+      "That's all, folks! Time for some tea!",
+      "I'm off the grid(). Later, pixels!",
+      'This script has left the console. See you later!',
+      'End script. Time for a coffee break!',
+    ]
 
-      if (options.exit) process.exit()
+    return greetings[Math.floor(Math.random() * greetings.length)]
+  }
+
+  private registerCloseListener(fn: () => void): void {
+    let run = false
+
+    const wrapper = () => {
+      if (!run) {
+        run = true
+        fn()
+      }
     }
 
     // do something when app is closing
-    process.on('exit', exitHandler.bind(null, { cleanup: true }))
+    process.on('exit', wrapper)
 
     // catches ctrl+c event
-    process.on('SIGINT', exitHandler.bind(null, { exit: true }))
+    process.on('SIGINT', wrapper)
 
     // catches "kill pid" (for example: nodemon restart)
-    process.on('SIGUSR1', exitHandler.bind(null, { exit: true }))
-    process.on('SIGUSR2', exitHandler.bind(null, { exit: true }))
+    process.on('SIGUSR1', wrapper)
+    process.on('SIGUSR2', wrapper)
 
     // catches uncaught exceptions
-    process.on('uncaughtException', exitHandler.bind(null, { exit: true }))
+    process.on('uncaughtException', wrapper)
   }
 
-  private waitForStopSignals(): Promise<void> {
-    return new Promise<void>((resolve, _reject) => {
-      for (const sig of ['SIGHUP', 'SIGINT', 'SIGTERM'] as Array<NodeJS.Signals>) {
-        process.on(sig, async () => {
-          this.log(chalk.cyan('Shutting down ...'))
-          await this.stopWebpackDevServer()
-          await this.stopNimbuServer()
+  private registerSignalHandlers() {
+    this._shutdownPromise = new Promise((resolve) => {
+      // Print out a message to let the user know we are shutting down the server
+      // when they press Ctrl+C or kill the process externally.
+      this.registerCloseListener(async () => {
+        this.log()
+        this.log(chalk.dim('Gracefully shutting down. Please wait...'))
+        await this.catch()
+        resolve()
+        process.on('SIGINT', () => {
+          this.log()
+          this.warn('Force-closing all open sockets...')
           resolve()
+          exit(0)
         })
-      }
+      })
     })
+  }
+
+  private async waitForStopSignals() {
+    if (this._shutdownPromise != null) {
+      await this._shutdownPromise
+    }
   }
 }

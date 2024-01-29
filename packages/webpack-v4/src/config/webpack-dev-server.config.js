@@ -4,13 +4,18 @@ process.traceDeprecation = true
 
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware')
 const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware')
-const path = require('path')
+const path = require('node:path')
 
 // This configuration is inspired by the one from create-react-app (after ejecting)
+// eslint-disable-next-line max-params
 module.exports = function (proxy, allowedHost, host, protocol, options = {}) {
   const result = {
     allowedHosts: ['localhost', '.localhost'],
     // Silence WebpackDevServer's own logs since they're generally not useful.
+    before(app) {
+      app.use(errorOverlayMiddleware())
+      app.use(noopServiceWorkerMiddleware())
+    },
     // It will still show compile warnings and errors with this setting.
     clientLogLevel: 'none',
     // Enable gzip compression of generated files.
@@ -21,7 +26,7 @@ module.exports = function (proxy, allowedHost, host, protocol, options = {}) {
     historyApiFallback: {
       disableDotRule: true,
     },
-    host: host,
+    host,
     hot: true,
     https: protocol === 'https',
     overlay: false,
@@ -31,17 +36,14 @@ module.exports = function (proxy, allowedHost, host, protocol, options = {}) {
     quiet: true,
     watchOptions: {
       ignored: new RegExp(
-        `^(?!${path.normalize('./src' + '/').replace(/[\\]+/g, '\\\\')}).+[\\\\/]node_modules[\\\\/]`,
+        `^(?!${path.normalize('./src/').replaceAll(/\\+/g, '\\\\')}).+[\\\\/]node_modules[\\\\/]`,
         'g',
       ),
-    },
-    before(app) {
-      app.use(errorOverlayMiddleware())
-      app.use(noopServiceWorkerMiddleware())
     },
   }
   if (options.poll) {
     result.watchOptions.poll = true
   }
+
   return result
 }

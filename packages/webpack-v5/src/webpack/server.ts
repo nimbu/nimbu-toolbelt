@@ -10,9 +10,10 @@ const debug = globalDebug('nimbu')
 
 export default class WebpackDevServer {
   private server?: DevServer
+  private serverRunning = false
 
   isRunning(): boolean {
-    return this.server !== undefined
+    return this.serverRunning
   }
 
   // eslint-disable-next-line max-params
@@ -39,7 +40,7 @@ export default class WebpackDevServer {
     const configFactory = require('../config/webpack.config')
     const projectWebpack = require('../config/webpack.project')
 
-    const createDevServerConfig = require('../config/webpackDevServer.config')
+    const createDevServerConfig = require('../config/webpack-dev-server.config.js')
     // const getClientEnvironment = require('../config/env')
 
     const useYarn = fs.existsSync(paths.yarnLockFile)
@@ -86,19 +87,19 @@ export default class WebpackDevServer {
         onError(err: any) {
           console.log('Could not proxy to Nimbu Dev Server:', err)
         },
-        target: `http://127.0.0.1:${nimbuPort}`,
+        target: `http://localhost:${nimbuPort}`,
       },
     }
     const serverConfig = {
-      ...createDevServerConfig(proxyConfig, [urls.lanUrlForConfig, 'localhost', '.localhost']),
+      ...createDevServerConfig(proxyConfig, ['localhost', '.localhost', ...(urls.lanUrlForConfig ?? [])]),
       host,
       port,
     }
 
     // Launch WebpackDevServer.
-    debug('Starting webpack dev server')
+    debug('Starting webpack-dev-server (v5)...')
     this.server = new DevServer(serverConfig, compiler)
-    await this.listen(host, port)
+    this.listen(host, port)
 
     if (open) {
       openBrowser(urls.localUrlForBrowser)
@@ -106,25 +107,18 @@ export default class WebpackDevServer {
   }
 
   async stop(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if (this.server) {
-        this.server.stop().catch((error: Error | null) => {
-          if (error) {
-            reject(error)
-          } else {
-            this.server = undefined
-            resolve()
-          }
-        })
-      } else {
-        reject(new Error('Server is not started'))
-      }
-    })
+    debug('Stopping webpack-dev-server (v5)...')
+    if (this.server) {
+      this.serverRunning = false
+      await this.server.stop()
+      debug('Webpack-dev-server stopped!')
+    }
   }
 
   private async listen(_host: string, _port: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.server) {
+        this.serverRunning = true
         this.server.start().catch((error: Error | null) => {
           if (error) {
             reject(error)

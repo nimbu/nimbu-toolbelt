@@ -8,6 +8,7 @@ import spawn from './process'
 export interface NimbuGemServerOptions {
   compass?: boolean
   haml?: boolean
+  host?: string
   nocookies?: boolean
 }
 
@@ -49,20 +50,24 @@ export default class NimbuGemServer {
   }
 
   async start(port: number, options?: NimbuGemServerOptions): Promise<void> {
-    const args = ['--host', '127.0.0.1', '--port', `${port}`]
+    const args = ['--port', `${port}`]
     let embeddedGemfile = true
 
-    if (options && options.haml) {
+    if (options?.haml) {
       args.push('--haml')
     }
 
-    if (options && options.nocookies) {
+    if (options?.nocookies) {
       args.push('--nocookies')
     }
 
-    if (options && options.compass) {
+    if (options?.compass) {
       args.push('--compass')
       embeddedGemfile = false
+    }
+
+    if (options?.host) {
+      args.push('--host', options.host)
     }
 
     await this.nimbu.validateLogin()
@@ -101,31 +106,10 @@ export default class NimbuGemServer {
   }
 
   async stop(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      function exitHandler(options) {
-        if (options.exit) process.exit()
+    return new Promise<void>((resolve) => {
+      this.process?.kill('SIGINT')
 
-        resolve()
-      }
-
-      if (this.process) {
-        // do something when app is closing
-        this.process.on('exit', exitHandler.bind(null, { cleanup: true }))
-
-        // catches ctrl+c event
-        this.process.on('SIGINT', exitHandler.bind(null, { exit: true }))
-
-        // catches "kill pid" (for example: nodemon restart)
-        this.process.on('SIGUSR1', exitHandler.bind(null, { exit: true }))
-        this.process.on('SIGUSR2', exitHandler.bind(null, { exit: true }))
-
-        // catches uncaught exceptions
-        this.process.on('uncaughtException', exitHandler.bind(null, { exit: true }))
-
-        this.process.kill('SIGTERM')
-      } else {
-        reject(new Error('Server is not started'))
-      }
+      resolve()
     })
   }
 

@@ -1,7 +1,7 @@
 {
   "name": "nimbu",
   "description": "Tools for Nimbu projects",
-  "version": "5.4.0-beta.0",
+  "version": "5.4.0-beta.1",
   "author": "Zenjoy Engineering",
   "bin": {
     "nimbu": "./bin/run"

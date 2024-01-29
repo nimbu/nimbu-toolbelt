@@ -11,9 +11,10 @@ const {
 let ReactRefreshWebpackPlugin
 
 try {
+  // eslint-disable-next-line node/no-missing-require
   ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
-} catch (error) {
-  // ILB
+} catch {
+  // @pmmmwh/react-refresh-webpack-plugin is not installed.
 }
 
 const webpackConfig = () => {
@@ -23,15 +24,16 @@ const webpackConfig = () => {
   const shouldExtractCSS = process.env.EXTRACT_CSS === 'true'
 
   // add hot-reload related code to entry chunks
-  Object.keys(baseWebpackConfig.entry).forEach(function (name) {
-    let extras = [require.resolve('webpack-dev-server/client') + '?/', require.resolve('webpack/hot/dev-server')]
+  for (const name of Object.keys(baseWebpackConfig.entry)) {
+    const extras = [require.resolve('webpack-dev-server/client') + '?/', require.resolve('webpack/hot/dev-server')]
     if (config.REACT) {
       extras.splice(0, 0, require.resolve('core-js/modules/es.symbol'))
     }
-    baseWebpackConfig.entry[name] = extras.concat(baseWebpackConfig.entry[name])
-  })
 
-  const styleConfig = utils.styleConfig({ shouldUseSourceMap, shouldExtractCSS })
+    baseWebpackConfig.entry[name] = extras.concat(baseWebpackConfig.entry[name])
+  }
+
+  const styleConfig = utils.styleConfig({ shouldExtractCSS, shouldUseSourceMap })
 
   const loaders = utils
     .codeLoaders({
@@ -53,7 +55,6 @@ const webpackConfig = () => {
         NODE_ENV: JSON.stringify('development'),
       },
     }),
-    ...utils.tsWebpackPlugins(),
     ...styleConfig.plugins,
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),

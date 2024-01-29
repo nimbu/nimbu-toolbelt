@@ -1,12 +1,10 @@
-'use strict'
-
-const fs = require('fs')
-const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware')
-const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware')
+// const fs = require('node:fs')
+// const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware')
+// const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware')
 const ignoredFiles = require('react-dev-utils/ignoredFiles')
-const redirectServedPath = require('react-dev-utils/redirectServedPathMiddleware')
+// const redirectServedPath = require('react-dev-utils/redirectServedPathMiddleware')
 const paths = require('./paths')
-const getHttpsConfig = require('./getHttpsConfig')
+const getHttpsConfig = require('./get-https-config.js')
 
 const host = process.env.HOST || '0.0.0.0'
 const sockHost = process.env.WDS_SOCKET_HOST
@@ -35,13 +33,45 @@ module.exports = function (proxy, allowedHosts) {
     // Note: ["localhost", ".localhost"] will support subdomains - but we might
     // want to allow setting the allowedHosts manually for more complex setups
     allowedHosts: disableFirewall ? 'all' : allowedHosts,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': '*',
-      'Access-Control-Allow-Headers': '*',
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false,
+      },
+      webSocketURL: {
+        // Enable custom sockjs pathname for websocket connection to hot reloading server.
+        // Enable custom sockjs hostname, pathname and port for websocket connection
+        // to hot reloading server.
+        hostname: sockHost,
+        pathname: sockPath,
+        port: sockPort,
+      },
     },
     // Enable gzip compression of generated files.
     compress: true,
+    devMiddleware: {
+      // It is important to tell WebpackDevServer to use the same "publicPath" path as
+      // we specified in the webpack config. When homepage is '.', default to serving
+      // from the root.
+      // remove last slash so user can land on `/test` instead of `/test/`
+      publicPath: paths.publicUrlOrPath.slice(0, -1),
+    },
+    headers: {
+      'Access-Control-Allow-Headers': '*',
+      'Access-Control-Allow-Methods': '*',
+      'Access-Control-Allow-Origin': '*',
+    },
+    historyApiFallback: {
+      // Paths with dots should still use the history fallback.
+      // See https://github.com/facebook/create-react-app/issues/387.
+      disableDotRule: true,
+      index: paths.publicUrlOrPath,
+    },
+
+    host,
+    https: getHttpsConfig(),
+    // `proxy` is run between `before` and `after` `webpack-dev-server` hooks
+    proxy,
     static: {
       // By default WebpackDevServer serves physical files from current directory
       // in addition to all the virtual build products that it serves from memory.
@@ -68,37 +98,5 @@ module.exports = function (proxy, allowedHosts) {
         ignored: ignoredFiles(paths.appSrc),
       },
     },
-    client: {
-      webSocketURL: {
-        // Enable custom sockjs pathname for websocket connection to hot reloading server.
-        // Enable custom sockjs hostname, pathname and port for websocket connection
-        // to hot reloading server.
-        hostname: sockHost,
-        pathname: sockPath,
-        port: sockPort,
-      },
-      overlay: {
-        errors: true,
-        warnings: false,
-      },
-    },
-    devMiddleware: {
-      // It is important to tell WebpackDevServer to use the same "publicPath" path as
-      // we specified in the webpack config. When homepage is '.', default to serving
-      // from the root.
-      // remove last slash so user can land on `/test` instead of `/test/`
-      publicPath: paths.publicUrlOrPath.slice(0, -1),
-    },
-
-    https: getHttpsConfig(),
-    host,
-    historyApiFallback: {
-      // Paths with dots should still use the history fallback.
-      // See https://github.com/facebook/create-react-app/issues/387.
-      disableDotRule: true,
-      index: paths.publicUrlOrPath,
-    },
-    // `proxy` is run between `before` and `after` `webpack-dev-server` hooks
-    proxy,
   }
 }
