@@ -27,7 +27,10 @@ export async function initialize() {
       projectConfig = require(projectConfigPath)
     }
   } catch (error) {
-    if (error instanceof Error && 'code' in error && error.code !== 'MODULE_NOT_FOUND') {
+    if (
+      (error instanceof Error && 'code' in error && error.code !== 'MODULE_NOT_FOUND') ||
+      error instanceof SyntaxError
+    ) {
       throw error
     }
   }
