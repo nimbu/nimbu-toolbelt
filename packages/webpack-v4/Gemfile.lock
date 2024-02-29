@@ -57,7 +57,7 @@ GEM
       version_gem (~> 1.1)
     optimist (3.0.1)
     paint (2.3.0)
-    rack (2.2.8)
+    rack (2.2.8.1)
     rack-protection (2.2.4)
       rack
     rack-streaming-proxy (2.0.2)
