@@ -89,7 +89,6 @@ const webpackConfig = () => {
           NODE_ENV: JSON.stringify('production'),
         },
       }),
-      ...utils.tsWebpackPlugins({ production: true }),
       ...styleConfig.plugins,
       ...utils.htmlWebPackPlugins(Object.keys(baseWebpackConfig.entry)),
     ],
