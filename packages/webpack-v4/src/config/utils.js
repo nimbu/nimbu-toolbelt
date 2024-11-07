@@ -147,7 +147,7 @@ function fileLoaders(options = {}) {
       loader: fileloader,
       options: {
         esModule: false,
-        name: 'fonts/[name].[ext]?h=[hash:8]',
+        name: 'fonts/[name].[ext]?h=[contenthash:6]',
         outputPath: fileloaderOutputPath,
         publicPath: options.publicPath || '/',
       },
@@ -162,7 +162,7 @@ function fileLoaders(options = {}) {
       loader: fileloader,
       options: {
         esModule: false,
-        name: 'images/[name].[ext]?h=[hash:8]',
+        name: 'images/[name].[ext]?h=[contenthash:6]',
         outputPath: fileloaderOutputPath,
         publicPath: options.publicPath || '/',
       },
