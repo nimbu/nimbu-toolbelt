@@ -55,8 +55,16 @@ const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT || '10
 // Check if TypeScript is setup
 const useTypeScript = fs.existsSync(paths.appTsConfig)
 
-// Check if Tailwind config exists
+// Check if Tailwind config exists and find  the tailwind version
 const useTailwind = fs.existsSync(path.join(paths.appPath, 'tailwind.config.js'))
+let tailwindPostCssPackage = 'tailwindcss'
+
+if (useTailwind) {
+  const { version } = require('tailwindcss/package.json')
+  if (parseInt(version.split('.')[0]) >= 4) {
+    tailwindPostCssPackage = '@tailwindcss/postcss'
+  }
+}
 
 // Get the path to the uncompiled service worker (if it exists).
 const swSrc = paths.swSrc
@@ -182,7 +190,7 @@ module.exports = function (webpackEnv) {
                   require.resolve('postcss-normalize'),
                 ]
               : [
-                  require.resolve('tailwindcss'),
+                  require.resolve(tailwindPostCssPackage),
                   require.resolve('postcss-flexbugs-fixes'),
                   [
                     require.resolve('postcss-preset-env'),
