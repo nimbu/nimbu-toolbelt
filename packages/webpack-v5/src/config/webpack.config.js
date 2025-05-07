@@ -55,13 +55,23 @@ const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT || '10
 // Check if TypeScript is setup
 const useTypeScript = fs.existsSync(paths.appTsConfig)
 
+// Helper function to check if tailwindcss is a dependency
+const hasTailwindCSS = () => {
+  try {
+    require.resolve('tailwindcss')
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 // Check if Tailwind config exists and find  the tailwind version
-const useTailwind = fs.existsSync(path.join(paths.appPath, 'tailwind.config.js'))
+const useTailwind = hasTailwindCSS()
 let tailwindPostCssPackage = 'tailwindcss'
 
 if (useTailwind) {
   const { version } = require('tailwindcss/package.json')
-  if (parseInt(version.split('.')[0]) >= 4) {
+  if (Number.parseInt(version.split('.')[0], 10) >= 4) {
     tailwindPostCssPackage = '@tailwindcss/postcss'
   }
 }
