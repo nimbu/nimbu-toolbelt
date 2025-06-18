@@ -5,11 +5,12 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "tsc -b",
+    "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
     "clean": "rimraf lib",
     "prepack": "yarn build",
     "test": "mocha --require ts-node/register 'test/**/*.test.ts'",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "yalc:publish": "yalc publish --push"
   },
   "dependencies": {
     "@nimbu-cli/command": "^5.4.1",

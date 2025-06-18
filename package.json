@@ -1,8 +1,8 @@
 {
   "devDependencies": {
     "@octokit/core": "^3",
-    "@typescript-eslint/parser": "^6",
     "@types/node": "^16",
+    "@typescript-eslint/parser": "^6",
     "eslint": "^8",
     "eslint-config-oclif": "^5",
     "eslint-config-oclif-typescript": "^3",
@@ -13,13 +13,14 @@
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
     "lerna": "^3.22.1",
-    "mem-fs-editor": "^9.4.0",
     "mem-fs": "^2.2.1",
+    "mem-fs-editor": "^9.4.0",
     "oclif": "^4.3.10",
     "promise-request-retry": "^1.0.2",
     "standard": "12.0.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "yalc": "^1.0.0-pre.53"
   },
   "standard": {
     "env": "mocha",

@@ -89,6 +89,34 @@ export class ProxyServer implements ServerAdapter {
   }
 
   /**
+   * Log debug information about the payload being sent to the API
+   * Excludes template code for readability
+   */
+  private logDebugPayload(payload: any, req: Request): void {
+    console.log(chalk.cyan('\n=== DEBUG: API Request Data ==='))
+    
+    // Create a copy of the payload without the template code
+    const debugPayload = JSON.parse(JSON.stringify(payload))
+    
+    // Remove or truncate the template code for readability
+    if (debugPayload.simulator?.code) {
+      const codeLength = debugPayload.simulator.code.length
+      debugPayload.simulator.code = `<BASE64_TEMPLATE_CODE length=${codeLength}>`
+    }
+    
+    console.log(chalk.yellow('Request:'), {
+      method: req.method,
+      path: req.path,
+      timestamp: new Date().toISOString()
+    })
+    
+    console.log(chalk.yellow('Payload to API:'))
+    console.log(JSON.stringify(debugPayload, null, 2))
+    
+    console.log(chalk.cyan('=== END DEBUG ===\n'))
+  }
+
+  /**
    * Handle authentication-specific errors and provide helpful messages
    */
   private handleAuthenticationError(error: Error): Error {
@@ -107,6 +135,25 @@ export class ProxyServer implements ServerAdapter {
     return error
   }
 
+  /**
+   * Log debug information about the response from the API
+   */
+  private logDebugResponse(response: any): void {
+    console.log(chalk.magenta('\n=== DEBUG: API Response Data ==='))
+    
+    // Create a copy of the response without the body content for readability
+    const debugResponse = { ...response }
+    if (debugResponse.body) {
+      const bodyLength = debugResponse.body.length
+      debugResponse.body = `<BASE64_BODY_CONTENT length=${bodyLength}>`
+    }
+    
+    console.log(chalk.yellow('Response from API:'))
+    console.log(JSON.stringify(debugResponse, null, 2))
+    
+    console.log(chalk.magenta('=== END DEBUG ===\n'))
+  }
+
   private async processRequest(req: Request, res: Response): Promise<void> {
     try {
       // Verify authentication before processing
@@ -122,8 +169,18 @@ export class ProxyServer implements ServerAdapter {
       // Build simulator payload
       const payload = await this.simulatorFormatter.buildSimulatorPayload(req, this.options.templatePath)
 
+      // Debug logging for API requests (excluding template code for readability)
+      if (this.options.debug) {
+        this.logDebugPayload(payload, req)
+      }
+
       // Send request to simulator API using nimbuClient
       const simulatorResponse = await this.nimbuClient.simulatorRender(payload)
+
+      // Debug logging for API response
+      if (this.options.debug) {
+        this.logDebugResponse(simulatorResponse)
+      }
 
       // Process and return response
       ResponseProcessor.processResponse(simulatorResponse, res)

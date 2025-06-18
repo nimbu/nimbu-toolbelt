@@ -54,6 +54,29 @@ describe('RequestExtractor', () => {
       expect(metadata.body.data).to.equal('test')
     })
 
+    it('should set Rack-specific headers for Ruby server compatibility', () => {
+      const mockReq = {
+        method: 'POST',
+        path: '/api/users',
+        url: '/api/users?id=123&name=test',
+        headers: {
+          'content-type': 'application/json'
+        },
+        query: { id: '123', name: 'test' },
+        body: { email: 'test@example.com' }
+      } as unknown as Request
+
+      const metadata = RequestExtractor.extractMetadata(mockReq)
+      const headers = JSON.parse(JSON.stringify(metadata.headers))
+
+      expect(headers.REQUEST_METHOD).to.equal('POST')
+      expect(headers.REQUEST_PATH).to.equal('/api/users')
+      expect(headers.PATH_INFO).to.equal('/api/users')
+      expect(headers.REQUEST_URI).to.equal('/api/users?id=123&name=test')
+      expect(headers.QUERY_STRING).to.equal('id=123&name=test')
+      expect(headers['x-nimbu-simulator']).to.include('nimbu-toolbelt-node')
+    })
+
     it('should handle different HTTP methods', () => {
       const methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
       

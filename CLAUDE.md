@@ -143,4 +143,4 @@ The build process generates webpack metadata for Liquid templates:
 3. Ruby gem path is managed via `paths.GEMFILE` configuration
 
 ## Development Reminders
-- Remember to always use yarn
+- Remember ALWAYS use yarn

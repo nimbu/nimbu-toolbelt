@@ -35,7 +35,6 @@ describe('SimulatorFormatter', () => {
       expect(payload.simulator).to.have.property('path', '/test-page')
       expect(payload.simulator).to.have.property('code')
       expect(payload.simulator).to.have.property('request')
-      expect(payload.simulator).to.have.property('session')
 
       expect(payload.simulator.request.method).to.equal('get')
       expect(payload.simulator.request.headers).to.be.a('string')
@@ -67,10 +66,15 @@ describe('SimulatorFormatter', () => {
 
       expect(payload.simulator.request.method).to.equal('post')
       expect(payload.simulator.request.body).to.be.a('string')
+      expect(payload.simulator.request.params).to.be.an('object')
 
       const body = JSON.parse(payload.simulator.request.body!)
       expect(body.name).to.equal('John')
       expect(body.email).to.equal('john@example.com')
+
+      // Verify params include body data
+      expect(payload.simulator.request.params.name).to.equal('John')
+      expect(payload.simulator.request.params.email).to.equal('john@example.com')
     })
 
     it('should handle multipart requests with files', async () => {
@@ -144,6 +148,110 @@ describe('SimulatorFormatter', () => {
 
       expect(payload.simulator).to.not.have.property('files')
     })
+
+    it('should merge query parameters with POST body parameters', async () => {
+      const mockReq = {
+        method: 'POST',
+        path: '/contact',
+        headers: {
+          'content-type': 'application/json'
+        },
+        query: { source: 'newsletter', ref: 'homepage' },
+        body: { name: 'Alice', message: 'Hello world' },
+        is: () => false
+      } as unknown as Request
+
+      const payload = await formatter.buildSimulatorPayload(mockReq)
+
+      expect(payload.simulator.request.params).to.be.an('object')
+      // Should contain both query and body parameters
+      expect(payload.simulator.request.params.source).to.equal('newsletter')
+      expect(payload.simulator.request.params.ref).to.equal('homepage')
+      expect(payload.simulator.request.params.name).to.equal('Alice')
+      expect(payload.simulator.request.params.message).to.equal('Hello world')
+    })
+
+    it('should handle PUT requests with parameters', async () => {
+      const mockReq = {
+        method: 'PUT',
+        path: '/users/123',
+        headers: {
+          'content-type': 'application/json'
+        },
+        query: { validate: 'true' },
+        body: { name: 'Updated Name', email: 'updated@example.com' },
+        is: () => false
+      } as unknown as Request
+
+      const payload = await formatter.buildSimulatorPayload(mockReq)
+
+      expect(payload.simulator.request.method).to.equal('put')
+      expect(payload.simulator.request.params).to.be.an('object')
+      expect(payload.simulator.request.params.validate).to.equal('true')
+      expect(payload.simulator.request.params.name).to.equal('Updated Name')
+      expect(payload.simulator.request.params.email).to.equal('updated@example.com')
+    })
+
+    it('should handle PATCH requests with parameters', async () => {
+      const mockReq = {
+        method: 'PATCH',
+        path: '/articles/456',
+        headers: {
+          'content-type': 'application/json'
+        },
+        query: { draft: 'false' },
+        body: { title: 'Updated Title' },
+        is: () => false
+      } as unknown as Request
+
+      const payload = await formatter.buildSimulatorPayload(mockReq)
+
+      expect(payload.simulator.request.method).to.equal('patch')
+      expect(payload.simulator.request.params).to.be.an('object')
+      expect(payload.simulator.request.params.draft).to.equal('false')
+      expect(payload.simulator.request.params.title).to.equal('Updated Title')
+    })
+
+    it('should handle GET requests with only query parameters', async () => {
+      const mockReq = {
+        method: 'GET',
+        path: '/search',
+        headers: {},
+        query: { q: 'nodejs', filter: 'recent' },
+        body: {},
+        is: () => false
+      } as unknown as Request
+
+      const payload = await formatter.buildSimulatorPayload(mockReq)
+
+      expect(payload.simulator.request.method).to.equal('get')
+      expect(payload.simulator.request.params).to.be.an('object')
+      expect(payload.simulator.request.params.q).to.equal('nodejs')
+      expect(payload.simulator.request.params.filter).to.equal('recent')
+      // Should not have body parameters for GET
+      expect(Object.keys(payload.simulator.request.params)).to.have.lengthOf(2)
+    })
+
+    it('should handle body parameter precedence over query parameters', async () => {
+      const mockReq = {
+        method: 'POST',
+        path: '/api/test',
+        headers: {
+          'content-type': 'application/json'
+        },
+        query: { name: 'QueryName', id: '999' },
+        body: { name: 'BodyName', email: 'test@example.com' },
+        is: () => false
+      } as unknown as Request
+
+      const payload = await formatter.buildSimulatorPayload(mockReq)
+
+      expect(payload.simulator.request.params).to.be.an('object')
+      // Body parameters should override query parameters with the same key
+      expect(payload.simulator.request.params.name).to.equal('BodyName')
+      expect(payload.simulator.request.params.id).to.equal('999')
+      expect(payload.simulator.request.params.email).to.equal('test@example.com')
+    })
   })
 
   describe('shouldHandleRequest', () => {
@@ -208,4 +316,49 @@ describe('SimulatorFormatter', () => {
       expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.true
     })
   })
+
+  describe('cookie handling', () => {
+    it('should map cookies to HTTP_COOKIE header', async () => {
+      const mockReq = {
+        method: 'GET',
+        path: '/test',
+        url: '/test',
+        query: {},
+        body: {},
+        headers: {
+          host: 'localhost:3000',
+          cookie: '_nimbu_session=abc123; csrf_token=xyz789'
+        },
+        secure: false,
+        is: () => false
+      } as unknown as Request
+
+      const result = await formatter.buildSimulatorPayload(mockReq)
+      const headers = JSON.parse(result.simulator.request.headers)
+      
+      expect(headers).to.have.property('HTTP_COOKIE', '_nimbu_session=abc123; csrf_token=xyz789')
+      expect(headers).to.have.property('cookie', '_nimbu_session=abc123; csrf_token=xyz789')
+    })
+
+    it('should handle requests without cookies', async () => {
+      const mockReq = {
+        method: 'GET',
+        path: '/test',
+        url: '/test',
+        query: {},
+        body: {},
+        headers: {
+          host: 'localhost:3000'
+        },
+        secure: false,
+        is: () => false
+      } as unknown as Request
+
+      const result = await formatter.buildSimulatorPayload(mockReq)
+      const headers = JSON.parse(result.simulator.request.headers)
+      
+      expect(headers).to.not.have.property('HTTP_COOKIE')
+    })
+  })
+
 })

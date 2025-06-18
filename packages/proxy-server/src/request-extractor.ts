@@ -12,13 +12,19 @@ export class RequestExtractor {
     const path = this.extractPath(req)
     const headers = this.extractHeaders(req)
     const query = req.query as Record<string, string | string[]>
-    const {body} = req
+    const { body } = req
+    const params = this.extractParams(req)
+    const host = this.extractHost(req)
+    const port = this.extractPort(req)
 
     return {
       body,
       headers,
+      host,
       method,
+      params,
       path,
+      port,
       query,
     }
   }
@@ -106,6 +112,13 @@ export class RequestExtractor {
     // Add X-Nimbu-Simulator header (mirrors headers.rb functionality)
     headers['x-nimbu-simulator'] = this.getUserAgent()
 
+    // Set Rack-specific headers to trick the Ruby server into interpreting the correct HTTP method
+    headers.REQUEST_METHOD = req.method.toUpperCase()
+    headers.REQUEST_PATH = req.path
+    headers.PATH_INFO = req.path
+    headers.REQUEST_URI = req.url || req.path
+    headers.QUERY_STRING = req.url && req.url.includes('?') ? req.url.split('?')[1] : ''
+
     return headers
   }
 
@@ -120,6 +133,64 @@ export class RequestExtractor {
 
     // Remove trailing slash
     return req.path.replace(/\/$/, '')
+  }
+
+  /**
+   * Extract parameters from request, merging query and body data
+   * Mirrors Sinatra's request.params behavior where query and form data are merged
+   */
+  private static extractParams(req: Request): Record<string, any> {
+    const params: Record<string, any> = {}
+
+    // Start with query parameters
+    const query = req.query as Record<string, string | string[]>
+    Object.assign(params, query)
+
+    // For POST, PUT, PATCH requests, merge in body data
+    const method = req.method.toUpperCase()
+    if (['PATCH', 'POST', 'PUT'].includes(method) && req.body && typeof req.body === 'object' && req.body !== null) {
+      // Handle form-encoded data or JSON body
+      Object.assign(params, req.body)
+    }
+
+    return params
+  }
+
+  /**
+   * Extract host from request headers
+   */
+  private static extractHost(req: Request): string {
+    const hostHeader = (req.get ? req.get('host') : req.headers.host) || req.headers.host
+    if (typeof hostHeader === 'string') {
+      // Remove port from host if present (e.g., "localhost:3000" -> "localhost")
+      return hostHeader.split(':')[0]
+    }
+
+    return 'localhost'
+  }
+
+  /**
+   * Extract port from request
+   * Tries to get port from host header, connection, or falls back to defaults
+   */
+  private static extractPort(req: Request): number {
+    const hostHeader = (req.get ? req.get('host') : req.headers.host) || req.headers.host
+    if (typeof hostHeader === 'string' && hostHeader.includes(':')) {
+      const portStr = hostHeader.split(':')[1]
+      const port = Number.parseInt(portStr, 10)
+      if (!Number.isNaN(port)) {
+        return port
+      }
+    }
+
+    // Check if connection has socket with localPort
+    const connection = (req as any).connection || (req as any).socket
+    if (connection && connection.localPort) {
+      return connection.localPort
+    }
+
+    // Default based on protocol
+    return req.secure ? 443 : 80
   }
 
   /**

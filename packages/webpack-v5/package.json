@@ -15,7 +15,7 @@
     "@babel/plugin-syntax-flow": "^7.16.7",
     "@babel/plugin-transform-react-jsx": "^7.16.7",
     "@babel/preset-env": "^7.15.8",
-    "@nimbu-cli/command": "^5.5.0",
+    "@nimbu-cli/command": "file:.yalc/@nimbu-cli/command",
     "@nimbu-cli/proxy-server": "^1.0.0",
     "@nuxt/friendly-errors-webpack-plugin": "^2.5.2",
     "@svgr/webpack": "^5.5.0",
@@ -120,7 +120,7 @@
   },
   "repository": "zenjoy/nimbu-toolbelt",
   "scripts": {
-    "build": "rm -rf lib && rm -f tsconfig.tsbuildinfo && tsc -b",
+    "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc",

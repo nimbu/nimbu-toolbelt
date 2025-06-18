@@ -102,7 +102,7 @@
   },
   "repository": "zenjoy/nimbu-toolbelt",
   "scripts": {
-    "build": "rm -rf lib && rm -f tsconfig.tsbuildinfo && tsc -b",
+    "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc",

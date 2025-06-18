@@ -11,6 +11,10 @@ export default class Server extends Command {
   static description = 'run the development server (webpack 5)'
 
   static flags = {
+    debug: Flags.boolean({
+      default: false,
+      description: 'Enable debug logging for API requests (excludes template code for readability)',
+    }),
     host: Flags.string({
       description: 'The hostname/ip-address to bind on.',
       env: 'HOST',
@@ -69,6 +73,7 @@ export default class Server extends Command {
 
       await this.checkPort(nimbuPort)
       await this.spawnNimbuServer(nimbuPort, {
+        debug: flags.debug,
         host: flags.host,
         templatePath: process.cwd()
       })
@@ -108,7 +113,7 @@ export default class Server extends Command {
     }
   }
 
-  async spawnNimbuServer(port: number, options: { host?: string; templatePath?: string } = {}) {
+  async spawnNimbuServer(port: number, options: { debug?: boolean; host?: string; templatePath?: string } = {}) {
     this.log(chalk.red('Starting Node.js proxy server...'))
 
     // Validate authentication
@@ -125,6 +130,7 @@ export default class Server extends Command {
 
     // Create and start the Node.js proxy server with auth context
     this._nimbuServer = new WebpackIntegration({
+      debug: options.debug,
       host: options.host || 'localhost',
       nimbuClient: this.nimbu,
       port,

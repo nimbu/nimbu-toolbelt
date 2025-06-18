@@ -2,7 +2,7 @@ import { Command, APITypes as Nimbu } from '@nimbu-cli/command'
 import { ux } from '@oclif/core'
 import { pathExists } from 'fs-extra'
 
-export default class AppsList extends Command {
+export default class AppsConfig extends Command {
   static description = 'Add an app to the local configuration'
 
   async configureApp(app: Nimbu.App): Promise<void> {

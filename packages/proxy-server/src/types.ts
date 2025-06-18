@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 
 export interface ProxyServerOptions {
   apiUrl?: string
+  debug?: boolean
   host?: string
   nimbuClient: any
   port: number
@@ -11,8 +12,11 @@ export interface ProxyServerOptions {
 export interface RequestMetadata {
   body?: any
   headers: Record<string, string | string[]>
+  host: string
   method: string
+  params: Record<string, any>
   path: string
+  port: number
   query: Record<string, string | string[]>
 }
 
