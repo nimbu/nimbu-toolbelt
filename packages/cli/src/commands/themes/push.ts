@@ -1,7 +1,8 @@
 import { Command } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 
-import proxy from '../../nimbu-gem/command'
+// TODO: Reimplement without Ruby gem dependency
+// import proxy from '../../nimbu-gem/command'
 
 export default class ThemesPush extends Command {
   static args = {}
@@ -47,15 +48,7 @@ export default class ThemesPush extends Command {
   static strict = false
 
   async execute() {
-    await this.nimbu.validateLogin()
-
-    if (this.nimbu.token !== undefined) {
-      if (this.nimbuConfig.site == null) {
-        this.error('No site configured')
-      }
-
-      // don't parse, then this.argv is the original arguments (including flags)
-      await proxy(this.nimbuConfig.site, this.nimbu.token, 'themes:push', this.argv)
-    }
+    this.error('themes:push command needs to be reimplemented without Ruby gem dependency')
+    // TODO: Reimplement this command to use the Node.js proxy server
   }
 }

@@ -1,35 +1,24 @@
-/* eslint-disable unicorn/no-process-exit */
-/* eslint-disable no-process-exit */
 import { Command } from '@nimbu-cli/command'
+import { WebpackIntegration } from '@nimbu-cli/proxy-server'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import detectPort from 'detect-port'
 import { exit } from 'node:process'
 
-import NimbuServer, { NimbuGemServerOptions } from '../nimbu-gem/server'
 import WebpackDevServer from '../webpack/server'
 export default class Server extends Command {
   static aliases = ['server:v5']
   static description = 'run the development server (webpack 5)'
 
   static flags = {
-    compass: Flags.boolean({
-      description: 'Use legacy ruby SASS compilation.',
-    }),
-    haml: Flags.boolean({
-      description: 'Use legacy ruby HAML compiler.',
-    }),
     host: Flags.string({
       description: 'The hostname/ip-address to bind on.',
       env: 'HOST',
     }),
     'nimbu-port': Flags.integer({
       default: 4568,
-      description: 'The port for the ruby nimbu server to listen on.',
+      description: 'The port for the nimbu proxy server to listen on.',
       env: 'NIMBU_PORT',
-    }),
-    nocookies: Flags.boolean({
-      description: 'Leave cookies untouched i.s.o. clearing them.',
     }),
     noopen: Flags.boolean({
       default: false,
@@ -49,7 +38,7 @@ export default class Server extends Command {
     }),
   }
 
-  private _nimbuServer?: NimbuServer
+  private _nimbuServer?: WebpackIntegration
   private _shutdownPromise?: Promise<void>
   private readonly webpackServer: WebpackDevServer = new WebpackDevServer()
 
@@ -80,10 +69,8 @@ export default class Server extends Command {
 
       await this.checkPort(nimbuPort)
       await this.spawnNimbuServer(nimbuPort, {
-        compass: flags.compass,
-        haml: flags.haml,
         host: flags.host,
-        nocookies: flags.nocookies,
+        templatePath: process.cwd()
       })
 
       if (!flags.nowebpack) {
@@ -112,7 +99,8 @@ export default class Server extends Command {
     try {
       if (!this.initialized) {
         await super.initialize()
-        this._nimbuServer = new NimbuServer(this.nimbu, this.log.bind(this), this.warn.bind(this))
+        // WebpackIntegration will be created in spawnNimbuServer with the port
+        this._nimbuServer = undefined
       }
     } catch (error) {
       console.error(error)
@@ -120,9 +108,30 @@ export default class Server extends Command {
     }
   }
 
-  async spawnNimbuServer(port: number, options: NimbuGemServerOptions = {}) {
-    this.log(chalk.red('Starting nimbu server...'))
-    await this.nimbuServer.start(port, options)
+  async spawnNimbuServer(port: number, options: { host?: string; templatePath?: string } = {}) {
+    this.log(chalk.red('Starting Node.js proxy server...'))
+
+    // Validate authentication
+    await this.nimbu.validateLogin()
+    const authContext = this.nimbu.getAuthContext()
+    
+    if (!authContext.token) {
+      throw new Error('Not authenticated')
+    }
+
+    if (!authContext.site) {
+      throw new Error('No site configured')
+    }
+
+    // Create and start the Node.js proxy server with auth context
+    this._nimbuServer = new WebpackIntegration({
+      host: options.host || 'localhost',
+      nimbuClient: this.nimbu,
+      port,
+      templatePath: options.templatePath || process.cwd()
+    })
+
+    await this._nimbuServer.start()
   }
 
   // eslint-disable-next-line max-params
@@ -163,7 +172,7 @@ export default class Server extends Command {
 
   private get nimbuServer() {
     if (this._nimbuServer === undefined) {
-      throw new Error('Command not initialized yet')
+      throw new Error('Nimbu server not started yet')
     }
 
     return this._nimbuServer

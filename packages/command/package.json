@@ -1,7 +1,7 @@
 {
   "name": "@nimbu-cli/command",
   "description": "base class for Nimbu CLI commands",
-  "version": "5.4.1",
+  "version": "5.5.0",
   "author": "Zenjoy Engineering",
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "dependencies": {

@@ -42,5 +42,6 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "license": "MIT"
 }
