@@ -6,13 +6,174 @@ const ignoredFiles = require('react-dev-utils/ignoredFiles')
 const paths = require('./paths')
 const getHttpsConfig = require('./get-https-config.js')
 
+// Import proxy server components for integrated mode
+let ProxyServer, TemplatePacker, SimulatorFormatter
+try {
+  const proxyModule = require('@nimbu-cli/proxy-server')
+  ProxyServer = proxyModule.ProxyServer
+  TemplatePacker = proxyModule.TemplatePacker 
+  SimulatorFormatter = proxyModule.SimulatorFormatter
+} catch (error) {
+  // Proxy server not available, will fall back to separate server mode
+}
+
 const host = process.env.HOST || '0.0.0.0'
 const sockHost = process.env.WDS_SOCKET_HOST
 const sockPath = process.env.WDS_SOCKET_PATH // default: '/ws'
 const sockPort = process.env.WDS_SOCKET_PORT
 
-module.exports = function (proxy, allowedHosts) {
+module.exports = function (proxy, allowedHosts, options = {}) {
   const disableFirewall = !proxy || process.env.DANGEROUSLY_DISABLE_HOST_CHECK === 'true'
+  const useIntegratedProxy = options.integratedProxy && ProxyServer && options.nimbuClient
+  
+  let setupMiddlewares
+  if (useIntegratedProxy) {
+    setupMiddlewares = (middlewares, devServer) => {
+      if (!devServer) {
+        throw new Error('webpack-dev-server is not defined')
+      }
+
+      const express = require('express')
+      const cors = require('cors')
+      const compression = require('compression')
+      const helmet = require('helmet')
+      
+      // Initialize proxy server components
+      const templatePacker = new TemplatePacker(options.templatePath || process.cwd())
+      const simulatorFormatter = new SimulatorFormatter(templatePacker)
+      
+      // Add security middleware
+      devServer.app.use(helmet({
+        contentSecurityPolicy: false,
+        crossOriginEmbedderPolicy: false,
+      }))
+      
+      // Add CORS middleware
+      devServer.app.use(cors({
+        credentials: true,
+        origin: true,
+      }))
+      
+      // Add compression
+      devServer.app.use(compression())
+      
+      // Add unified body parsing middleware for v3 simulator
+      devServer.app.use((req, res, next) => {
+        // Skip for GET requests and webpack resources
+        if (req.method === 'GET' || req.path.includes('/__webpack') || req.path.includes('/sockjs-node')) {
+          return next()
+        }
+
+        // Use express.raw to capture raw body
+        express.raw({
+          limit: '64mb',
+          type: '*/*',
+        })(req, res, (rawErr) => {
+          if (rawErr) {
+            return next(rawErr)
+          }
+
+          // Store raw body for v3 simulator
+          if (req.body && Buffer.isBuffer(req.body)) {
+            req.rawBody = req.body
+          }
+
+          // Parse body based on content type for Express compatibility
+          const contentType = req.get('content-type') || ''
+
+          if (contentType.includes('application/json')) {
+            try {
+              if (req.rawBody) {
+                req.body = JSON.parse(req.rawBody.toString())
+              }
+            } catch {
+              req.body = {}
+            }
+          } else if (contentType.includes('application/x-www-form-urlencoded')) {
+            try {
+              if (req.rawBody) {
+                const querystring = require('node:querystring')
+                req.body = querystring.parse(req.rawBody.toString())
+              }
+            } catch {
+              req.body = {}
+            }
+          }
+
+          next()
+        })
+      })
+      
+      // Add proxy server request handler before webpack's default handlers
+      middlewares.unshift((req, res, next) => {
+        // Skip webpack dev server resources and static assets
+        if (req.path.includes('/__webpack') || 
+            req.path.includes('/sockjs-node') ||
+            req.path.includes('.hot-update.') ||
+            req.path === '/webpack.stats.json') {
+          return next()
+        }
+        
+        // Check if request should be handled by simulator
+        if (!SimulatorFormatter.shouldHandleRequest(req)) {
+          return next()
+        }
+
+        // Process request with integrated proxy logic
+        ;(async () => {
+          const timestamp = new Date().toISOString()
+          
+          try {
+            // Verify authentication
+            const authContext = options.nimbuClient.getAuthContext()
+            if (!authContext.token) {
+              throw new Error('Authentication required')
+            }
+            if (!authContext.site) {
+              throw new Error('Site configuration missing')
+            }
+
+            // Build simulator payload
+            const payload = await simulatorFormatter.buildSimulatorPayload(req, options.templatePath)
+
+            // Debug logging
+            if (options.debug) {
+              console.log(`🔄 Integrated proxy handling: ${req.method} ${req.path}`)
+            }
+
+            // Send to simulator API
+            const simulatorResponse = await options.nimbuClient.simulatorRender(payload)
+
+            // Process response (using ResponseProcessor from proxy-server)
+            const { ResponseProcessor } = require('@nimbu-cli/proxy-server')
+            ResponseProcessor.processResponse(simulatorResponse, res)
+
+            // Log response status (similar to dual server mode with colors)
+            const chalk = require('chalk')
+            const statusCode = simulatorResponse.statusCode || 200
+            const coloredStatus = statusCode >= 200 && statusCode < 300 
+              ? chalk.green(`(${statusCode})`)
+              : statusCode >= 400 
+                ? chalk.red(`(${statusCode})`)
+                : chalk.yellow(`(${statusCode})`)
+            console.log(`${timestamp} ${req.method} ${req.path} ${coloredStatus}`)
+          } catch (error) {
+            const chalk = require('chalk')
+            console.error(`${timestamp} ${req.method} ${req.path} ${chalk.red('(ERROR:')} ${error.message}${chalk.red(')')}`)
+            const { ResponseProcessor } = require('@nimbu-cli/proxy-server')
+            ResponseProcessor.handleError(error, res)
+          }
+        })().catch(err => {
+          console.error('Unhandled error in integrated proxy middleware:', err)
+          const { ResponseProcessor } = require('@nimbu-cli/proxy-server')
+          ResponseProcessor.handleError(err, res)
+        })
+      })
+      
+      return middlewares
+    }
+  }
+
   return {
     // WebpackDevServer 2.4.3 introduced a security fix that prevents remote
     // websites from potentially accessing local content through DNS rebinding:
@@ -38,6 +199,7 @@ module.exports = function (proxy, allowedHosts) {
         errors: true,
         warnings: false,
       },
+      logging: 'verbose',
       webSocketURL: {
         // Enable custom sockjs pathname for websocket connection to hot reloading server.
         // Enable custom sockjs hostname, pathname and port for websocket connection
@@ -71,7 +233,8 @@ module.exports = function (proxy, allowedHosts) {
     host,
     https: getHttpsConfig(),
     // `proxy` is run between `before` and `after` `webpack-dev-server` hooks
-    proxy,
+    // Only include proxy if it's not null to avoid webpack-dev-server validation errors
+    ...(proxy && { proxy }),
     static: {
       // By default WebpackDevServer serves physical files from current directory
       // in addition to all the virtual build products that it serves from memory.
@@ -87,8 +250,9 @@ module.exports = function (proxy, allowedHosts) {
       // for files like `favicon.ico`, `manifest.json`, and libraries that are
       // for some reason broken when imported through webpack. If you just want to
       // use an image, put it in `src` and `import` it from JavaScript instead.
-      directory: paths.appPublic,
+      directory: process.cwd(),
       publicPath: [paths.publicUrlOrPath],
+      serveIndex: false,
       // By default files from `contentBase` will not trigger a page reload.
       watch: {
         // Reportedly, this avoids CPU overload on some systems.
@@ -98,5 +262,6 @@ module.exports = function (proxy, allowedHosts) {
         ignored: ignoredFiles(paths.appSrc),
       },
     },
+    ...(setupMiddlewares && { setupMiddlewares }),
   }
 }

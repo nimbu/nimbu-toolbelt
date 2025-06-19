@@ -56,9 +56,9 @@
     "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "posttest": "yarn run lint",
-    "prepublishOnly": "yarn run build",
+    "prepack": "yarn run build",
     "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 10000",
-    "yalc:publish": "yalc publish --push"
+    "yalc:publish": "yarn build && yalc publish --push --no-script"
   },
   "types": "./lib/index.d.ts",
   "gitHead": "f9d5b8f084e75a4aa8a29f9930f8da36a6ad258f"

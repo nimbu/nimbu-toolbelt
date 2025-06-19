@@ -39,7 +39,7 @@
     "version": "cp packages/cli/CHANGELOG.md CHANGELOG.md && git add CHANGELOG.md",
     "alpha": "lerna run build && lerna publish from-package --pre-dist-tag next --allow-branch '**' --no-git-tag-version",
     "publish": "lerna run build && lerna publish from-package",
-    "yalc:publish": "lerna run yalc:publish && lerna run yalc:push"
+    "yalc:publish": "lerna run yalc:publish"
   },
   "workspaces": [
     "packages/*"

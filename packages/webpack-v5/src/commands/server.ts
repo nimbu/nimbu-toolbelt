@@ -19,6 +19,10 @@ export default class Server extends Command {
       description: 'The hostname/ip-address to bind on.',
       env: 'HOST',
     }),
+    'dual-server': Flags.boolean({
+      default: false,
+      description: 'Use legacy dual-server mode (webpack + separate proxy server)',
+    }),
     'nimbu-port': Flags.integer({
       default: 4568,
       description: 'The port for the nimbu proxy server to listen on.',
@@ -55,7 +59,7 @@ export default class Server extends Command {
       await this.stopWebpackDevServer()
     }
 
-    if (this.nimbuServer.isRunning()) {
+    if (this._nimbuServer && this.nimbuServer.isRunning()) {
       await this.stopNimbuServer()
     }
 
@@ -69,26 +73,73 @@ export default class Server extends Command {
 
       const { flags } = await this.parse(Server)
 
-      const nimbuPort = (flags.nowebpack ? flags.port : flags['nimbu-port']) ?? 4567
+      if (flags['dual-server'] || flags.nowebpack) {
+        // Legacy dual-server mode
+        this.log(chalk.yellow('⚡ Using legacy dual-server mode (webpack + separate proxy)'))
+        
+        const nimbuPort = (flags.nowebpack ? flags.port : flags['nimbu-port']) ?? 4567
 
-      await this.checkPort(nimbuPort)
-      await this.spawnNimbuServer(nimbuPort, {
-        debug: flags.debug,
-        host: flags.host,
-        templatePath: process.cwd(),
-      })
+        await this.checkPort(nimbuPort)
+        await this.spawnNimbuServer(nimbuPort, {
+          debug: flags.debug,
+          host: flags.host,
+          templatePath: process.cwd(),
+        })
 
-      if (!flags.nowebpack) {
-        await this.checkPort(flags.port)
-        await this.startWebpackDevServer(
-          flags.host ?? 'localhost',
-          flags.port,
-          flags['nimbu-port'] ?? 4567,
-          !flags.noopen,
-          {
-            poll: flags.poll,
-          },
-        )
+        if (!flags.nowebpack) {
+          await this.checkPort(flags.port)
+          await this.startWebpackDevServer(
+            flags.host ?? 'localhost',
+            flags.port,
+            flags['nimbu-port'] ?? 4567,
+            !flags.noopen,
+            {
+              poll: flags.poll,
+            },
+          )
+        }
+      } else {
+        // Default: Integrated proxy mode - single server on webpack port
+        this.log(chalk.cyan('🚀 Using integrated proxy mode (single server)'))
+        
+        try {
+          this.debug('Validating authentication...')
+          // Validate authentication first
+          await this.nimbu.validateLogin()
+          const authContext = this.nimbu.getAuthContext()
+
+          if (!authContext.token) {
+            throw new Error('Not authenticated')
+          }
+
+          if (!authContext.site) {
+            throw new Error('No site configured')
+          }
+
+          this.debug('Authentication validated successfully')
+          this.debug(`Starting webpack dev server on port ${flags.port}`)
+          
+          await this.checkPort(flags.port)
+          await this.startWebpackDevServer(
+            flags.host ?? 'localhost',
+            flags.port,
+            flags['nimbu-port'] ?? 4567,
+            !flags.noopen,
+            {
+              poll: flags.poll,
+              integratedProxy: true,
+              nimbuClient: this.nimbu,
+              debug: flags.debug,
+              templatePath: process.cwd(),
+            },
+          )
+          
+          this.debug('Webpack dev server started successfully')
+        } catch (error) {
+          this.log(chalk.red('Failed to start integrated proxy mode:'))
+          console.error(error)
+          throw error
+        }
       }
 
       await this.waitForStopSignals()
@@ -146,13 +197,26 @@ export default class Server extends Command {
     defaultPort: number,
     nimbuPort: number,
     open: boolean,
-    options?: { poll?: boolean },
+    options?: { 
+      debug?: boolean
+      integratedProxy?: boolean
+      nimbuClient?: any
+      poll?: boolean
+      templatePath?: string
+    },
   ) {
     this.log(chalk.cyan('\nStarting the webpack-dev-server (Webpack 5)...\n'))
     try {
       await this.webpackServer.start(host, defaultPort, nimbuPort, 'http', open, options)
     } catch (error) {
-      console.error('⚠️  Could not start webpack-dev-server ⚠️ \n\n', error, '\n')
+      console.error('⚠️  Could not start webpack-dev-server ⚠️')
+      console.error(`Mode: ${options?.integratedProxy ? 'Integrated Proxy' : 'Dual Server'}`)
+      console.error('Error details:')
+      console.error(error)
+      if (error instanceof Error) {
+        console.error('Stack trace:', error.stack)
+      }
+      console.error('')
       await this.catch()
       exit(1)
     }

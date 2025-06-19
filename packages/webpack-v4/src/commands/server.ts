@@ -15,6 +15,14 @@ export default class Server extends Command {
     compass: Flags.boolean({
       description: 'Use legacy ruby SASS compilation.',
     }),
+    debug: Flags.boolean({
+      default: false,
+      description: 'Enable debug logging for API requests',
+    }),
+    'dual-server': Flags.boolean({
+      default: false,
+      description: 'Use legacy dual-server mode (webpack + separate ruby server)',
+    }),
     haml: Flags.boolean({
       description: 'Use legacy ruby HAML compiler.',
     }),
@@ -61,7 +69,7 @@ export default class Server extends Command {
       await this.stopWebpackDevServer()
     }
 
-    if (this.nimbuServer.isRunning()) {
+    if (this._nimbuServer && this.nimbuServer.isRunning()) {
       await this.stopNimbuServer()
     }
   }
@@ -73,19 +81,48 @@ export default class Server extends Command {
       this.debug('Starting server command')
       const { flags } = await this.parse(Server)
 
-      const nimbuPort = (flags.nowebpack ? flags.port : flags['nimbu-port']) ?? 4567
+      if (flags['dual-server'] || flags.nowebpack) {
+        // Legacy dual-server mode with Ruby server
+        this.log(chalk.yellow('⚡ Using legacy dual-server mode (webpack + separate ruby server)'))
+        
+        const nimbuPort = (flags.nowebpack ? flags.port : flags['nimbu-port']) ?? 4567
 
-      await this.checkPort(nimbuPort)
-      await this.spawnNimbuServer(nimbuPort, {
-        compass: flags.compass,
-        haml: flags.haml,
-        nocookies: flags.nocookies,
-      })
+        await this.checkPort(nimbuPort)
+        await this.spawnNimbuServer(nimbuPort, {
+          compass: flags.compass,
+          haml: flags.haml,
+          nocookies: flags.nocookies,
+        })
 
-      if (!flags.nowebpack) {
+        if (!flags.nowebpack) {
+          await this.checkPort(flags.port)
+          await this.startWebpackDevServer(flags.host, flags.port, flags['nimbu-port'] ?? 4567, !flags.noopen, {
+            poll: flags.poll,
+          })
+        }
+      } else {
+        // Default: Integrated proxy mode using Node.js proxy server
+        this.log(chalk.cyan('🚀 Using integrated proxy mode (single server)'))
+        
+        // Validate authentication first
+        await this.nimbu.validateLogin()
+        const authContext = this.nimbu.getAuthContext()
+
+        if (!authContext.token) {
+          throw new Error('Not authenticated')
+        }
+
+        if (!authContext.site) {
+          throw new Error('No site configured')
+        }
+
         await this.checkPort(flags.port)
         await this.startWebpackDevServer(flags.host, flags.port, flags['nimbu-port'] ?? 4567, !flags.noopen, {
+          debug: flags.debug,
+          integratedProxy: true,
+          nimbuClient: this.nimbu,
           poll: flags.poll,
+          templatePath: process.cwd(),
         })
       }
 
@@ -123,7 +160,13 @@ export default class Server extends Command {
     defaultPort: number,
     nimbuPort: number,
     open: boolean,
-    options?: { poll?: boolean },
+    options?: { 
+      debug?: boolean
+      integratedProxy?: boolean
+      nimbuClient?: any
+      poll?: boolean
+      templatePath?: string
+    },
   ) {
     this.log(chalk.cyan('\nStarting the webpack-dev-server (Webpack 4)...\n'))
     try {

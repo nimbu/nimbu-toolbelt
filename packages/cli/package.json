@@ -145,7 +145,7 @@
     "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 60000",
     "posttest": "yarn lint",
     "version": "oclif readme --multi && git add README.md",
-    "yalc:publish": "yalc publish --push"
+    "yalc:publish": "yarn build && yarn oclif manifest && yalc publish --push --no-script"
   },
   "types": "lib/index.d.ts",
   "mocha": {

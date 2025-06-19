@@ -1,0 +1,1443 @@
+{
+  "commands": {
+    "config": {
+      "aliases": [],
+      "args": {},
+      "description": "Show resolved configuration",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "config",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "config.js"
+      ]
+    },
+    "version": {
+      "aliases": [],
+      "args": {},
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "version",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "version.js"
+      ]
+    },
+    "apps:config": {
+      "aliases": [],
+      "args": {},
+      "description": "Add an app to the local configuration",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "apps:config",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "apps",
+        "config.js"
+      ]
+    },
+    "apps:list": {
+      "aliases": [],
+      "args": {},
+      "description": "List the applications registered in Nimbu",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "apps:list",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "apps",
+        "list.js"
+      ]
+    },
+    "apps:push": {
+      "aliases": [],
+      "args": {},
+      "description": "Push your cloud code files to nimbu",
+      "flags": {
+        "app": {
+          "char": "a",
+          "description": "The (local) name of the application to push to (see apps:list and apps:config).",
+          "name": "app",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "apps:push",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": false,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "apps",
+        "push.js"
+      ]
+    },
+    "apps:transpile": {
+      "aliases": [],
+      "args": {},
+      "description": "Transpile a file from ES6 to ES5 for compatiblity with legacy Nimbu Cloud engine",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "apps:transpile",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "apps",
+        "transpile.js"
+      ]
+    },
+    "auth:login": {
+      "aliases": [
+        "login"
+      ],
+      "args": {},
+      "description": "login with your nimbu credentials",
+      "flags": {
+        "expires-in": {
+          "char": "e",
+          "description": "duration of token in seconds (default 1 year)",
+          "name": "expires-in",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:login",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "login.js"
+      ]
+    },
+    "auth:logout": {
+      "aliases": [
+        "logout"
+      ],
+      "args": {},
+      "description": "clears local login credentials and invalidates API session",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:logout",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "logout.js"
+      ]
+    },
+    "auth:token": {
+      "aliases": [],
+      "args": {},
+      "description": "outputs current CLI authentication token.\nBy default, the CLI auth token is only valid for 1 year. To generate a long-lived token, use nimbu authorizations:create",
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:token",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "token.js"
+      ]
+    },
+    "auth:whoami": {
+      "aliases": [
+        "whoami"
+      ],
+      "args": {},
+      "description": "display the current logged in user",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:whoami",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "whoami.js"
+      ]
+    },
+    "browse:admin": {
+      "aliases": [],
+      "args": {},
+      "description": "open the admin area for your current site",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "browse:admin",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "browse",
+        "admin.js"
+      ]
+    },
+    "browse:simulator": {
+      "aliases": [],
+      "args": {},
+      "description": "open the simulator for your current site",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "browse:simulator",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "browse",
+        "simulator.js"
+      ]
+    },
+    "channels:copy": {
+      "aliases": [],
+      "args": {},
+      "description": "copy channel configuration from one to another",
+      "flags": {
+        "all": {
+          "char": "a",
+          "description": "copy all channels from source to target",
+          "name": "all",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "force": {
+          "description": "do not ask confirmation to overwrite existing channel",
+          "name": "force",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from": {
+          "char": "f",
+          "description": "slug of the source channel",
+          "name": "from",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "slug of the target channel",
+          "name": "to",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "channels:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "channels",
+        "copy.js"
+      ]
+    },
+    "channels:diff": {
+      "aliases": [],
+      "args": {},
+      "description": "check differences between channel settings from one to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "slug of the source channel",
+          "name": "from",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "slug of the target channel",
+          "name": "to",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "channels:diff",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "channels",
+        "diff.js"
+      ]
+    },
+    "channels:info": {
+      "aliases": [],
+      "args": {
+        "channel": {
+          "description": "slug of your channel (optionally with the site, i.e. site/channel)",
+          "name": "channel",
+          "required": true
+        }
+      },
+      "description": "list info about this channel",
+      "flags": {
+        "columns": {
+          "description": "only show provided columns (comma-separated)",
+          "exclusive": [
+            "extended"
+          ],
+          "name": "columns",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "csv": {
+          "description": "output is csv format [alias: --output=csv]",
+          "exclusive": [
+            "no-truncate"
+          ],
+          "name": "csv",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "extended": {
+          "char": "x",
+          "description": "show extra columns",
+          "exclusive": [
+            "columns"
+          ],
+          "name": "extended",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "filter": {
+          "description": "filter property by partial string matching, ex: name=foo",
+          "name": "filter",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "no-header": {
+          "description": "hide table header from output",
+          "exclusive": [
+            "csv"
+          ],
+          "name": "no-header",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "no-truncate": {
+          "description": "do not truncate output to fit screen",
+          "exclusive": [
+            "csv"
+          ],
+          "name": "no-truncate",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "output": {
+          "description": "output in a more machine friendly format",
+          "exclusive": [
+            "no-truncate",
+            "csv"
+          ],
+          "name": "output",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "csv",
+            "json",
+            "yaml",
+            "ts"
+          ],
+          "type": "option"
+        },
+        "sort": {
+          "description": "property to sort by (prepend '-' for descending)",
+          "name": "sort",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "channels:info",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "channels",
+        "info.js"
+      ]
+    },
+    "customers:copy": {
+      "aliases": [],
+      "args": {},
+      "description": "copy customers from one to another",
+      "flags": {
+        "allow-errors": {
+          "description": "do not stop when an item fails and continue with the other",
+          "name": "allow-errors",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from": {
+          "char": "f",
+          "description": "the source site",
+          "name": "from",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "password-length": {
+          "char": "l",
+          "description": "length of the password generated for each new customer",
+          "name": "password-length",
+          "default": 12,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "per-page": {
+          "char": "p",
+          "description": "number of customers to fetch per page",
+          "name": "per-page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "query": {
+          "char": "q",
+          "description": "query params to append to source customer api call",
+          "name": "query",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "the target site",
+          "name": "to",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "upsert": {
+          "char": "u",
+          "description": "name of parameter to use for matching existing customers",
+          "name": "upsert",
+          "default": "email",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "where": {
+          "char": "w",
+          "description": "query expression to filter the the source customer api call",
+          "name": "where",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "customers:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "customers",
+        "copy.js"
+      ]
+    },
+    "init": {
+      "aliases": [],
+      "args": {},
+      "description": "initialize your working directory to code a selected theme",
+      "flags": {
+        "cloudcode": {
+          "char": "c",
+          "description": "Create CloudCode directory",
+          "name": "cloudcode",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "haml": {
+          "char": "h",
+          "description": "Use HAML for the templates in this project",
+          "name": "haml",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "site": {
+          "char": "s",
+          "description": "The site (use the Nimbu subdomain) to link to this project.",
+          "env": "NIMBU_SITE",
+          "name": "site",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "init",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "init",
+        "index.js"
+      ]
+    },
+    "mails:pull": {
+      "aliases": [],
+      "args": {},
+      "description": "download all notification templates",
+      "flags": {
+        "only": {
+          "char": "o",
+          "description": "the names of the templates to pull from Nimbu",
+          "name": "only",
+          "required": false,
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "mails:pull",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "mails",
+        "pull.js"
+      ]
+    },
+    "mails:push": {
+      "aliases": [],
+      "args": {},
+      "description": "upload all notification templates",
+      "flags": {
+        "only": {
+          "char": "o",
+          "description": "the names of the templates to push online",
+          "name": "only",
+          "required": false,
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "mails:push",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "mails",
+        "push.js"
+      ]
+    },
+    "menus:copy": {
+      "aliases": [],
+      "args": {
+        "slug": {
+          "description": "permalink of menu to be copied",
+          "name": "slug",
+          "required": false
+        }
+      },
+      "description": "copy menus from one site to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "menus:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "menus",
+        "copy.js"
+      ]
+    },
+    "pages:copy": {
+      "aliases": [],
+      "args": {
+        "fullpath": {
+          "default": "*",
+          "description": "fullpath of pages to be copied",
+          "name": "fullpath",
+          "required": false
+        }
+      },
+      "description": "copy page from one site to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "fromHost": {
+          "description": "hostname of origin Nimbu API",
+          "name": "fromHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "toHost": {
+          "description": "hostname of target Nimbu API",
+          "name": "toHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "pages:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "pages",
+        "copy.js"
+      ]
+    },
+    "sites:copy": {
+      "aliases": [],
+      "args": {},
+      "description": "copy a complete site from one to another",
+      "flags": {
+        "allow-errors": {
+          "description": "do not stop when an item fails and continue with the other",
+          "name": "allow-errors",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "copy-customers": {
+          "description": "copy and replicate all owners related to the objects we are copying",
+          "name": "copy-customers",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "force": {
+          "description": "do not ask confirmation to overwrite existing channel",
+          "name": "force",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "include": {
+          "char": "i",
+          "description": "channels from which entities should be copied",
+          "name": "include",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "only": {
+          "description": "limit copy of channels to this list (comma-separated) when using recursive",
+          "name": "only",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "recursive": {
+          "description": "recursively copy child entities referenced by the entities to be copied",
+          "name": "recursive",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "upsert": {
+          "char": "u",
+          "description": "name of parameter to use for matching existing documents",
+          "name": "upsert",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sites:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "sites",
+        "copy.js"
+      ]
+    },
+    "sites:list": {
+      "aliases": [
+        "sites"
+      ],
+      "args": {},
+      "description": "list sites you can edit",
+      "flags": {
+        "subdomain": {
+          "char": "s",
+          "description": "show Nimbu subdomain for each site",
+          "name": "subdomain",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sites:list",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "sites",
+        "list.js"
+      ]
+    },
+    "themes:copy": {
+      "aliases": [],
+      "args": {},
+      "description": "copy themes from one site to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "slug of the source theme",
+          "name": "from",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "fromHost": {
+          "description": "hostname of origin Nimbu API",
+          "name": "fromHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "liquid-only": {
+          "description": "only copy the templates",
+          "name": "liquid-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "to": {
+          "char": "t",
+          "description": "slug of the target theme",
+          "name": "to",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "toHost": {
+          "description": "hostname of target Nimbu API",
+          "name": "toHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "themes:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "themes",
+        "copy.js"
+      ]
+    },
+    "themes:diff": {
+      "aliases": [],
+      "args": {
+        "theme": {
+          "description": "The name of the theme to list",
+          "name": "theme"
+        }
+      },
+      "description": "compare theme files (TODO: reimplement)",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "themes:diff",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "themes",
+        "diff.js"
+      ]
+    },
+    "themes:list": {
+      "aliases": [],
+      "args": {
+        "theme": {
+          "description": "The name of the theme to list",
+          "name": "theme"
+        }
+      },
+      "description": "list all layouts, templates and assets (TODO: reimplement)",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "themes:list",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "themes",
+        "list.js"
+      ]
+    },
+    "themes:pull": {
+      "aliases": [],
+      "args": {},
+      "description": "download all code and assets for a theme",
+      "flags": {
+        "liquid-only": {
+          "description": "only download template files",
+          "name": "liquid-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "site": {
+          "char": "s",
+          "description": "the site of the theme",
+          "name": "site",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "theme": {
+          "char": "t",
+          "description": "slug of the theme",
+          "name": "theme",
+          "default": "default-theme",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "themes:pull",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "themes",
+        "pull.js"
+      ]
+    },
+    "themes:push": {
+      "aliases": [],
+      "args": {},
+      "description": "push the theme code online",
+      "flags": {
+        "css": {
+          "hidden": true,
+          "name": "css",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "css-only": {
+          "description": "only push css",
+          "name": "css-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "fonts-only": {
+          "description": "only push fonts",
+          "name": "fonts-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "force": {
+          "description": "skip the usage check and upload anyway",
+          "name": "force",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "images-only": {
+          "description": "only push new images",
+          "name": "images-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "js": {
+          "hidden": true,
+          "name": "js",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "js-only": {
+          "description": "only push javascript",
+          "name": "js-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "liquid": {
+          "hidden": true,
+          "name": "liquid",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "liquid-only": {
+          "description": "only push template code",
+          "name": "liquid-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "only": {
+          "description": "only push the files given on the command line",
+          "name": "only",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "themes:push",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": false,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "themes",
+        "push.js"
+      ]
+    },
+    "translations:copy": {
+      "aliases": [],
+      "args": {
+        "query": {
+          "default": "*",
+          "description": "query to match subset of translations to be copied",
+          "name": "query",
+          "required": false
+        }
+      },
+      "description": "copy translations from one site to another",
+      "flags": {
+        "dry-run": {
+          "description": "log which translations would be copied without actually copying them",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "fromHost": {
+          "description": "hostname of origin Nimbu API",
+          "name": "fromHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "since": {
+          "char": "s",
+          "description": "copy translations updated since the given date (use ISO 8601 format or a time unit like 1d, 1w, 1m, 1y)",
+          "name": "since",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "toHost": {
+          "description": "hostname of target Nimbu API",
+          "name": "toHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "translations:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "translations",
+        "copy.js"
+      ]
+    },
+    "channels:entries:copy": {
+      "aliases": [],
+      "args": {},
+      "description": "copy channel entries from one to another",
+      "flags": {
+        "allow-errors": {
+          "description": "do not stop when an item fails and continue with the other",
+          "name": "allow-errors",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "copy-customers": {
+          "description": "copy and replicate all owners related to the objects we are copying",
+          "name": "copy-customers",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "log which translations would be copied without actually copying them",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from": {
+          "char": "f",
+          "description": "slug of the source channel",
+          "name": "from",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "only": {
+          "description": "limit copy of channels to this list (comma-separated)",
+          "name": "only",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "per-page": {
+          "char": "p",
+          "description": "number of entries to fetch per page",
+          "name": "per-page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "query": {
+          "char": "q",
+          "description": "query params to append to source channel api call",
+          "name": "query",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "recursive": {
+          "char": "r",
+          "description": "automatically copy all dependent objects",
+          "name": "recursive",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "to": {
+          "char": "t",
+          "description": "slug of the target channel",
+          "name": "to",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "upsert": {
+          "char": "u",
+          "description": "name of parameter to use for matching existing documents",
+          "name": "upsert",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "where": {
+          "char": "w",
+          "description": "query expression to filter the source channel",
+          "name": "where",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "channels:entries:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "channels",
+        "entries",
+        "copy.js"
+      ]
+    },
+    "customers:config:copy": {
+      "aliases": [],
+      "args": {},
+      "description": "copy customer customizations from one to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "customers:config:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "customers",
+        "config",
+        "copy.js"
+      ]
+    },
+    "customers:config:diff": {
+      "aliases": [],
+      "args": {},
+      "description": "check differences between customer customizations from one to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "slug of the source channel",
+          "name": "from",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "slug of the target channel",
+          "name": "to",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "customers:config:diff",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "customers",
+        "config",
+        "diff.js"
+      ]
+    },
+    "products:config:copy": {
+      "aliases": [],
+      "args": {},
+      "description": "copy product customizations from one to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "products:config:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "products",
+        "config",
+        "copy.js"
+      ]
+    },
+    "products:config:diff": {
+      "aliases": [],
+      "args": {},
+      "description": "check differences between product customizations from one to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "slug of the source channel",
+          "name": "from",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "slug of the target channel",
+          "name": "to",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "products:config:diff",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "products",
+        "config",
+        "diff.js"
+      ]
+    }
+  },
+  "version": "5.4.0"
+}

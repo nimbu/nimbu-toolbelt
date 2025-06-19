@@ -46,11 +46,16 @@ export class RequestExtractor {
 
   /**
    * Check if path is a static asset that should be served by webpack dev server
-   * This includes images, fonts, and webpack resources
+   * This includes images, fonts, JS/CSS, and webpack resources from local filesystem
    */
   static isStaticAsset(path: string, webpackResources?: string[]): boolean {
-    // Check for images and fonts paths
+    // Check for images and fonts paths - serve from local template directory
     if (path.startsWith('/images/') || path.startsWith('/fonts/')) {
+      return true
+    }
+
+    // Check for JavaScript and CSS assets that should be served by webpack
+    if (path.startsWith('/javascripts/') || path.startsWith('/stylesheets/')) {
       return true
     }
 
