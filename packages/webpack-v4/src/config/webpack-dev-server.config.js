@@ -52,6 +52,10 @@ module.exports = function (proxy, allowedHost, host, protocol, options = {}) {
         // Add compression
         app.use(compression())
         
+        // Add middleware to serve images and fonts from template root directory
+        app.use('/images', express.static(require('path').join(process.cwd(), 'images')))
+        app.use('/fonts', express.static(require('path').join(process.cwd(), 'fonts')))
+        
         // Add unified body parsing middleware for v3 simulator
         app.use((req, res, next) => {
           // Skip for GET requests and webpack resources
@@ -101,16 +105,19 @@ module.exports = function (proxy, allowedHost, host, protocol, options = {}) {
         
         // Add proxy server request handler
         app.use((req, res, next) => {
-          // Skip webpack dev server resources and static assets
+          // Skip all webpack-related resources including HMR
           if (req.path.includes('/__webpack') || 
               req.path.includes('/sockjs-node') ||
               req.path.includes('.hot-update.') ||
-              req.path === '/webpack.stats.json') {
+              req.path.startsWith('/__') ||
+              req.path === '/webpack.stats.json' ||
+              req.path === '/ws' ||
+              req.headers.upgrade === 'websocket') {
             return next()
           }
           
           // Check if request should be handled by simulator
-          if (!SimulatorFormatter.shouldHandleRequest(req)) {
+          if (!SimulatorFormatter.shouldHandleRequest(req, options.webpackResources)) {
             return next()
           }
           
@@ -140,8 +147,21 @@ module.exports = function (proxy, allowedHost, host, protocol, options = {}) {
               // Process response (using ResponseProcessor from proxy-server)
               const { ResponseProcessor } = require('@nimbu-cli/proxy-server')
               ResponseProcessor.processResponse(simulatorResponse, res)
+
+              // Log response status (similar to dual server mode with colors)
+              const chalk = require('chalk')
+              const timestamp = new Date().toISOString()
+              const statusCode = simulatorResponse.statusCode || 200
+              const coloredStatus = statusCode >= 200 && statusCode < 300 
+                ? chalk.green(`(${statusCode})`)
+                : statusCode >= 400 
+                  ? chalk.red(`(${statusCode})`)
+                  : chalk.yellow(`(${statusCode})`)
+              console.log(`${timestamp} ${req.method} ${req.path} ${coloredStatus}`)
             } catch (error) {
-              console.error('Integrated proxy error:', error.message)
+              const chalk = require('chalk')
+              const timestamp = new Date().toISOString()
+              console.error(`${timestamp} ${req.method} ${req.path} ${chalk.red('(ERROR:')} ${error.message}${chalk.red(')')}`)
               const { ResponseProcessor } = require('@nimbu-cli/proxy-server')
               ResponseProcessor.handleError(error, res)
             }

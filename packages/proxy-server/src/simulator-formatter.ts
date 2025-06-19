@@ -38,6 +38,20 @@ export class SimulatorFormatter {
       return false
     }
 
+    // Skip webpack dev server specific paths
+    if (req.path.includes('/__webpack') || 
+        req.path.includes('/sockjs-node') ||
+        req.path.includes('.hot-update.') ||
+        req.path.startsWith('/__') ||
+        req.path === '/ws') {
+      return false
+    }
+
+    // Skip websocket upgrades
+    if (req.headers.upgrade === 'websocket') {
+      return false
+    }
+
     // Handle private files
     if (RequestExtractor.isPrivateFile(req)) {
       return true
