@@ -31,7 +31,7 @@ describe('SimulatorFormatter', () => {
       const payload = await formatter.buildSimulatorPayload(mockReq)
 
       expect(payload).to.have.property('simulator')
-      expect(payload.simulator).to.have.property('version')
+      expect(payload.simulator).to.have.property('version', 'v3')
       expect(payload.simulator).to.have.property('path', '/test-page')
       expect(payload.simulator).to.have.property('code')
       expect(payload.simulator).to.have.property('request')
@@ -78,11 +78,13 @@ describe('SimulatorFormatter', () => {
     })
 
     it('should handle multipart requests with files', async () => {
+      const rawFormData = '--boundary123\r\nContent-Disposition: form-data; name="name"\r\n\r\nJohn\r\n--boundary123\r\nContent-Disposition: form-data; name="avatar"; filename="avatar.jpg"\r\nContent-Type: image/jpeg\r\n\r\nimage data\r\n--boundary123--\r\n'
+      
       const mockReq = {
         method: 'POST',
         path: '/upload',
         headers: {
-          'content-type': 'multipart/form-data'
+          'content-type': 'multipart/form-data; boundary=boundary123'
         },
         query: {},
         body: {
@@ -93,20 +95,31 @@ describe('SimulatorFormatter', () => {
             data: Buffer.from('image data').toString('base64')
           }
         },
+        rawBody: Buffer.from(rawFormData),
         is: (type: string) => type === 'multipart/form-data'
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
 
-      expect(payload.simulator.files).to.be.an('object')
-      expect(payload.simulator.files!.avatar).to.equal(Buffer.from('image data').toString('base64'))
+      // For v3, we should have rawBody instead of processed files
+      expect(payload.simulator.request.rawBody).to.be.a('string')
+      expect(payload.simulator.version).to.equal('v3')
+      
+      // Verify the rawBody is base64 encoded form data
+      const decodedBody = Buffer.from(payload.simulator.request.rawBody!, 'base64').toString()
+      expect(decodedBody).to.include('John')
+      expect(decodedBody).to.include('avatar.jpg')
     })
 
     it('should handle complex nested file structures', async () => {
+      const rawFormData = '--boundary456\r\nContent-Disposition: form-data; name="user[documents][0]"; filename="doc1.pdf"\r\nContent-Type: application/pdf\r\n\r\npdf content 1\r\n--boundary456\r\nContent-Disposition: form-data; name="user[documents][1]"; filename="doc2.pdf"\r\nContent-Type: application/pdf\r\n\r\npdf content 2\r\n--boundary456--\r\n'
+      
       const mockReq = {
         method: 'POST',
         path: '/complex-upload',
-        headers: {},
+        headers: {
+          'content-type': 'multipart/form-data; boundary=boundary456'
+        },
         query: {},
         body: {
           user: {
@@ -124,17 +137,25 @@ describe('SimulatorFormatter', () => {
             ]
           }
         },
+        rawBody: Buffer.from(rawFormData),
         is: (type: string) => type === 'multipart/form-data'
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
 
-      expect(payload.simulator.files).to.be.an('object')
-      expect(payload.simulator.files!['user[documents][0]']).to.equal(Buffer.from('pdf content 1').toString('base64'))
-      expect(payload.simulator.files!['user[documents][1]']).to.equal(Buffer.from('pdf content 2').toString('base64'))
+      // For v3, we should have rawBody instead of processed files
+      expect(payload.simulator.request.rawBody).to.be.a('string')
+      expect(payload.simulator.version).to.equal('v3')
+      
+      // Verify the rawBody contains the file data
+      const decodedBody = Buffer.from(payload.simulator.request.rawBody!, 'base64').toString()
+      expect(decodedBody).to.include('doc1.pdf')
+      expect(decodedBody).to.include('doc2.pdf')
+      expect(decodedBody).to.include('pdf content 1')
+      expect(decodedBody).to.include('pdf content 2')
     })
 
-    it('should not include files property when no files present', async () => {
+    it('should not include rawBody when no request body present', async () => {
       const mockReq = {
         method: 'GET',
         path: '/no-files',
@@ -146,7 +167,10 @@ describe('SimulatorFormatter', () => {
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
 
+      // For v3, we don't have files property anymore, but check rawBody
       expect(payload.simulator).to.not.have.property('files')
+      expect(payload.simulator.request.rawBody).to.be.undefined
+      expect(payload.simulator.version).to.equal('v3')
     })
 
     it('should merge query parameters with POST body parameters', async () => {

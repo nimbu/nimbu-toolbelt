@@ -13,8 +13,6 @@ export class WebpackIntegration {
       throw new Error('nimbuClient is required for WebpackIntegration')
     }
 
-    console.log('🚀 Initializing Nimbu proxy server...')
-
     this.proxyServer = new ProxyServer({
       ...options,
       // Default webpack integration settings
@@ -41,14 +39,10 @@ export class WebpackIntegration {
    * Start the proxy server for webpack integration
    */
   async start(options?: Partial<WebpackIntegrationOptions>): Promise<void> {
-    console.log('🚀 Starting Nimbu Node.js proxy server...')
-
     // Set up webpack-specific middleware
     this.setupWebpackMiddleware(options?.webpackResources)
 
     await this.proxyServer.start()
-
-    console.log('✅ Nimbu Node.js proxy server ready for webpack integration')
   }
 
   /**

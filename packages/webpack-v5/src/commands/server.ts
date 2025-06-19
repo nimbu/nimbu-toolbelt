@@ -75,7 +75,7 @@ export default class Server extends Command {
       await this.spawnNimbuServer(nimbuPort, {
         debug: flags.debug,
         host: flags.host,
-        templatePath: process.cwd()
+        templatePath: process.cwd(),
       })
 
       if (!flags.nowebpack) {
@@ -114,12 +114,12 @@ export default class Server extends Command {
   }
 
   async spawnNimbuServer(port: number, options: { debug?: boolean; host?: string; templatePath?: string } = {}) {
-    this.log(chalk.red('Starting Node.js proxy server...'))
+    this.log(chalk.red('🚀 Starting Nimbu proxy server...'))
 
     // Validate authentication
     await this.nimbu.validateLogin()
     const authContext = this.nimbu.getAuthContext()
-    
+
     if (!authContext.token) {
       throw new Error('Not authenticated')
     }
@@ -134,7 +134,7 @@ export default class Server extends Command {
       host: options.host || 'localhost',
       nimbuClient: this.nimbu,
       port,
-      templatePath: options.templatePath || process.cwd()
+      templatePath: options.templatePath || process.cwd(),
     })
 
     await this._nimbuServer.start()

@@ -3,11 +3,9 @@ import compression from 'compression'
 import cors from 'cors'
 import express, { Express, Request, RequestHandler, Response } from 'express'
 import helmet from 'helmet'
-import multer from 'multer'
 import { Server } from 'node:http'
 import path from 'node:path'
 
-import { FileProcessor } from './file-processor'
 import { ResponseProcessor } from './response-processor'
 import { SimulatorFormatter } from './simulator-formatter'
 import { TemplatePacker } from './template-packer'
@@ -21,7 +19,6 @@ export class ProxyServer implements ServerAdapter {
   private server: Server | null = null
   private simulatorFormatter: SimulatorFormatter
   private templatePacker: TemplatePacker
-  private upload: multer.Multer
 
   constructor(private options: ProxyServerOptions) {
     if (!options.nimbuClient) {
@@ -34,7 +31,6 @@ export class ProxyServer implements ServerAdapter {
     // Initialize components
     this.templatePacker = new TemplatePacker(options.templatePath || process.cwd())
     this.simulatorFormatter = new SimulatorFormatter(this.templatePacker)
-    this.upload = multer(FileProcessor.createMulterConfig())
 
     this.setupMiddleware()
     this.setupRoutes()
@@ -54,7 +50,7 @@ export class ProxyServer implements ServerAdapter {
 
     return new Promise((resolve, reject) => {
       this.server = this.app.listen(config.port, host, () => {
-        console.log(`Proxy server running on http://${host}:${config.port}`)
+        console.log(`✅ Proxy server running on http://${host}:${config.port}`)
         this.isRunning = true
         resolve()
       })
@@ -94,25 +90,25 @@ export class ProxyServer implements ServerAdapter {
    */
   private logDebugPayload(payload: any, req: Request): void {
     console.log(chalk.cyan('\n=== DEBUG: API Request Data ==='))
-    
+
     // Create a copy of the payload without the template code
     const debugPayload = JSON.parse(JSON.stringify(payload))
-    
+
     // Remove or truncate the template code for readability
     if (debugPayload.simulator?.code) {
       const codeLength = debugPayload.simulator.code.length
       debugPayload.simulator.code = `<BASE64_TEMPLATE_CODE length=${codeLength}>`
     }
-    
+
     console.log(chalk.yellow('Request:'), {
       method: req.method,
       path: req.path,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     })
-    
+
     console.log(chalk.yellow('Payload to API:'))
     console.log(JSON.stringify(debugPayload, null, 2))
-    
+
     console.log(chalk.cyan('=== END DEBUG ===\n'))
   }
 
@@ -140,17 +136,17 @@ export class ProxyServer implements ServerAdapter {
    */
   private logDebugResponse(response: any): void {
     console.log(chalk.magenta('\n=== DEBUG: API Response Data ==='))
-    
+
     // Create a copy of the response without the body content for readability
     const debugResponse = { ...response }
     if (debugResponse.body) {
       const bodyLength = debugResponse.body.length
       debugResponse.body = `<BASE64_BODY_CONTENT length=${bodyLength}>`
     }
-    
+
     console.log(chalk.yellow('Response from API:'))
     console.log(JSON.stringify(debugResponse, null, 2))
-    
+
     console.log(chalk.magenta('=== END DEBUG ===\n'))
   }
 
@@ -211,9 +207,54 @@ export class ProxyServer implements ServerAdapter {
     // Compression
     this.app.use(compression() as RequestHandler)
 
-    // Body parsing
-    this.app.use(express.json({ limit: '10mb' }))
-    this.app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+    // Unified body parsing middleware - handles both raw body capture and Express parsing
+    this.app.use((req: Request, res: Response, next) => {
+      // Skip for GET requests and health checks
+      if (req.method === 'GET' || req.path === '/health') {
+        return next()
+      }
+
+      // For v3 requests, we capture raw body and also parse with Express
+      // Use express.raw to get the raw buffer first
+      express.raw({
+        limit: '64mb',
+        type: '*/*',
+      })(req, res, (rawErr) => {
+        if (rawErr) {
+          return next(rawErr)
+        }
+
+        // Store the raw body for v3 simulator
+        if (req.body && Buffer.isBuffer(req.body)) {
+          ;(req as any).rawBody = req.body
+        }
+
+        // Determine content type and parse accordingly for Express compatibility
+        const contentType = req.get('content-type') || ''
+
+        if (contentType.includes('application/json')) {
+          try {
+            if ((req as any).rawBody) {
+              req.body = JSON.parse((req as any).rawBody.toString())
+            }
+          } catch {
+            req.body = {}
+          }
+        } else if (contentType.includes('application/x-www-form-urlencoded')) {
+          try {
+            if ((req as any).rawBody) {
+              const querystring = require('node:querystring')
+              req.body = querystring.parse((req as any).rawBody.toString())
+            }
+          } catch {
+            req.body = {}
+          }
+        }
+        // For multipart, keep raw body and let simulator handle it
+
+        next()
+      })
+    })
 
     // Request logging
     this.app.use((req: Request, res: Response, next) => {
@@ -288,23 +329,9 @@ export class ProxyServer implements ServerAdapter {
           })
         }
 
-        // Handle multipart data if present
-        if (FileProcessor.hasMultipartData(req)) {
-          // Use multer to parse multipart data
-          const multerHandler = this.upload.any()
-          multerHandler(req as any, res as any, async (err: any) => {
-            if (err) {
-              console.error('Multer error:', err)
-              return ResponseProcessor.handleError(new Error('File upload error'), res)
-            }
-
-            // Process the request with files
-            await this.processRequest(req, res)
-          })
-        } else {
-          // Process regular request
-          await this.processRequest(req, res)
-        }
+        // For v3, we don't need multer - we send raw body directly
+        // Process all requests the same way
+        await this.processRequest(req, res)
       } catch (error) {
         ResponseProcessor.handleError(error as Error, res)
       }
