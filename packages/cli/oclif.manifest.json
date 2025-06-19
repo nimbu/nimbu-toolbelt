@@ -466,6 +466,50 @@
         "info.js"
       ]
     },
+    "init": {
+      "aliases": [],
+      "args": {},
+      "description": "initialize your working directory to code a selected theme",
+      "flags": {
+        "cloudcode": {
+          "char": "c",
+          "description": "Create CloudCode directory",
+          "name": "cloudcode",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "haml": {
+          "char": "h",
+          "description": "Use HAML for the templates in this project",
+          "name": "haml",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "site": {
+          "char": "s",
+          "description": "The site (use the Nimbu subdomain) to link to this project.",
+          "env": "NIMBU_SITE",
+          "name": "site",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "init",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "init",
+        "index.js"
+      ]
+    },
     "customers:copy": {
       "aliases": [],
       "args": {},
@@ -551,50 +595,6 @@
         "commands",
         "customers",
         "copy.js"
-      ]
-    },
-    "init": {
-      "aliases": [],
-      "args": {},
-      "description": "initialize your working directory to code a selected theme",
-      "flags": {
-        "cloudcode": {
-          "char": "c",
-          "description": "Create CloudCode directory",
-          "name": "cloudcode",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "haml": {
-          "char": "h",
-          "description": "Use HAML for the templates in this project",
-          "name": "haml",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "site": {
-          "char": "s",
-          "description": "The site (use the Nimbu subdomain) to link to this project.",
-          "env": "NIMBU_SITE",
-          "name": "site",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "init",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "init",
-        "index.js"
       ]
     },
     "mails:pull": {

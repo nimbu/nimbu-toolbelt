@@ -69,7 +69,7 @@ export default class WebpackDevServer {
           onError(err: any) {
             console.log('Could not proxy to Nimbu Dev Server:', err)
           },
-          target: `http://127.0.0.1:${nimbuPort}`,
+          target: `http://localhost:${nimbuPort}`,
         },
       }
       serverConfig = createDevServerConfig(proxyConfig, urls.lanUrlForConfig, host, protocol, {

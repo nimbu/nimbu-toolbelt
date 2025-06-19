@@ -76,7 +76,7 @@ export default class Server extends Command {
       if (flags['dual-server'] || flags.nowebpack) {
         // Legacy dual-server mode
         this.log(chalk.yellow('⚡ Using legacy dual-server mode (webpack + separate proxy)'))
-        
+
         const nimbuPort = (flags.nowebpack ? flags.port : flags['nimbu-port']) ?? 4567
 
         await this.checkPort(nimbuPort)
@@ -101,7 +101,7 @@ export default class Server extends Command {
       } else {
         // Default: Integrated proxy mode - single server on webpack port
         this.log(chalk.cyan('🚀 Using integrated proxy mode (single server)'))
-        
+
         try {
           this.debug('Validating authentication...')
           // Validate authentication first
@@ -118,7 +118,7 @@ export default class Server extends Command {
 
           this.debug('Authentication validated successfully')
           this.debug(`Starting webpack dev server on port ${flags.port}`)
-          
+
           await this.checkPort(flags.port)
           await this.startWebpackDevServer(
             flags.host ?? 'localhost',
@@ -126,14 +126,14 @@ export default class Server extends Command {
             flags['nimbu-port'] ?? 4567,
             !flags.noopen,
             {
-              poll: flags.poll,
+              debug: flags.debug,
               integratedProxy: true,
               nimbuClient: this.nimbu,
-              debug: flags.debug,
+              poll: flags.poll,
               templatePath: process.cwd(),
             },
           )
-          
+
           this.debug('Webpack dev server started successfully')
         } catch (error) {
           this.log(chalk.red('Failed to start integrated proxy mode:'))
@@ -197,7 +197,7 @@ export default class Server extends Command {
     defaultPort: number,
     nimbuPort: number,
     open: boolean,
-    options?: { 
+    options?: {
       debug?: boolean
       integratedProxy?: boolean
       nimbuClient?: any
@@ -216,6 +216,7 @@ export default class Server extends Command {
       if (error instanceof Error) {
         console.error('Stack trace:', error.stack)
       }
+
       console.error('')
       await this.catch()
       exit(1)

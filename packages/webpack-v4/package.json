@@ -83,11 +83,8 @@
     "/bin",
     "/lib",
     "/oclif.manifest.json",
-    "/Gemfile",
-    "/Gemfile.lock",
     "/template",
-    "/README.md",
-    "/.bundle/config"
+    "/README.md"
   ],
   "homepage": "https://github.com/zenjoy/nimbu-toolbelt",
   "keywords": [
@@ -107,7 +104,6 @@
     "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "rm -f oclif.manifest.json",
-    "postinstall": "bundle install",
     "posttest": "eslint . --ext .ts --config .eslintrc",
     "prepack": "yarn build",
     "test": "echo 'Not implemented yet...'",
