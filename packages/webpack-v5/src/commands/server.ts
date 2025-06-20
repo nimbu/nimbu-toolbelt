@@ -70,8 +70,6 @@ export default class Server extends Command {
   }
 
   async execute() {
-    console.log('execute() method called')
-    this.debug('execute() method called')
     try {
       displayNimbuHeader()
 
