@@ -279,6 +279,19 @@ export default class Server extends Command {
     return greetings[Math.floor(Math.random() * greetings.length)]
   }
 
+  private triggerShutdown = (eventType: string, error?: Error) => {
+    this.debug(`Process event triggered: ${eventType}`)
+    if (error) {
+      this.debug(`Error details: ${error.message}`)
+      this.debug(`Stack trace: ${error.stack}`)
+    }
+
+    // Call all registered shutdown handlers
+    for (const handler of this._shutdownHandlers) {
+      handler()
+    }
+  }
+
   private setupProcessListeners(): void {
     // Only register process listeners once
     if (Server._processListenersRegistered) {
@@ -287,28 +300,15 @@ export default class Server extends Command {
 
     Server._processListenersRegistered = true
 
-    const triggerShutdown = (eventType: string, error?: Error) => {
-      this.debug(`Process event triggered: ${eventType}`)
-      if (error) {
-        this.debug(`Error details: ${error.message}`)
-        this.debug(`Stack trace: ${error.stack}`)
-      }
-
-      // Call all registered shutdown handlers
-      for (const handler of this._shutdownHandlers) {
-        handler()
-      }
-    }
-
     // catches ctrl+c event
-    process.on('SIGINT', () => triggerShutdown('SIGINT'))
+    process.on('SIGINT', () => this.triggerShutdown('SIGINT'))
 
     // catches "kill pid" (for example: nodemon restart)
-    process.on('SIGUSR1', () => triggerShutdown('SIGUSR1'))
-    process.on('SIGUSR2', () => triggerShutdown('SIGUSR2'))
+    process.on('SIGUSR1', () => this.triggerShutdown('SIGUSR1'))
+    process.on('SIGUSR2', () => this.triggerShutdown('SIGUSR2'))
 
     // catches uncaught exceptions
-    process.on('uncaughtException', (error) => triggerShutdown('uncaughtException', error))
+    process.on('uncaughtException', (error) => this.triggerShutdown('uncaughtException', error))
 
     // Note: Removed process.on('exit') as it creates circular issues
   }
@@ -332,6 +332,7 @@ export default class Server extends Command {
         if (shutdownStarted) {
           return
         }
+
         shutdownStarted = true
 
         this.debug('Shutdown handler triggered')
@@ -357,7 +358,7 @@ export default class Server extends Command {
 
   private async waitForStopSignals() {
     this.debug('waitForStopSignals called')
-    if (this._shutdownPromise != null) {
+    if (this._shutdownPromise) {
       this.debug('Shutdown promise exists, waiting for it')
       await this._shutdownPromise
       this.debug('Shutdown promise resolved')
