@@ -27,10 +27,10 @@ export default class WebpackDevServer {
     protocol: string,
     open: boolean,
     options?: { 
-      poll?: boolean
+      debug?: boolean
       integratedProxy?: boolean
       nimbuClient?: any
-      debug?: boolean
+      poll?: boolean
       templatePath?: string
     },
   ): Promise<void> {
@@ -56,10 +56,10 @@ export default class WebpackDevServer {
     if (options?.integratedProxy) {
       // Integrated proxy mode - no external proxy, all handled in webpack dev server
       serverConfig = createDevServerConfig(null, urls.lanUrlForConfig, host, protocol, {
-        poll: options?.poll ?? false,
+        debug: options.debug,
         integratedProxy: true,
         nimbuClient: options.nimbuClient,
-        debug: options.debug,
+        poll: options?.poll ?? false,
         templatePath: options.templatePath,
       })
     } else {
@@ -76,6 +76,7 @@ export default class WebpackDevServer {
         poll: options?.poll ?? false,
       })
     }
+
     this.server = new DevServer(compiler, serverConfig)
     // Launch WebpackDevServer.
     try {

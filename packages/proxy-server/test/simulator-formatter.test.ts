@@ -282,7 +282,8 @@ describe('SimulatorFormatter', () => {
     it('should handle regular page requests', () => {
       const mockReq = {
         path: '/about',
-        query: {}
+        query: {},
+        headers: {}
       } as unknown as Request
 
       expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.true
@@ -316,7 +317,8 @@ describe('SimulatorFormatter', () => {
     it('should handle favicon requests', () => {
       const mockReq = {
         path: '/favicon.ico',
-        query: {}
+        query: {},
+        headers: {}
       } as unknown as Request
 
       expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.true
@@ -325,7 +327,8 @@ describe('SimulatorFormatter', () => {
     it('should handle private file requests', () => {
       const mockReq = {
         path: '/downloads/document.pdf',
-        query: { key: 'secret123' }
+        query: { key: 'secret123' },
+        headers: {}
       } as unknown as Request
 
       expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.true
@@ -334,7 +337,8 @@ describe('SimulatorFormatter', () => {
     it('should not handle private files without key', () => {
       const mockReq = {
         path: '/downloads/document.pdf',
-        query: {}
+        query: {},
+        headers: {}
       } as unknown as Request
 
       expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.true

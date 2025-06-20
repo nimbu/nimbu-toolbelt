@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/no-process-exit */
 /* eslint-disable no-process-exit */
-import { Command } from '@nimbu-cli/command'
+import { Command, displayNimbuHeader } from '@nimbu-cli/command'
 import { WebpackIntegration } from '@nimbu-cli/proxy-server'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
@@ -70,6 +70,8 @@ export default class Server extends Command {
 
   async execute() {
     try {
+      displayNimbuHeader()
+      
       this.debug('Starting server command')
       this.registerSignalHandlers()
 

@@ -1,14 +1,14 @@
 {
   "name": "nimbu",
   "description": "Tools for Nimbu projects",
-  "version": "5.4.0",
+  "version": "5.5.0",
   "author": "Zenjoy Engineering",
   "bin": {
     "nimbu": "./bin/run"
   },
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "dependencies": {
-    "@nimbu-cli/command": "^5.4.0",
+    "@nimbu-cli/command": "^5.5.0",
     "@oclif/plugin-autocomplete": "^3.0.5",
     "@oclif/plugin-commands": "^3.1.1",
     "@oclif/plugin-help": "^6.0.12",
@@ -21,6 +21,7 @@
     "date-fns": "^2",
     "deep-object-diff": "^1.1.0",
     "dependency-graph": "^0.11.0",
+    "diff": "^8.0.2",
     "follow-redirects": "^1.14.4",
     "front-matter": "^3.0.2",
     "fuzzy": "^0.1.3",

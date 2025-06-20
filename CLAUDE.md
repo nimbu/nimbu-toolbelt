@@ -144,3 +144,4 @@ The build process generates webpack metadata for Liquid templates:
 
 ## Development Reminders
 - Remember ALWAYS use yarn
+- Always use YARN

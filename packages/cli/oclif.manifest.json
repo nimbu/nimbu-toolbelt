@@ -38,6 +38,46 @@
         "version.js"
       ]
     },
+    "browse:admin": {
+      "aliases": [],
+      "args": {},
+      "description": "open the admin area for your current site",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "browse:admin",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "browse",
+        "admin.js"
+      ]
+    },
+    "browse:simulator": {
+      "aliases": [],
+      "args": {},
+      "description": "open the simulator for your current site",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "browse:simulator",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "browse",
+        "simulator.js"
+      ]
+    },
     "apps:config": {
       "aliases": [],
       "args": {},
@@ -228,46 +268,6 @@
         "commands",
         "auth",
         "whoami.js"
-      ]
-    },
-    "browse:admin": {
-      "aliases": [],
-      "args": {},
-      "description": "open the admin area for your current site",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "browse:admin",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "browse",
-        "admin.js"
-      ]
-    },
-    "browse:simulator": {
-      "aliases": [],
-      "args": {},
-      "description": "open the simulator for your current site",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "browse:simulator",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "browse",
-        "simulator.js"
       ]
     },
     "channels:copy": {
@@ -466,50 +466,6 @@
         "info.js"
       ]
     },
-    "init": {
-      "aliases": [],
-      "args": {},
-      "description": "initialize your working directory to code a selected theme",
-      "flags": {
-        "cloudcode": {
-          "char": "c",
-          "description": "Create CloudCode directory",
-          "name": "cloudcode",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "haml": {
-          "char": "h",
-          "description": "Use HAML for the templates in this project",
-          "name": "haml",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "site": {
-          "char": "s",
-          "description": "The site (use the Nimbu subdomain) to link to this project.",
-          "env": "NIMBU_SITE",
-          "name": "site",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "init",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "init",
-        "index.js"
-      ]
-    },
     "customers:copy": {
       "aliases": [],
       "args": {},
@@ -595,6 +551,50 @@
         "commands",
         "customers",
         "copy.js"
+      ]
+    },
+    "init": {
+      "aliases": [],
+      "args": {},
+      "description": "initialize your working directory to code a selected theme",
+      "flags": {
+        "cloudcode": {
+          "char": "c",
+          "description": "Create CloudCode directory",
+          "name": "cloudcode",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "haml": {
+          "char": "h",
+          "description": "Use HAML for the templates in this project",
+          "name": "haml",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "site": {
+          "char": "s",
+          "description": "The site (use the Nimbu subdomain) to link to this project.",
+          "env": "NIMBU_SITE",
+          "name": "site",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "init",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "init",
+        "index.js"
       ]
     },
     "mails:pull": {
@@ -935,12 +935,21 @@
       "aliases": [],
       "args": {
         "theme": {
-          "description": "The name of the theme to list",
+          "description": "The name of the theme to compare",
           "name": "theme"
         }
       },
-      "description": "compare theme files (TODO: reimplement)",
-      "flags": {},
+      "description": "show differences between local and server theme files",
+      "flags": {
+        "site": {
+          "char": "s",
+          "description": "the site of the theme",
+          "name": "site",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
       "id": "themes:diff",
@@ -964,8 +973,17 @@
           "name": "theme"
         }
       },
-      "description": "list all layouts, templates and assets (TODO: reimplement)",
-      "flags": {},
+      "description": "list all layouts, templates, snippets and assets",
+      "flags": {
+        "site": {
+          "char": "s",
+          "description": "the site of the theme",
+          "name": "site",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
       "id": "themes:list",
@@ -1048,12 +1066,6 @@
           "allowNo": false,
           "type": "boolean"
         },
-        "force": {
-          "description": "skip the usage check and upload anyway",
-          "name": "force",
-          "allowNo": false,
-          "type": "boolean"
-        },
         "images-only": {
           "description": "only push new images",
           "name": "images-only",
@@ -1067,7 +1079,7 @@
           "type": "boolean"
         },
         "js-only": {
-          "description": "only push javascript",
+          "description": "only push scripts",
           "name": "js-only",
           "allowNo": false,
           "type": "boolean"
@@ -1089,6 +1101,14 @@
           "name": "only",
           "allowNo": false,
           "type": "boolean"
+        },
+        "site": {
+          "char": "s",
+          "description": "the site of the theme",
+          "name": "site",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -1439,5 +1459,5 @@
       ]
     }
   },
-  "version": "5.4.0"
+  "version": "5.5.0"
 }
