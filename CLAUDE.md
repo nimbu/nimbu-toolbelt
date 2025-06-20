@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Nimbu Toolbelt** is a comprehensive CLI tool for developing and managing projects on the Nimbu CMS platform. It's a monorepo built with TypeScript, Node.js, and uses Lerna for package management. The tool provides both modern webpack-based development tooling and Ruby gem integration for theme development and deployment.
+**Nimbu Toolbelt** is a comprehensive CLI tool for developing and managing projects on the Nimbu CMS platform. It's a monorepo built with TypeScript, Node.js, and uses Lerna for package management. The tool provides modern webpack-based development tooling for theme development and deployment.
 
 ## Development Commands
 
@@ -28,7 +28,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Theme Development Workflow
 - `yarn nimbu init` - Initialize project with theme selection
-- `yarn nimbu server` - Start development server (webpack-dev-server + ruby server at localhost:4567)
+- `yarn nimbu server` - Start development server (webpack-dev-server at localhost:4567)
 - `yarn nimbu build` - Create production build
 - `yarn nimbu themes:push` - Deploy theme to Nimbu platform
 
@@ -51,13 +51,12 @@ The project uses **Lerna + Yarn workspaces** with three core packages:
 #### packages/webpack-v5
 - Modern webpack-based build system for theme development
 - Features: HMR, TypeScript/CoffeeScript support, SCSS pipeline, asset optimization
-- Ruby gem integration via `bundle exec nimbu` commands
 - Generates `snippets/webpack.liquid` for Liquid template integration
 
-### Hybrid Architecture Pattern
-The toolbelt bridges **modern frontend development** with **legacy Ruby gem compatibility**:
+### Architecture Pattern
+The toolbelt provides a **modern frontend development** experience:
 - Node.js CLI with TypeScript for modern development experience
-- Ruby gem backend (`bundle exec nimbu`) for Nimbu platform operations
+- Direct API integration for Nimbu platform operations
 - Webpack frontend with Liquid template integration for asset pipeline
 
 ## Technology Stack
@@ -69,10 +68,6 @@ The toolbelt bridges **modern frontend development** with **legacy Ruby gem comp
 - **TypeScript**: Optional TS support (enable with `yarn add --dev typescript ts-loader`)
 - **CoffeeScript**: Legacy CoffeeScript 2 support
 
-### Ruby Integration
-- **Bundler**: Ruby dependency management via Gemfile in webpack-v5 package
-- **Nimbu Gem**: Legacy Ruby-based theme operations
-- Process spawning via `spawn('bundle', ['exec', 'nimbu', ...])` pattern
 
 ### Testing & Quality
 - **Mocha + Chai**: Test framework with TypeScript support
@@ -84,7 +79,6 @@ The toolbelt bridges **modern frontend development** with **legacy Ruby gem comp
 
 ### Configuration
 - `/packages/webpack-v5/src/config/paths.ts` - Path configuration
-- `/packages/webpack-v5/src/nimbu-gem/process.ts` - Ruby gem process spawning
 - Each package has its own `package.json` with specific scripts
 
 ### Command Structure
@@ -100,12 +94,10 @@ The toolbelt bridges **modern frontend development** with **legacy Ruby gem comp
 
 ## Development Notes
 
-### Ruby Dependencies
-The webpack-v5 package includes a `postinstall` script that runs `bundle install`. Ensure Ruby and Bundler are available in the development environment.
 
 ### Environment Variables
 - `EXTRACT_CSS=true yarn nimbu server` - Force CSS extraction in development
-- `NIMBU_API_KEY` - Set by CLI for Ruby gem authentication
+- `NIMBU_API_KEY` - Set by CLI for API authentication
 - `NIMBU_SITE` - Site context for operations
 
 ### Plugin System
@@ -137,10 +129,6 @@ The build process generates webpack metadata for Liquid templates:
 3. Verify both development and production builds work
 4. Ensure `snippets/webpack.liquid` generation works correctly
 
-### Working with Ruby Integration
-1. Ruby operations are handled via `packages/webpack-v5/src/nimbu-gem/process.ts`
-2. Environment variables are passed to Ruby processes for authentication
-3. Ruby gem path is managed via `paths.GEMFILE` configuration
 
 ## Development Reminders
 - Remember ALWAYS use yarn
