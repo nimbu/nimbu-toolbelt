@@ -1,11 +1,12 @@
+/* eslint-disable perfectionist/sort-objects */
 'use strict'
 
 const {
   buildConfig: { get: getProjectConfig },
 } = require('@nimbu-cli/command')
 
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 const webpack = require('webpack')
 const resolve = require('resolve')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
@@ -50,7 +51,7 @@ const babelRuntimeRegenerator = require.resolve('@babel/runtime/regenerator', {
 const emitErrorsAsWarnings = process.env.ESLINT_NO_DEV_ERRORS === 'true'
 const disableESLintPlugin = process.env.DISABLE_ESLINT_PLUGIN === 'true'
 
-const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT || '10000') // smaller then 10000 bytes will be inlined as data url
+const imageInlineSizeLimit = Number.parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT || '10000', 10) // smaller then 10000 bytes will be inlined as data url
 
 // Check if TypeScript is setup
 const useTypeScript = fs.existsSync(paths.appTsConfig)
@@ -60,7 +61,7 @@ const hasTailwindCSS = () => {
   try {
     require.resolve('tailwindcss')
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 }
@@ -70,6 +71,7 @@ const useTailwind = hasTailwindCSS()
 let tailwindPostCssPackage = 'tailwindcss'
 
 if (useTailwind) {
+  // eslint-disable-next-line node/no-missing-require
   const { version } = require('tailwindcss/package.json')
   if (Number.parseInt(version.split('.')[0], 10) >= 4) {
     tailwindPostCssPackage = '@tailwindcss/postcss'
@@ -77,7 +79,7 @@ if (useTailwind) {
 }
 
 // Get the path to the uncompiled service worker (if it exists).
-const swSrc = paths.swSrc
+const { swSrc } = paths
 
 // style files regexes
 const cssRegex = /\.css$/
@@ -93,7 +95,7 @@ const hasJsxRuntime = (() => {
   try {
     require.resolve('react/jsx-runtime')
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 })()
@@ -109,10 +111,10 @@ function htmlWebPackPlugins(entries, options = {}) {
       chunksSortMode: 'auto',
       filename: `snippets/webpack_${name}.liquid`,
       inject: false,
-      template: template,
+      template,
       templateParameters: {
-        prefix: `${name}_`,
         cdnRoot: options.cdnRoot,
+        prefix: `${name}_`,
       },
     })
   })
@@ -128,13 +130,14 @@ function ensureTrailingSlash(url) {
 // webpackEnv is either 'development' or 'production'
 module.exports = function (webpackEnv) {
   const projectConfig = getProjectConfig() ?? {}
+  const { NIMBU_DIRECTORY } = paths
 
   const defaultEntryCssEntry = projectConfig.CSS_ENTRY ?? 'index.scss'
   const defaultEntryJsEntry = projectConfig.JS_ENTRY ?? 'index.js'
   const defaultEntry = {
     app: [
-      path.resolve(paths.NIMBU_DIRECTORY, `src/${defaultEntryCssEntry}`),
-      path.resolve(paths.NIMBU_DIRECTORY, `src/${defaultEntryJsEntry}`),
+      path.resolve(NIMBU_DIRECTORY, `src/${defaultEntryCssEntry}`),
+      path.resolve(NIMBU_DIRECTORY, `src/${defaultEntryJsEntry}`),
     ],
   }
   const entry = projectConfig.WEBPACK_ENTRY ?? defaultEntry
@@ -165,8 +168,8 @@ module.exports = function (webpackEnv) {
       isEnvDevelopment && {
         loader: require.resolve('style-loader'),
         options: {
-          // Enable HMR for CSS
-          injectType: 'singletonStyleTag',
+          // Enable HMR for CSS - use styleTag for better HMR with Tailwind v4
+          injectType: 'styleTag',
         },
       },
       isEnvProduction && {
@@ -186,10 +189,39 @@ module.exports = function (webpackEnv) {
           postcssOptions: {
             // Necessary for external CSS imports to work
             // https://github.com/facebook/create-react-app/issues/2677
-            ident: 'postcss',
             config: false,
-            plugins: !useTailwind
+            ident: 'postcss',
+            plugins: useTailwind
               ? [
+                  [
+                    require.resolve(tailwindPostCssPackage),
+                    {
+                      // Force Tailwind to reprocess @apply directives on file changes
+                      content: [
+                        './src/**/*.{js,jsx,ts,tsx,html,liquid}',
+                        './templates/**/*.liquid',
+                        './snippets/**/*.liquid', 
+                        './layout/**/*.liquid',
+                        './sections/**/*.liquid',
+                        './assets/**/*.scss',
+                        './src/**/*.scss',
+                        './src/**/*.css'
+                      ]
+                    }
+                  ],
+                  require.resolve('postcss-nesting'),
+                  require.resolve('postcss-flexbugs-fixes'),
+                  [
+                    require.resolve('postcss-preset-env'),
+                    {
+                      autoprefixer: {
+                        flexbox: 'no-2009',
+                      },
+                      stage: 3,
+                    },
+                  ],
+                ]
+              : [
                   require.resolve('postcss-flexbugs-fixes'),
                   [
                     require.resolve('postcss-preset-env'),
@@ -204,32 +236,22 @@ module.exports = function (webpackEnv) {
                   // so that it honors browserslist config in package.json
                   // which in turn let's users customize the target behavior as per their needs.
                   require.resolve('postcss-normalize'),
-                ]
-              : [
-                  require.resolve(tailwindPostCssPackage),
-                  require.resolve('postcss-flexbugs-fixes'),
-                  [
-                    require.resolve('postcss-preset-env'),
-                    {
-                      autoprefixer: {
-                        flexbox: 'no-2009',
-                      },
-                      stage: 3,
-                    },
-                  ],
                 ],
           },
           sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
         },
       },
     ].filter(Boolean)
+
+    const { appSrc } = paths
+
     if (preProcessor) {
       loaders.push(
         {
           loader: require.resolve('resolve-url-loader'),
           options: {
+            root: appSrc,
             sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
-            root: paths.appSrc,
           },
         },
         {
@@ -240,6 +262,7 @@ module.exports = function (webpackEnv) {
         },
       )
     }
+
     return loaders
   }
 
@@ -271,8 +294,8 @@ module.exports = function (webpackEnv) {
       publicPath: publicUrlOrPath,
       // Point sourcemap entries to original disk location (format as URL on Windows)
       devtoolModuleFilenameTemplate: isEnvProduction
-        ? (info) => path.relative(paths.appSrc, info.absoluteResourcePath).replace(/\\/g, '/')
-        : isEnvDevelopment && ((info) => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
+        ? (info) => path.relative(paths.appSrc, info.absoluteResourcePath).replaceAll('\\', '/')
+        : isEnvDevelopment && ((info) => path.resolve(info.absoluteResourcePath).replaceAll('\\', '/')),
     },
     cache: {
       type: 'filesystem',
@@ -283,6 +306,8 @@ module.exports = function (webpackEnv) {
         defaultWebpack: ['webpack/lib/'],
         config: [__filename],
         tsconfig: [paths.appTsConfig, paths.appJsConfig].filter((f) => fs.existsSync(f)),
+        // Add SCSS files to cache dependencies for proper HMR invalidation
+        scss: ['src/**/*.scss', 'assets/**/*.scss'],
       },
     },
     infrastructureLogging: {
@@ -343,7 +368,7 @@ module.exports = function (webpackEnv) {
                 chunks: 'initial',
                 name: 'polyfills',
                 priority: 10,
-                test: function (module) {
+                test(module) {
                   return (
                     /css/.test(module.type) === false &&
                     module.context &&
@@ -356,7 +381,7 @@ module.exports = function (webpackEnv) {
                 chunks: 'initial',
                 name: 'vendor',
                 priority: 0,
-                test: function (module) {
+                test(module) {
                   return (
                     /css/.test(module.type) === false &&
                     module.context &&
@@ -392,7 +417,7 @@ module.exports = function (webpackEnv) {
           'react-dom$': 'react-dom/profiling',
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
-        ...(modules.webpackAliases || {}),
+        ...modules.webpackAliases,
       },
       plugins: [
         // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -410,7 +435,7 @@ module.exports = function (webpackEnv) {
             babelRuntimeEntryHelpers,
             babelRuntimeRegenerator,
             require.resolve('script-loader'),
-          ].filter((plugin) => !!plugin),
+          ].filter(Boolean),
         ),
       ],
     },
@@ -623,7 +648,7 @@ module.exports = function (webpackEnv) {
               exclude: sassModuleRegex,
               use: getStyleLoaders(
                 {
-                  importLoaders: 3,
+                  importLoaders: 4, // Updated for postcss-nesting addition
                   sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
                   modules: {
                     mode: 'icss',
@@ -643,7 +668,7 @@ module.exports = function (webpackEnv) {
               test: sassModuleRegex,
               use: getStyleLoaders(
                 {
-                  importLoaders: 3,
+                  importLoaders: 4, // Updated for postcss-nesting addition
                   sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
                   modules: {
                     mode: 'local',
@@ -733,7 +758,7 @@ module.exports = function (webpackEnv) {
         fs.existsSync(swSrc) &&
         new WorkboxWebpackPlugin.InjectManifest({
           swSrc,
-          dontCacheBustURLsMatching: /\.[0-9a-f]{8}\./,
+          dontCacheBustURLsMatching: /\.[\da-f]{8}\./,
           exclude: [/\.map$/, /asset-manifest\.json$/, /LICENSE/],
           // Bump up the default maximum size (2mb) that's precached,
           // to make lazy-loading failure scenarios less likely.
@@ -779,9 +804,7 @@ module.exports = function (webpackEnv) {
               { file: '**/src/setupTests.*' },
             ],
           },
-          logger: {
-            infrastructure: 'silent',
-          },
+          logger: 'webpack-infrastructure',
         }),
       !disableESLintPlugin &&
         new ESLintPlugin({
@@ -814,18 +837,14 @@ module.exports = function (webpackEnv) {
       // some third party packages may ship miss-configured sourcemaps, that interrupts the build
       // See: https://github.com/facebook/create-react-app/discussions/11278#discussioncomment-1780169
       /**
-       *
        * @param {import('webpack').WebpackError} warning
        * @returns {boolean}
        */
-      function ignoreSourcemapsloaderWarnings(warning) {
-        return (
-          warning.module &&
-          warning.module.resource.includes('node_modules') &&
-          warning.details &&
-          warning.details.includes('source-map-loader')
-        )
-      },
+      (warning) =>
+        warning.module &&
+        warning.module.resource.includes('node_modules') &&
+        warning.details &&
+        warning.details.includes('source-map-loader'),
     ],
   }
 }

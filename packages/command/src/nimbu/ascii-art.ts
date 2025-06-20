@@ -14,10 +14,17 @@ const NIMBU_ASCII_ART = `
 export function displayNimbuHeader(): void {
   const options = {
     freq: 0.3,
-    seed: 0,
+    seed: Math.floor(Math.random() * 1000),
     speed: 100,
     spread: 8,
   }
 
-  console.log(lolcatjs.fromString(NIMBU_ASCII_ART.trim(), options))
+  lolcatjs.fromString(NIMBU_ASCII_ART.trim(), options)
+
+  // print a new line
+  console.log('')
+}
+
+export function getNimbuHeader(): string {
+  return NIMBU_ASCII_ART.trim()
 }

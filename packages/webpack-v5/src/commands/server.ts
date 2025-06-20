@@ -10,6 +10,8 @@ export default class Server extends Command {
   static aliases = ['server:v5']
   static description = 'run the development server (webpack 5)'
 
+  private static _processListenersRegistered = false
+
   static flags = {
     debug: Flags.boolean({
       default: false,
@@ -48,6 +50,7 @@ export default class Server extends Command {
 
   private _nimbuServer?: WebpackIntegration
   private _shutdownPromise?: Promise<void>
+  private _shutdownHandlers: Array<() => void> = []
   private readonly webpackServer: WebpackDevServer = new WebpackDevServer()
 
   get initialized() {
@@ -67,9 +70,11 @@ export default class Server extends Command {
   }
 
   async execute() {
+    console.log('execute() method called')
+    this.debug('execute() method called')
     try {
       displayNimbuHeader()
-      
+
       this.debug('Starting server command')
       this.registerSignalHandlers()
 
@@ -144,7 +149,11 @@ export default class Server extends Command {
         }
       }
 
+      this.debug('About to register signal handlers')
+      this.registerSignalHandlers()
+      this.debug('About to wait for stop signals')
       await this.waitForStopSignals()
+      this.debug('waitForStopSignals completed - this should not happen unless shutdown was triggered')
     } catch (error) {
       console.error(error)
       await this.catch()
@@ -207,11 +216,11 @@ export default class Server extends Command {
       templatePath?: string
     },
   ) {
-    this.log(chalk.cyan('\nStarting the webpack-dev-server (Webpack 5)...\n'))
+    this.log(chalk.cyan('🚧 Starting the webpack-dev-server (Webpack 5)...\n'))
     try {
       await this.webpackServer.start(host, defaultPort, nimbuPort, 'http', open, options)
     } catch (error) {
-      console.error('⚠️  Could not start webpack-dev-server ⚠️')
+      console.error('⚠️ Could not start webpack-dev-server ⚠️')
       console.error(`Mode: ${options?.integratedProxy ? 'Integrated Proxy' : 'Dual Server'}`)
       console.error('Error details:')
       console.error(error)
@@ -237,7 +246,7 @@ export default class Server extends Command {
     const suggestedPort = await detectPort(port)
 
     if (suggestedPort !== port) {
-      console.error(`\n⚠️  There is already a process listening on port ${port} ⚠️ \n`)
+      console.error(`\n⚠️ There is already a process listening on port ${port} ⚠️ \n`)
       await this.catch()
       exit(1)
     }
@@ -272,52 +281,90 @@ export default class Server extends Command {
     return greetings[Math.floor(Math.random() * greetings.length)]
   }
 
-  private registerCloseListener(fn: () => void): void {
-    let run = false
+  private setupProcessListeners(): void {
+    // Only register process listeners once
+    if (Server._processListenersRegistered) {
+      return
+    }
 
-    const wrapper = () => {
-      if (!run) {
-        run = true
-        fn()
+    Server._processListenersRegistered = true
+
+    const triggerShutdown = (eventType: string, error?: Error) => {
+      this.debug(`Process event triggered: ${eventType}`)
+      if (error) {
+        this.debug(`Error details: ${error.message}`)
+        this.debug(`Stack trace: ${error.stack}`)
+      }
+
+      // Call all registered shutdown handlers
+      for (const handler of this._shutdownHandlers) {
+        handler()
       }
     }
 
-    // do something when app is closing
-    process.on('exit', wrapper)
-
     // catches ctrl+c event
-    process.on('SIGINT', wrapper)
+    process.on('SIGINT', () => triggerShutdown('SIGINT'))
 
     // catches "kill pid" (for example: nodemon restart)
-    process.on('SIGUSR1', wrapper)
-    process.on('SIGUSR2', wrapper)
+    process.on('SIGUSR1', () => triggerShutdown('SIGUSR1'))
+    process.on('SIGUSR2', () => triggerShutdown('SIGUSR2'))
 
     // catches uncaught exceptions
-    process.on('uncaughtException', wrapper)
+    process.on('uncaughtException', (error) => triggerShutdown('uncaughtException', error))
+
+    // Note: Removed process.on('exit') as it creates circular issues
   }
 
   private registerSignalHandlers() {
+    // Only register if not already registered
+    if (this._shutdownPromise) {
+      this.debug('Signal handlers already registered, skipping')
+      return
+    }
+
+    this.debug('Registering signal handlers')
+
+    // Setup process listeners if not already done
+    this.setupProcessListeners()
+
+    let shutdownStarted = false
+
     this._shutdownPromise = new Promise((resolve) => {
-      // Print out a message to let the user know we are shutting down the server
-      // when they press Ctrl+C or kill the process externally.
-      this.registerCloseListener(async () => {
+      const shutdownHandler = async () => {
+        if (shutdownStarted) {
+          return
+        }
+        shutdownStarted = true
+
+        this.debug('Shutdown handler triggered')
         this.log()
         this.log(chalk.dim('Gracefully shutting down. Please wait...'))
         await this.catch()
         resolve()
+
+        // Second SIGINT forces immediate exit
         process.on('SIGINT', () => {
           this.log()
           this.warn('Force-closing all open sockets...')
-          resolve()
           exit(0)
         })
-      })
+      }
+
+      // Register this handler
+      this._shutdownHandlers.push(shutdownHandler)
     })
+
+    this.debug('Signal handlers registered')
   }
 
   private async waitForStopSignals() {
+    this.debug('waitForStopSignals called')
     if (this._shutdownPromise != null) {
+      this.debug('Shutdown promise exists, waiting for it')
       await this._shutdownPromise
+      this.debug('Shutdown promise resolved')
+    } else {
+      this.debug('WARNING: No shutdown promise exists!')
     }
   }
 }

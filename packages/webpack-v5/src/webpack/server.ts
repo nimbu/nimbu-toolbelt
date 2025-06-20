@@ -41,7 +41,7 @@ export default class WebpackDevServer {
     // load all dependencies at runtime
     const fs = require('node:fs')
 
-    const { choosePort, createCompiler, prepareUrls } = require('react-dev-utils/WebpackDevServerUtils')
+    const { choosePort, createCompiler, prepareUrls } = require('../config/webpack-dev-server-utils')
     const openBrowser = require('react-dev-utils/openBrowser')
 
     const paths = require('../config/paths')
@@ -101,14 +101,15 @@ export default class WebpackDevServer {
       }
     } else {
       // Traditional mode - proxy to separate server
-      const proxyConfig = {
-        '*': {
+      const proxyConfig = [
+        {
+          context: ['**'],
           onError(err: any) {
             console.log('Could not proxy to Nimbu Dev Server:', err)
           },
           target: `http://localhost:${nimbuPort}`,
         },
-      }
+      ]
       serverConfig = {
         ...createDevServerConfig(proxyConfig, ['localhost', '.localhost', ...(urls.lanUrlForConfig ?? [])]),
         host,
@@ -149,13 +150,18 @@ export default class WebpackDevServer {
     return new Promise<void>((resolve, reject) => {
       if (this.server) {
         this.serverRunning = true
-        this.server.start().catch((error: Error | null) => {
-          if (error) {
-            reject(error)
-          } else {
+        this.server
+          .start()
+          .then(() => {
             resolve()
-          }
-        })
+          })
+          .catch((error: Error | null) => {
+            if (error) {
+              reject(error)
+            } else {
+              reject(new Error('Unknown error occurred while starting server'))
+            }
+          })
       } else {
         reject(new Error('Server is not set.'))
       }

@@ -38,46 +38,6 @@
         "version.js"
       ]
     },
-    "browse:admin": {
-      "aliases": [],
-      "args": {},
-      "description": "open the admin area for your current site",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "browse:admin",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "browse",
-        "admin.js"
-      ]
-    },
-    "browse:simulator": {
-      "aliases": [],
-      "args": {},
-      "description": "open the simulator for your current site",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "browse:simulator",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "browse",
-        "simulator.js"
-      ]
-    },
     "apps:config": {
       "aliases": [],
       "args": {},
@@ -165,6 +125,46 @@
         "commands",
         "apps",
         "transpile.js"
+      ]
+    },
+    "browse:admin": {
+      "aliases": [],
+      "args": {},
+      "description": "open the admin area for your current site",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "browse:admin",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "browse",
+        "admin.js"
+      ]
+    },
+    "browse:simulator": {
+      "aliases": [],
+      "args": {},
+      "description": "open the simulator for your current site",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "browse:simulator",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "browse",
+        "simulator.js"
       ]
     },
     "auth:login": {
@@ -466,93 +466,6 @@
         "info.js"
       ]
     },
-    "customers:copy": {
-      "aliases": [],
-      "args": {},
-      "description": "copy customers from one to another",
-      "flags": {
-        "allow-errors": {
-          "description": "do not stop when an item fails and continue with the other",
-          "name": "allow-errors",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "from": {
-          "char": "f",
-          "description": "the source site",
-          "name": "from",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "password-length": {
-          "char": "l",
-          "description": "length of the password generated for each new customer",
-          "name": "password-length",
-          "default": 12,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "per-page": {
-          "char": "p",
-          "description": "number of customers to fetch per page",
-          "name": "per-page",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "query": {
-          "char": "q",
-          "description": "query params to append to source customer api call",
-          "name": "query",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "to": {
-          "char": "t",
-          "description": "the target site",
-          "name": "to",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "upsert": {
-          "char": "u",
-          "description": "name of parameter to use for matching existing customers",
-          "name": "upsert",
-          "default": "email",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "where": {
-          "char": "w",
-          "description": "query expression to filter the the source customer api call",
-          "name": "where",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "customers:copy",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "customers",
-        "copy.js"
-      ]
-    },
     "init": {
       "aliases": [],
       "args": {},
@@ -655,6 +568,93 @@
         "commands",
         "mails",
         "push.js"
+      ]
+    },
+    "customers:copy": {
+      "aliases": [],
+      "args": {},
+      "description": "copy customers from one to another",
+      "flags": {
+        "allow-errors": {
+          "description": "do not stop when an item fails and continue with the other",
+          "name": "allow-errors",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from": {
+          "char": "f",
+          "description": "the source site",
+          "name": "from",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "password-length": {
+          "char": "l",
+          "description": "length of the password generated for each new customer",
+          "name": "password-length",
+          "default": 12,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "per-page": {
+          "char": "p",
+          "description": "number of customers to fetch per page",
+          "name": "per-page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "query": {
+          "char": "q",
+          "description": "query params to append to source customer api call",
+          "name": "query",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "the target site",
+          "name": "to",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "upsert": {
+          "char": "u",
+          "description": "name of parameter to use for matching existing customers",
+          "name": "upsert",
+          "default": "email",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "where": {
+          "char": "w",
+          "description": "query expression to filter the the source customer api call",
+          "name": "where",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "customers:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "customers",
+        "copy.js"
       ]
     },
     "menus:copy": {

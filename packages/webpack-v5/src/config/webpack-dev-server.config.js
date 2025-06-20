@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-objects */
 // const fs = require('node:fs')
 // const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware')
 // const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware')
@@ -251,7 +252,24 @@ module.exports = function (proxy, allowedHosts, options = {}) {
     },
 
     host,
-    https: getHttpsConfig(),
+    // Configure server (replaces deprecated https option in v5)
+    ...(() => {
+      const httpsConfig = getHttpsConfig()
+      if (httpsConfig === true) {
+        return { server: 'https' }
+      }
+
+      if (httpsConfig && typeof httpsConfig === 'object') {
+        return {
+          server: {
+            options: httpsConfig,
+            type: 'https',
+          },
+        }
+      }
+
+      return {} // HTTP (default)
+    })(),
     // `proxy` is run between `before` and `after` `webpack-dev-server` hooks
     // Only include proxy if it's not null to avoid webpack-dev-server validation errors
     ...(proxy && { proxy }),
