@@ -162,7 +162,13 @@ module.exports = function (webpackEnv) {
   // common function to get style loaders
   const getStyleLoaders = (cssOptions, preProcessor) => {
     const loaders = [
-      isEnvDevelopment && require.resolve('style-loader'),
+      isEnvDevelopment && {
+        loader: require.resolve('style-loader'),
+        options: {
+          // Enable HMR for CSS
+          injectType: 'singletonStyleTag',
+        },
+      },
       isEnvProduction && {
         loader: MiniCssExtractPlugin.loader,
         options: { publicPath: publicUrlOrPath },
@@ -700,6 +706,8 @@ module.exports = function (webpackEnv) {
         new ReactRefreshWebpackPlugin({
           overlay: false,
         }),
+      // Enable Hot Module Replacement for CSS
+      isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
       // See https://github.com/facebook/create-react-app/issues/240

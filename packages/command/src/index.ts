@@ -11,6 +11,7 @@ import * as APITypes from './nimbu/types'
 
 export type APIOptions = IOptions
 
+export { displayNimbuHeader } from './nimbu/ascii-art'
 export { color } from './nimbu/color'
 export { AppConfig, Config } from './nimbu/config'
 export {

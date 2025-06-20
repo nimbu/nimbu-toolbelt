@@ -1,6 +1,6 @@
 {
   "name": "@nimbu-cli/plugin-webpack-v4",
-  "version": "5.4.1",
+  "version": "5.5.0",
   "author": "Zenjoy Engineering",
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "main": "lib/index.js",
@@ -13,6 +13,8 @@
     "@babel/plugin-proposal-private-methods": "^7.16.7",
     "@babel/plugin-proposal-private-property-in-object": "^7.16.7",
     "@babel/preset-env": "^7.16.7",
+    "@nimbu-cli/command": "^5.5.0",
+    "@nimbu-cli/proxy-server": "^1.0.0",
     "autoprefixer": "^9.8.8",
     "babel-loader": "^8.2.3",
     "babel-plugin-root-import": "^6.6.0",
@@ -81,11 +83,8 @@
     "/bin",
     "/lib",
     "/oclif.manifest.json",
-    "/Gemfile",
-    "/Gemfile.lock",
     "/template",
-    "/README.md",
-    "/.bundle/config"
+    "/README.md"
   ],
   "homepage": "https://github.com/zenjoy/nimbu-toolbelt",
   "keywords": [
@@ -102,14 +101,14 @@
   },
   "repository": "zenjoy/nimbu-toolbelt",
   "scripts": {
-    "build": "rm -rf lib && rm -f tsconfig.tsbuildinfo && tsc -b",
+    "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc",
-    "postinstall": "bundle install",
+    "prepack": "yarn build",
     "test": "echo 'Not implemented yet...'",
     "version": "oclif readme && git add README.md",
-    "yalc:publish": "yalc publish --push"
+    "yalc:publish": "yarn build && yalc publish --push --no-script"
   },
   "gitHead": "e2b07c50f99f5bf9e0d166db35504ff466e59360"
 }

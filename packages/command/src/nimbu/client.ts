@@ -10,6 +10,34 @@ import { User } from './types'
 
 type HTTPVerbs = 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT'
 
+export interface ISimulatorPayload {
+  code: string
+  files?: Record<string, string>
+  path: string
+  request: {
+    body?: string
+    headers: string
+    method: string
+    query: string
+  }
+  session: string
+  version: string
+}
+
+export interface ISimulatorResponse {
+  body: string
+  encoding?: string
+  headers: Record<string, string>
+  status: number
+}
+
+export interface IAuthContext {
+  apiHost: string
+  apiUrl: string
+  site: string | undefined
+  token: string | undefined
+}
+
 export interface IOptions {
   auth?: string
   body?: object
@@ -100,6 +128,15 @@ export default class Client {
     return this.request<T>('GET', path, options)
   }
 
+  getAuthContext(): IAuthContext {
+    return {
+      apiHost: this.config.apiHost,
+      apiUrl: this.config.apiUrl,
+      site: this.config.site,
+      token: this.token,
+    }
+  }
+
   login(options: CredentialsOptions = {}) {
     return this.credentials.login(options)
   }
@@ -161,6 +198,12 @@ export default class Client {
         throw error
       }
     }
+  }
+
+  async simulatorRender(payload: ISimulatorPayload): Promise<ISimulatorResponse> {
+    return this.request<ISimulatorResponse>('POST', '/simulator/render', {
+      body: payload
+    })
   }
 
   async validateLogin(): Promise<boolean> {
