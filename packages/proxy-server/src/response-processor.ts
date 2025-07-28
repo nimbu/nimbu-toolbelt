@@ -124,7 +124,7 @@ export class ResponseProcessor {
       } catch (error) {
         // If base64 decoding fails, fall back to treating as plain text
         console.warn('Failed to decode base64 response body, sending as plain text:', error)
-        
+
         if (this.isBinaryContent(contentType) && typeof simulatorResponse.body === 'string') {
           // Convert string to buffer for binary content
           res.send(Buffer.from(simulatorResponse.body))
@@ -197,10 +197,26 @@ export class ResponseProcessor {
 
     for (const [name, value] of Object.entries(filteredHeaders)) {
       try {
-        res.set(name, value)
+        // Special handling for Set-Cookie headers that may contain newlines
+        if (name.toLowerCase() === 'set-cookie') {
+          // Split multiple cookies by newlines and set each as a separate header
+          const cookies = value.split('\n').filter((cookie) => cookie.trim())
+          if (cookies.length > 1) {
+            // Multiple cookies - use append to set multiple Set-Cookie headers
+            for (const cookie of cookies) {
+              res.append('Set-Cookie', cookie.trim())
+            }
+          } else {
+            // Single cookie - remove any potential newlines
+            res.set(name, value.replaceAll('\n', ''))
+          }
+        } else {
+          res.set(name, value)
+        }
       } catch (error) {
         // Skip invalid headers
         console.warn(`Failed to set header ${name}: ${error}`)
+        console.warn(` -> value: ${value}`)
       }
     }
   }
