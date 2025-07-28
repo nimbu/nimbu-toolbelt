@@ -37,3 +37,15 @@ node_modules/
 .yalc/
 **/.yalc/
 .claude/settings.local.json
+
+# Keep only selected subfolders (cache, plugins) in version control
+# Ignore other potentially large or machine-specific folders
+.yarn/*
+!.yarn/cache/
+!.yarn/patches/
+!.yarn/plugins/
+!.yarn/releases/
+!.yarn/sdks/
+!.yarn/versions/
+.yarn/install-state.gz
+.yarn/unplugged/
