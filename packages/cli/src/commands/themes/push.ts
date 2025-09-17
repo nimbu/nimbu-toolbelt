@@ -1,7 +1,7 @@
 import { Command } from '@nimbu-cli/command'
 import { Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
-import glob from 'fast-glob'
+import fg from 'fast-glob'
 import * as fs from 'fs-extra'
 import * as path from 'node:path'
 
@@ -179,7 +179,7 @@ export default class ThemesPush extends Command {
     } else {
       try {
         const pattern = path.join(this.nimbuConfig.projectPath, type, '**/*')
-        const allFiles = await glob(pattern, { dot: true, onlyFiles: true })
+        const allFiles = await fg(pattern, { dot: true, onlyFiles: true })
         files = allFiles.map((file) =>
           path.relative(path.join(this.nimbuConfig.projectPath, type), file),
         )
@@ -204,7 +204,7 @@ export default class ThemesPush extends Command {
         .map((file: string) => file.replace(`${type}/`, ''))
     } else {
       const pattern = path.join(this.nimbuConfig.projectPath, type, '**/*.liquid')
-      const allFiles = await glob(pattern, { onlyFiles: true })
+      const allFiles = await fg(pattern, { onlyFiles: true })
       files = allFiles.map((file) =>
         path.relative(path.join(this.nimbuConfig.projectPath, type), file),
       )
