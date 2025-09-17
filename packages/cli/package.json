@@ -47,7 +47,7 @@
     "tslib": "^2.6.2"
   },
   "devDependencies": {
-    "@oclif/test": "^2.3.8",
+    "@oclif/test": "2.3.32",
     "@types/debug": "^4.1.7",
     "@types/follow-redirects": "^1.13.1",
     "@types/glob": "^7.1.4",

@@ -2,12 +2,15 @@
 import { Interfaces } from '@oclif/core'
 import base from '@oclif/test'
 import { loadConfig } from '@oclif/test/lib/load-config'
+import { resolve as resolvePath } from 'node:path'
 import mockfs from 'mock-fs'
 import nock from 'nock'
 
 import { AbsPath, MockFSHelper } from './utils'
 
 export { expect } from '@oclif/test'
+
+const cliRoot = resolvePath(__dirname, '../..')
 
 export function nockActivate() {
   if (!nock.isActive()) {
@@ -50,7 +53,10 @@ export const test = base
   }))
   .register('command', (args: string | string[], opts: loadConfig.Options = {}) => ({
     async run(ctx: { config: Interfaces.Config; expectation: string; fs: any }) {
-      if (!ctx.config || opts.reset) ctx.config = (await loadConfig(opts).run({} as any)) as any
+      if (!ctx.config || opts.reset) {
+        const loadOpts = { ...opts, root: cliRoot }
+        ctx.config = (await loadConfig(loadOpts).run({} as any)) as any
+      }
       args = castArray(args)
       const [id, ...extra] = args
       ctx.expectation = ctx.expectation || `runs ${args.join(' ')}`

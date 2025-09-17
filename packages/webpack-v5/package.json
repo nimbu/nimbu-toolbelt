@@ -77,7 +77,7 @@
     "workbox-webpack-plugin": "^7.3.0"
   },
   "devDependencies": {
-    "@oclif/test": "^2.3.8",
+    "@oclif/test": "2.3.32",
     "@types/babel__core": "^7.1.2",
     "@types/chai": "^4.1.7",
     "@types/lodash": "^4.14.116",

@@ -51,7 +51,7 @@
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
-    "@oclif/test": "^2.3.8",
+    "@oclif/test": "2.3.32",
     "@types/babel__core": "^7.1.2",
     "@types/chai": "^4.1.7",
     "@types/glob": "^7.1.1",
