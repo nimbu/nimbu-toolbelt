@@ -60,7 +60,7 @@ ARGUMENTS
   PLUGIN  plugin to install
 
 OPTIONS
-  -f, --force    yarn install with force flag
+  -f, --force    pnpm install with force flag
   -h, --help     show CLI help
   -v, --verbose
 

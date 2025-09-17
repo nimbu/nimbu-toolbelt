@@ -3,7 +3,6 @@ import { Flags, ux } from '@oclif/core'
 import chalk from 'chalk'
 import glob from 'fast-glob'
 import * as fs from 'fs-extra'
-import { statSync } from 'node:fs'
 import * as path from 'node:path'
 
 interface PushOptions {
@@ -180,16 +179,10 @@ export default class ThemesPush extends Command {
     } else {
       try {
         const pattern = path.join(this.nimbuConfig.projectPath, type, '**/*')
-        const allFiles = await glob(pattern)
-        files = allFiles
-          .filter((file) => {
-            const filePath = typeof file === 'string' ? file : file.path
-            return !statSync(filePath).isDirectory()
-          })
-          .map((file) => {
-            const filePath = typeof file === 'string' ? file : file.path
-            return path.relative(path.join(this.nimbuConfig.projectPath, type), filePath)
-          })
+        const allFiles = await glob(pattern, { dot: true, onlyFiles: true })
+        files = allFiles.map((file) =>
+          path.relative(path.join(this.nimbuConfig.projectPath, type), file),
+        )
       } catch {
         files = []
       }
@@ -211,11 +204,10 @@ export default class ThemesPush extends Command {
         .map((file: string) => file.replace(`${type}/`, ''))
     } else {
       const pattern = path.join(this.nimbuConfig.projectPath, type, '**/*.liquid')
-      const allFiles = await glob(pattern)
-      files = allFiles.map((file) => {
-        const filePath = typeof file === 'string' ? file : file.path
-        return path.relative(path.join(this.nimbuConfig.projectPath, type), filePath)
-      })
+      const allFiles = await glob(pattern, { onlyFiles: true })
+      files = allFiles.map((file) =>
+        path.relative(path.join(this.nimbuConfig.projectPath, type), file),
+      )
     }
 
     for (const file of files) {

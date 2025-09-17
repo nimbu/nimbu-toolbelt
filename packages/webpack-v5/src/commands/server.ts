@@ -92,10 +92,10 @@ export default class Server extends Command {
         })
 
         if (!flags.nowebpack) {
-          await this.checkPort(flags.port)
+          await this.checkPort(flags.port ?? 4567)
           await this.startWebpackDevServer(
             flags.host ?? 'localhost',
-            flags.port,
+            flags.port ?? 4567,
             flags['nimbu-port'] ?? 4567,
             !flags.noopen,
             {
@@ -124,10 +124,10 @@ export default class Server extends Command {
           this.debug('Authentication validated successfully')
           this.debug(`Starting webpack dev server on port ${flags.port}`)
 
-          await this.checkPort(flags.port)
+          await this.checkPort(flags.port ?? 4567)
           await this.startWebpackDevServer(
             flags.host ?? 'localhost',
-            flags.port,
+            flags.port ?? 4567,
             flags['nimbu-port'] ?? 4567,
             !flags.noopen,
             {

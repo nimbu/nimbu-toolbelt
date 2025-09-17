@@ -5,6 +5,8 @@
 
 Toolbelt for Nimbu projects
 
+See [Repository Guidelines](./AGENTS.md) for contributor practices covering builds, testing, and review expectations.
+
 [![Version](https://img.shields.io/npm/v/nimbu-toolbelt.svg)](https://npmjs.org/package/nimbu-toolbelt)
 [![Downloads/week](https://img.shields.io/npm/dw/nimbu-toolbelt.svg)](https://npmjs.org/package/nimbu-toolbelt)
 [![License](https://img.shields.io/npm/l/nimbu-toolbelt.svg)](https://github.com/zenjoy/nimbu-toolbelt/blob/master/package.json)
@@ -81,10 +83,10 @@ Toolbelt for Nimbu projects
 
 ## Prerequisites
 
-You need a recent `node` and `yarn`. On Mac OS X:
+You need a recent `node` and `pnpm`. On Mac OS X:
 
 ```
-brew install node yarn
+brew install node pnpm
 ```
 
 ## Getting started
@@ -92,7 +94,7 @@ brew install node yarn
 Add this package to your project:
 
 ```
-yarn add --dev nimbu
+pnpm add -D nimbu
 ```
 
 ## Development server
@@ -100,7 +102,7 @@ yarn add --dev nimbu
 To start developing on your project that uses this toolbelt, just run:
 
 ```
-yarn nimbu server
+pnpm exec nimbu server
 ```
 
 This will start a `webpack-dev-server`. Your browser should automatically open a connection to it at `http://localhost:4567/`.
@@ -108,8 +110,8 @@ This will start a `webpack-dev-server`. Your browser should automatically open a
 ## Pushing to nimbu
 
 1. Stop your development server
-2. Make a production build with `yarn nimbu build`
-3. Push to nimbu with `yarn nimbu themes:push`
+2. Make a production build with `pnpm exec nimbu build`
+3. Push to nimbu with `pnpm exec nimbu themes:push`
 
 NOTE: Both the development and production webpack configuration generate
 `snippets/webpack.liquid` that gives access to the information about which files
@@ -764,10 +766,10 @@ ARGUMENTS
   PLUGIN  Plugin to install.
 
 FLAGS
-  -f, --force    Run yarn install with force flag.
+  -f, --force    Run pnpm install with force flag.
   -h, --help     Show CLI help.
-  -s, --silent   Silences yarn output.
-  -v, --verbose  Show verbose yarn output.
+  -s, --silent   Silences pnpm output.
+  -v, --verbose  Show verbose pnpm output.
 
 GLOBAL FLAGS
   --json  Format output as json.
@@ -833,10 +835,10 @@ ARGUMENTS
   PLUGIN  Plugin to install.
 
 FLAGS
-  -f, --force    Run yarn install with force flag.
+  -f, --force    Run pnpm install with force flag.
   -h, --help     Show CLI help.
-  -s, --silent   Silences yarn output.
-  -v, --verbose  Show verbose yarn output.
+  -s, --silent   Silences pnpm output.
+  -v, --verbose  Show verbose pnpm output.
 
 GLOBAL FLAGS
   --json  Format output as json.
@@ -1329,7 +1331,7 @@ The javascripts pipeline supports:
   ([Breaking changes from 1.x](http://coffeescript.org/#breaking-changes))
 - ES6 syntax with all features and polyfills that
   [create react app supports](https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md#supported-language-features-and-polyfills)
-- Optional TypeScript: run `yarn add --dev typescript ts-loader` to enable it
+- Optional TypeScript: run `pnpm add -D typescript ts-loader` to enable it
 
 There is one entrypoint `src/index.js` that gets compiled into `javascripts/app.js` and
 `javascripts/vendor.js` (split automatically).
@@ -1345,7 +1347,7 @@ The entrypoint is `src/index.scss`, but any (S)CSS you import in your javascript
 or coffeescript will also be included in the output.
 
 To import scss files from `node_modules`, use a `~` prefix. For example,
-to import bourbon that was added with `yarn add bourbon`:
+to import bourbon that was added with `pnpm add bourbon`:
 
 ```
 @import '~bourbon/core/bourbon';
@@ -1363,7 +1365,7 @@ development too. Start the development server with the following command to do
 that:
 
 ```
-EXTRACT_CSS=true yarn start
+EXTRACT_CSS=true pnpm run start
 ```
 
 ## Using the webpack output in your layout

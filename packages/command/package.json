@@ -56,10 +56,10 @@
   "scripts": {
     "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
     "lint": "eslint . --ext .ts --config .eslintrc",
-    "posttest": "yarn run lint",
-    "prepack": "yarn run build",
+    "posttest": "pnpm run lint",
+    "prepack": "pnpm run build",
     "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 10000",
-    "yalc:publish": "yarn build && yalc publish --push --no-script"
+    "yalc:publish": "pnpm run build && pnpm exec yalc publish --push --no-script"
   },
   "types": "./lib/index.d.ts",
   "gitHead": "f9d5b8f084e75a4aa8a29f9930f8da36a6ad258f"

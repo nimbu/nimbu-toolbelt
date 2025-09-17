@@ -16,8 +16,10 @@
     "@babel/plugin-transform-react-jsx": "^7.16.7",
     "@babel/preset-env": "^7.15.8",
     "@nimbu-cli/command": "^5.5.1",
+    "@oclif/core": "^3.18.1",
     "@nimbu-cli/proxy-server": "^1.0.0",
     "@nuxt/friendly-errors-webpack-plugin": "^2.5.2",
+    "chalk": "^4.1.2",
     "@svgr/webpack": "^5.5.0",
     "autoprefixer": "^9.8.8",
     "babel-loader": "^8.2.3",
@@ -32,6 +34,7 @@
     "coffeescript": "^2.1.1",
     "core-js": "^3.2.1",
     "css-loader": "^6.5.1",
+    "debug": "^4.3.6",
     "css-minimizer-webpack-plugin": "^3.2.0",
     "detect-port": "^1.2.0",
     "dotenv": "^10.0.0",
@@ -126,13 +129,10 @@
     "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc",
-    "prepack": "yarn build",
+    "prepack": "pnpm run build",
     "test": "mocha --require ts-node/register 'test/**/*.test.ts'",
     "version": "oclif readme && git add README.md",
-    "yalc:publish": "yarn build && yalc publish --push --no-script"
+    "yalc:publish": "pnpm run build && pnpm exec yalc publish --push --no-script"
   },
-  "gitHead": "e2b07c50f99f5bf9e0d166db35504ff466e59360",
-  "resolutions": {
-    "fork-ts-checker-webpack-plugin": "9.1.0"
-  }
+  "gitHead": "e2b07c50f99f5bf9e0d166db35504ff466e59360"
 }

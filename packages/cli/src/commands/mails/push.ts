@@ -1,4 +1,3 @@
-/* eslint-disable import/namespace */
 import { APIError, Command } from '@nimbu-cli/command'
 import { Flags, ux } from '@oclif/core'
 import chalk from 'chalk'

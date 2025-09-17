@@ -1,4 +1,3 @@
-/* eslint-disable import/namespace */
 import debugGlobal from 'debug'
 import { http, https } from 'follow-redirects'
 import * as fs from 'fs-extra'

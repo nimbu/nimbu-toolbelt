@@ -68,6 +68,16 @@ export const appSrc = resolveApp('src')
 export const appTsConfig = resolveApp('tsconfig.json')
 export const appJsConfig = resolveApp('jsconfig.json')
 export const yarnLockFile = resolveApp('yarn.lock')
+export const pnpmLockFile = resolveApp('pnpm-lock.yaml')
+export const packageManager = (() => {
+  if (fs.existsSync(pnpmLockFile)) {
+    return 'pnpm'
+  }
+  if (fs.existsSync(yarnLockFile)) {
+    return 'yarn'
+  }
+  return 'npm'
+})()
 export const testsSetup = resolveModule(resolveApp, 'src/setupTests')
 export const proxySetup = resolveApp('src/setupProxy.js')
 export const appNodeModules = resolveApp('node_modules')

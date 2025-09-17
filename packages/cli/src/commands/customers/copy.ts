@@ -613,12 +613,12 @@ export default class CopyCustomers extends Command {
     ctx.nbEntries = sum(counts)
 
     // halt further execution if the first query does not result in any entries to copy
-    if (ctx.nbEntries === 0 && queryFromCtx != null) {
+    if ((ctx.nbEntries ?? 0) === 0 && queryFromCtx != null) {
       ux.error('Please specify a query that returns customers to copy...')
     }
 
     let nbPages = 1
-    if (ctx.nbEntries > 0) {
+    if ((ctx.nbEntries ?? 0) > 0) {
       nbPages = sum(counts.map((count) => Math.floor(count / perPage) + 1))
     }
 
