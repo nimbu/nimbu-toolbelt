@@ -1,4 +1,3 @@
-//import { expect } from '@oclif/test'
 import test from '../../helpers/setup'
 import { matches } from 'lodash'
 import { destinations, countries, journeys } from './fixtures'

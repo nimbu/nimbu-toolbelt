@@ -54,6 +54,7 @@
     "@types/mock-fs": "^4.13.1",
     "@types/nock": "^11.1.0",
     "chai": "^4.4.1",
+    "fancy-test": "^2.0.42",
     "mock-fs": "^4.8.0",
     "mocha": "^10.7.3",
     "nock": "^13.5.4"
