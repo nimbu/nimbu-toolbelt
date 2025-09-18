@@ -784,7 +784,7 @@ export default class CopyChannelEntries extends Command {
 
     // halt further execution if the first query does not result in any entries to copy
     if (
-      ctx.nbEntries === 0 &&
+      (ctx.nbEntries ?? 0) === 0 &&
       queryFromCtx != null &&
       (ctx.fromChannelOriginal == null || ctx.fromChannelOriginal === ctx.fromChannel)
     ) {
@@ -792,7 +792,7 @@ export default class CopyChannelEntries extends Command {
     }
 
     let nbPages = 1
-    if (ctx.nbEntries > 0) {
+    if ((ctx.nbEntries ?? 0) > 0) {
       nbPages = sum(counts.map((count) => Math.floor(count / perPage) + 1))
     }
 

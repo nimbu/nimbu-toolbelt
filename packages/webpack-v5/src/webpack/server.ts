@@ -51,13 +51,14 @@ export default class WebpackDevServer {
     const createDevServerConfig = require('../config/webpack-dev-server.config.js')
     // const getClientEnvironment = require('../config/env')
 
-    const useYarn = fs.existsSync(paths.yarnLockFile)
     const isInteractive = process.stdout.isTTY
 
     // We require that you explicitly set browsers and do not fall back to
     // browserslist defaults.
     const { checkBrowsers } = require('react-dev-utils/browsersHelper')
-    await checkBrowsers(paths.appPath, isInteractive)
+    const { PROJECT_DIRECTORY, appPath, appTsConfig, packageManager, publicUrlOrPath } = paths
+
+    await checkBrowsers(appPath, isInteractive)
 
     // Find a port to run
     const port = await choosePort(host, defaultPort)
@@ -68,10 +69,10 @@ export default class WebpackDevServer {
 
     debug(`Port ${port} is available`)
 
-    const appName = require(path.resolve(paths.PROJECT_DIRECTORY, 'package.json')).name
-    const useTypeScript = fs.existsSync(paths.appTsConfig)
+    const appName = require(path.resolve(PROJECT_DIRECTORY, 'package.json')).name
+    const useTypeScript = fs.existsSync(appTsConfig)
 
-    const urls = prepareUrls(protocol, host, port, paths.publicUrlOrPath.slice(0, -1))
+    const urls = prepareUrls(protocol, host, port, publicUrlOrPath.slice(0, -1))
 
     // Get the custom config for each project
     debug('Getting project config')
@@ -82,9 +83,9 @@ export default class WebpackDevServer {
     const compiler = createCompiler({
       appName,
       config,
+      packageManager,
       urls,
       useTypeScript,
-      useYarn,
       webpack,
     })
 

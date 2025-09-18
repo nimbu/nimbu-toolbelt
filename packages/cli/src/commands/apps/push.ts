@@ -119,7 +119,7 @@ export default class AppsPush extends Command {
       const namesWithCode = {}
       const filenamesWithCode = {}
 
-      for (const filename of this._files) {
+      for (const filename of this._files ?? []) {
         const { code, name } = await this.getCode(filename)
         graph.addNode(name)
         names.push(name)
@@ -130,7 +130,7 @@ export default class AppsPush extends Command {
         filenamesWithCode[name] = filename
       }
 
-      for (const filename of this._files) {
+      for (const filename of this._files ?? []) {
         const { code: codeWithComments, name } = namesWithCode[filename]
         // strip comments as there can be references to files in comments which are not in a loop
         const code = codeWithComments.replaceAll(/\/\*[\S\s]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '')

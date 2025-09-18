@@ -1,4 +1,3 @@
-/* eslint-disable import/namespace */
 import { Command, APITypes as Nimbu, color } from '@nimbu-cli/command'
 import { Flags, ux } from '@oclif/core'
 import * as fs from 'fs-extra'

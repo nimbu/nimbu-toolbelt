@@ -8,6 +8,7 @@
     "eslint-config-oclif-typescript": "^3",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "12.0.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
@@ -41,8 +42,11 @@
     "publish": "lerna run build && lerna publish from-package",
     "yalc:publish": "lerna run yalc:publish"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "packageManager": "pnpm@10.13.1",
+  "pnpm": {
+    "overrides": {
+      "fork-ts-checker-webpack-plugin": "9.1.0"
+    }
+  },
   "license": "MIT"
 }
