@@ -45,7 +45,7 @@ To start developing on your project that uses this toolbelt, just run:
 pnpm exec nimbu server
 ```
 
-This will start a `webpack-dev-server`. Your browser should automatically open a connection to it at `http://localhost:4567/`.
+This will start the active bundler plugin. With the default webpack plugin you get the familiar `webpack-dev-server` on `http://localhost:4567/`. When the optional `@nimbu-cli/plugin-vite` is installed, the proxy continues to run on `http://localhost:4567/` while Vite serves assets from `http://localhost:5173/`.
 
 ## Pushing to nimbu
 
@@ -53,10 +53,11 @@ This will start a `webpack-dev-server`. Your browser should automatically open a
 2. Make a production build with `pnpm exec nimbu build`
 3. Push to nimbu with `pnpm exec nimbu themes:push`
 
-NOTE: Both the development and production webpack configuration generate
-`snippets/webpack.liquid` that gives access to the information about which files
-webpack generated. This should be included and used in the layout of your theme.
-Make sure that include is there and that you push the snippet to nimbu!
+NOTE: Webpack generates `snippets/webpack.liquid` (and entry-specific
+`snippets/webpack_<entry>.liquid`) while the Vite plugin generates
+`snippets/vite.liquid` plus `snippets/vite_<entry>.liquid`. These snippets give
+access to information about which files were produced and should be included in
+your layout and pushed along with the rest of the theme.
 
 # Commands
 
@@ -89,7 +90,7 @@ Make sure that include is there and that you push the snippet to nimbu!
 
 # Features
 
-Webpack is configured to support the features below.
+Webpack is configured to support the features below. If you opt into the Vite plugin the same snippet contract applies, with assets emitted via Vite while keeping stable filenames.
 
 ## Coffeescript/Javascript
 
@@ -160,4 +161,19 @@ For example, you can use this snippet of liquid in your layout:
 {% for chunk in webpack_chunks, cache: webpack_build_timestamp %}
 {{ webpack_js[chunk] | javascript_tag }}
 {% endfor %}
+
+When using the Vite plugin, include `vite` snippets instead:
+
+```
+{% include 'vite' %}
+{% for chunk in vite_chunks, cache: vite_build_timestamp %}
+{% for file in vite_css[chunk] %}
+{{ file | stylesheet_tag }}
+{% endfor %}
+{% endfor %}
+
+{% for chunk in vite_chunks, cache: vite_build_timestamp %}
+{{ vite_js[chunk] | javascript_tag }}
+{% endfor %}
+```
 ```
