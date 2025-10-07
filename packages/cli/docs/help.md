@@ -1,23 +1,26 @@
 `nimbu help`
 ============
 
-display help for nimbu
+Display help for nimbu.
 
 * [`nimbu help [COMMAND]`](#nimbu-help-command)
 
 ## `nimbu help [COMMAND]`
 
-display help for nimbu
+Display help for nimbu.
 
 ```
 USAGE
-  $ nimbu help [COMMAND]
+  $ nimbu help [COMMAND] [-n]
 
 ARGUMENTS
-  COMMAND  command to show help for
+  COMMAND  Command to show help for.
 
-OPTIONS
-  --all  see all commands in CLI
+FLAGS
+  -n, --nested-commands  Include all nested commands in the output.
+
+DESCRIPTION
+  Display help for nimbu.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.33/src/commands/help.ts)_

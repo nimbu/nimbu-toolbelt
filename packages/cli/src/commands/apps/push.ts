@@ -5,8 +5,9 @@ import {
   IValidationError,
   APITypes as Nimbu,
   isValidationError,
+  ux,
 } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { readFile } from 'fs-extra'
 import { intersection } from 'lodash'

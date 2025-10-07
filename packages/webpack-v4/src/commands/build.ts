@@ -1,5 +1,4 @@
-import { Command, buildConfig } from '@nimbu-cli/command'
-import { ux } from '@oclif/core'
+import { Command, buildConfig, ux } from '@nimbu-cli/command'
 
 import defaultWebpackConfig = require('../config/webpack.prod')
 import projectWebpack = require('../config/webpack.project')

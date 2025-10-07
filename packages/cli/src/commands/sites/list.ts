@@ -1,5 +1,5 @@
-import { Command, APITypes as Nimbu, color } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { Command, APITypes as Nimbu, type TableColumns, color, ux } from '@nimbu-cli/command'
+import { Flags } from '@oclif/core'
 import { orderBy } from 'lodash'
 
 export default class SitesList extends Command {
@@ -28,7 +28,7 @@ export default class SitesList extends Command {
       this.log('\nYou have access to following sites:\n')
 
       sites = orderBy(sites, [(site) => site.name.toLowerCase()], ['asc'])
-      const columns: ux.Table.table.Columns<Nimbu.Site> = {
+      const columns: TableColumns<Nimbu.Site> = {
         name: {
           get: (row) => (row.name.length > 30 ? row.name.slice(0, 40).trim() + '...' : row.name),
           header: 'Site Name',

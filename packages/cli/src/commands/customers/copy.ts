@@ -1,5 +1,5 @@
-import { APIError, APIOptions, Command, APITypes as Nimbu, color } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { APIError, APIOptions, Command, APITypes as Nimbu, type TableColumns, color, ux } from '@nimbu-cli/command'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
 import { chunk, cloneDeep, sum } from 'lodash'
@@ -509,7 +509,7 @@ export default class CopyCustomers extends Command {
       const supports = require('supports-hyperlinks')
       const hyperlinker = require('hyperlinker')
 
-      const columns: ux.Table.table.Columns<Customer> = {
+      const columns: TableColumns<Customer> = {
         email: {
           get: (row) => row.email,
           header: 'Email',

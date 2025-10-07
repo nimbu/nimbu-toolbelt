@@ -1,30 +1,35 @@
 `nimbu commands`
 ================
 
-list all the commands
+List all nimbu commands.
 
 * [`nimbu commands`](#nimbu-commands)
 
 ## `nimbu commands`
 
-list all the commands
+List all nimbu commands.
 
 ```
 USAGE
-  $ nimbu commands
+  $ nimbu commands [--json] [-c id|plugin|summary|type | --tree] [--deprecated] [-x | ] [--hidden]
+    [--no-truncate | ] [--sort id|plugin|summary|type | ]
 
-OPTIONS
-  -h, --help              show CLI help
-  -j, --json              display unfiltered api data in json format
-  -x, --extended          show extra columns
-  --columns=columns       only show provided columns (comma-separated)
-  --csv                   output is csv format [alias: --output=csv]
-  --filter=filter         filter property by partial string matching, ex: name=foo
-  --hidden                show hidden commands
-  --no-header             hide table header from output
-  --no-truncate           do not truncate output to fit screen
-  --output=csv|json|yaml  output in a more machine friendly format
-  --sort=sort             property to sort by (prepend '-' for descending)
+FLAGS
+  -c, --columns=<option>...  Only show provided columns (comma-separated).
+                             <options: id|plugin|summary|type>
+  -x, --extended             Show extra columns.
+      --deprecated           Show deprecated commands.
+      --hidden               Show hidden commands.
+      --no-truncate          Do not truncate output.
+      --sort=<option>        [default: id] Property to sort by.
+                             <options: id|plugin|summary|type>
+      --tree                 Show tree of commands.
+
+GLOBAL FLAGS
+  --json  Format output as json.
+
+DESCRIPTION
+  List all nimbu commands.
 ```
 
-_See code: [@oclif/plugin-commands](https://github.com/oclif/plugin-commands/blob/v1.3.0/src/commands/commands.ts)_
+_See code: [@oclif/plugin-commands](https://github.com/oclif/plugin-commands/blob/v4.1.33/src/commands/commands.ts)_

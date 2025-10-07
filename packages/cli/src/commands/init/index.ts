@@ -1,5 +1,5 @@
-import { Command, APITypes as Nimbu, color } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { Command, APITypes as Nimbu, color, ux } from '@nimbu-cli/command'
+import { Flags } from '@oclif/core'
 import * as fs from 'fs-extra'
 import inquirer from 'inquirer'
 import { orderBy } from 'lodash'

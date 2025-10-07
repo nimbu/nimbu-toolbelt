@@ -1,5 +1,5 @@
-import { APIError, APIOptions, Command } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { APIError, APIOptions, Command, ux } from '@nimbu-cli/command'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import inquirer from 'inquirer'
 import Listr from 'listr'

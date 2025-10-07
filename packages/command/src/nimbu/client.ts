@@ -1,9 +1,10 @@
 /* eslint-disable import/no-named-as-default */
 
-import { Errors, Interfaces, ux } from '@oclif/core'
+import { Errors, Interfaces } from '@oclif/core'
 import Netrc from 'netrc-parser'
 import Nimbu, { HTTPError } from 'nimbu-client'
 
+import { ux } from '../ux'
 import { Config } from './config'
 import { Credentials, CredentialsOptions } from './credentials'
 import { User } from './types'

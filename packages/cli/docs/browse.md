@@ -13,9 +13,12 @@ open the admin area for your current site
 ```
 USAGE
   $ nimbu browse:admin
+
+DESCRIPTION
+  open the admin area for your current site
 ```
 
-_See code: [lib/commands/browse/admin.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/browse/admin.js)_
+_See code: [lib/commands/browse/admin.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/browse/admin.js)_
 
 ## `nimbu browse:simulator`
 
@@ -24,6 +27,9 @@ open the simulator for your current site
 ```
 USAGE
   $ nimbu browse:simulator
+
+DESCRIPTION
+  open the simulator for your current site
 ```
 
-_See code: [lib/commands/browse/simulator.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/browse/simulator.js)_
+_See code: [lib/commands/browse/simulator.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/browse/simulator.js)_

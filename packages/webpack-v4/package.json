@@ -1,6 +1,6 @@
 {
   "name": "@nimbu-cli/plugin-webpack-v4",
-  "version": "5.5.0",
+  "version": "6.0.0",
   "author": "Zenjoy Engineering",
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "main": "lib/index.js",
@@ -12,11 +12,10 @@
     "@babel/plugin-proposal-optional-chaining": "^7.16.7",
     "@babel/plugin-proposal-private-methods": "^7.16.7",
     "@babel/plugin-proposal-private-property-in-object": "^7.16.7",
-    "@oclif/core": "^3.18.1",
+    "@oclif/core": "^4.5.3",
     "@babel/preset-env": "^7.16.7",
-    "@nimbu-cli/command": "^5.5.0",
-    "@nimbu-cli/proxy-server": "^1.0.0",
-    "@oclif/core": "^3.18.1",
+    "@nimbu-cli/command": "workspace:^6.0.0",
+    "@nimbu-cli/proxy-server": "workspace:^6.0.0",
     "autoprefixer": "^9.8.8",
     "chalk": "^4.1.2",
     "babel-loader": "^8.2.3",
@@ -34,7 +33,7 @@
     "html-webpack-plugin": "^4.5.0",
     "loader-utils": "^1.1.0",
     "mini-css-extract-plugin": "^1.6.2",
-    "nimbu": "^5.4.0",
+    "nimbu": "workspace:^6.0.0",
     "node-fetch": "^2.2.0",
     "postcss-flexbugs-fixes": "^4.1.0",
     "postcss-loader": "^3.0.0",
@@ -51,13 +50,13 @@
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
-    "@oclif/test": "2.3.32",
+    "@oclif/test": "^4.1.14",
     "@types/babel__core": "^7.1.2",
     "@types/chai": "^4.1.7",
     "@types/glob": "^7.1.1",
     "@types/lodash": "^4.14.116",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^16",
+    "@types/node": "^20",
     "@types/node-fetch": "^2.1.2",
     "@types/webpack": "^4.41.32",
     "@types/webpack-dev-server": "^3.11.2",
@@ -80,7 +79,7 @@
     "unionfs": "^4.2.0"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "files": [
     "/bin",

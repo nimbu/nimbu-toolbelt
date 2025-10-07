@@ -1,4 +1,4 @@
-import { ux } from '@oclif/core'
+import { ux } from '@nimbu-cli/command'
 import chalk from 'chalk'
 
 export function convertChangesToTree(fields, tree?) {

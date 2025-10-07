@@ -382,24 +382,12 @@
           "multiple": false,
           "type": "option"
         },
-        "csv": {
-          "description": "output is csv format [alias: --output=csv]",
-          "exclusive": [
-            "no-truncate"
-          ],
-          "name": "csv",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "extended": {
-          "char": "x",
-          "description": "show extra columns",
-          "exclusive": [
-            "columns"
-          ],
-          "name": "extended",
-          "allowNo": false,
-          "type": "boolean"
+        "sort": {
+          "description": "property to sort by (prepend '-' for descending)",
+          "name": "sort",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         },
         "filter": {
           "description": "filter property by partial string matching, ex: name=foo",
@@ -408,21 +396,12 @@
           "multiple": false,
           "type": "option"
         },
-        "no-header": {
-          "description": "hide table header from output",
+        "csv": {
+          "description": "output is csv format [alias: --output=csv]",
           "exclusive": [
-            "csv"
+            "no-truncate"
           ],
-          "name": "no-header",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "no-truncate": {
-          "description": "do not truncate output to fit screen",
-          "exclusive": [
-            "csv"
-          ],
-          "name": "no-truncate",
+          "name": "csv",
           "allowNo": false,
           "type": "boolean"
         },
@@ -443,12 +422,33 @@
           ],
           "type": "option"
         },
-        "sort": {
-          "description": "property to sort by (prepend '-' for descending)",
-          "name": "sort",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
+        "extended": {
+          "char": "x",
+          "description": "show extra columns",
+          "exclusive": [
+            "columns"
+          ],
+          "name": "extended",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "no-truncate": {
+          "description": "do not truncate output to fit screen",
+          "exclusive": [
+            "csv"
+          ],
+          "name": "no-truncate",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "no-header": {
+          "description": "hide table header from output",
+          "exclusive": [
+            "csv"
+          ],
+          "name": "no-header",
+          "allowNo": false,
+          "type": "boolean"
         }
       },
       "hasDynamicHelp": false,
@@ -464,6 +464,93 @@
         "commands",
         "channels",
         "info.js"
+      ]
+    },
+    "customers:copy": {
+      "aliases": [],
+      "args": {},
+      "description": "copy customers from one to another",
+      "flags": {
+        "allow-errors": {
+          "description": "do not stop when an item fails and continue with the other",
+          "name": "allow-errors",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from": {
+          "char": "f",
+          "description": "the source site",
+          "name": "from",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "password-length": {
+          "char": "l",
+          "description": "length of the password generated for each new customer",
+          "name": "password-length",
+          "default": 12,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "per-page": {
+          "char": "p",
+          "description": "number of customers to fetch per page",
+          "name": "per-page",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "query": {
+          "char": "q",
+          "description": "query params to append to source customer api call",
+          "name": "query",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "the target site",
+          "name": "to",
+          "required": true,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "upsert": {
+          "char": "u",
+          "description": "name of parameter to use for matching existing customers",
+          "name": "upsert",
+          "default": "email",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "where": {
+          "char": "w",
+          "description": "query expression to filter the the source customer api call",
+          "name": "where",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "customers:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "customers",
+        "copy.js"
       ]
     },
     "init": {
@@ -568,93 +655,6 @@
         "commands",
         "mails",
         "push.js"
-      ]
-    },
-    "customers:copy": {
-      "aliases": [],
-      "args": {},
-      "description": "copy customers from one to another",
-      "flags": {
-        "allow-errors": {
-          "description": "do not stop when an item fails and continue with the other",
-          "name": "allow-errors",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "from": {
-          "char": "f",
-          "description": "the source site",
-          "name": "from",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "password-length": {
-          "char": "l",
-          "description": "length of the password generated for each new customer",
-          "name": "password-length",
-          "default": 12,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "per-page": {
-          "char": "p",
-          "description": "number of customers to fetch per page",
-          "name": "per-page",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "query": {
-          "char": "q",
-          "description": "query params to append to source customer api call",
-          "name": "query",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "to": {
-          "char": "t",
-          "description": "the target site",
-          "name": "to",
-          "required": true,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "upsert": {
-          "char": "u",
-          "description": "name of parameter to use for matching existing customers",
-          "name": "upsert",
-          "default": "email",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "where": {
-          "char": "w",
-          "description": "query expression to filter the the source customer api call",
-          "name": "where",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "customers:copy",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "customers",
-        "copy.js"
       ]
     },
     "menus:copy": {
@@ -1459,5 +1459,5 @@
       ]
     }
   },
-  "version": "5.5.0"
+  "version": "6.0.0"
 }

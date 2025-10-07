@@ -11,14 +11,17 @@ copy menus from one site to another
 
 ```
 USAGE
-  $ nimbu menus:copy [SLUG]
+  $ nimbu menus:copy [SLUG] [-f <value>] [-t <value>]
 
 ARGUMENTS
   SLUG  permalink of menu to be copied
 
-OPTIONS
-  -f, --from=from  subdomain of the source site
-  -t, --to=to      subdomain of the destination site
+FLAGS
+  -f, --from=<value>  subdomain of the source site
+  -t, --to=<value>    subdomain of the destination site
+
+DESCRIPTION
+  copy menus from one site to another
 ```
 
-_See code: [lib/commands/menus/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/menus/copy.js)_
+_See code: [lib/commands/menus/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/menus/copy.js)_

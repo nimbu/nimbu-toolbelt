@@ -1,5 +1,5 @@
-import { APIError, Command } from '@nimbu-cli/command'
-import { Args, Flags, ux } from '@oclif/core'
+import { APIError, Command, ux } from '@nimbu-cli/command'
+import { Args, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import { Observable } from 'rxjs'
 

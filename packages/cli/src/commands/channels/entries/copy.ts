@@ -1,5 +1,5 @@
-import { APIError, APIOptions, Command, APITypes as Nimbu } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { APIError, APIOptions, Command, APITypes as Nimbu, ux } from '@nimbu-cli/command'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
 import { chunk, cloneDeep, compact, flatten, intersection, sum, uniq } from 'lodash'

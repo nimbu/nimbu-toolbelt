@@ -12,6 +12,9 @@ Show resolved configuration
 ```
 USAGE
   $ nimbu config
+
+DESCRIPTION
+  Show resolved configuration
 ```
 
-_See code: [lib/commands/config.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/config.js)_
+_See code: [lib/commands/config.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/config.js)_

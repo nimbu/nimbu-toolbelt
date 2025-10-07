@@ -1,10 +1,11 @@
-import { Interfaces, ux } from '@oclif/core'
+import { Interfaces } from '@oclif/core'
 import { pathExistsSync, readFileSync } from 'fs-extra'
 import { default as Netrc } from 'netrc-parser'
 import { HTTPError, default as Nimbu } from 'nimbu-client'
 import * as os from 'node:os'
 import urlencode from 'urlencode'
 
+import { ux } from '../ux'
 import { APIError, default as Client } from './client'
 
 const debug = require('debug')('nimbu')
@@ -144,8 +145,9 @@ export class Credentials {
 
   private async interactive(login?: string, expiresIn?: number): Promise<NetrcEntry> {
     process.stderr.write('nimbu: Please enter your login credentials\n')
-    login = await ux.prompt('Email or username', { default: login })
-    const password = await ux.prompt('Password', { type: 'hide' })
+    const loginPromptOptions = login ? { default: login } : undefined
+    login = (await ux.prompt('Email or username', loginPromptOptions)) as string
+    const password = (await ux.prompt('Password', { type: 'hide' })) as string
 
     let auth
     try {
@@ -153,7 +155,7 @@ export class Credentials {
     } catch (error) {
       if (error instanceof HTTPError && (!error.body || error.body.code !== 210)) throw error
 
-      const secondFactor = await ux.prompt('Two-factor code', { type: 'mask' })
+      const secondFactor = (await ux.prompt('Two-factor code', { type: 'mask' })) as string
       auth = await this.createOAuthToken(login, password, { expiresIn, secondFactor })
     }
 

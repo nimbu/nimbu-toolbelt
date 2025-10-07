@@ -1,5 +1,5 @@
-import { Command } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { Command, ux } from '@nimbu-cli/command'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
 import * as pathFinder from 'node:path'
