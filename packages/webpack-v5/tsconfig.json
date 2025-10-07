@@ -5,12 +5,16 @@
       "outDir": "./lib",
       "rootDir": "./src",
       "paths": {
-          "nimbu": ["../cli"]
+          "nimbu": ["../cli"],
+          "@nimbu-cli/command": ["../command"]
       },
   },
   "references": [
       {
           "path": "../cli"
+      },
+      {
+          "path": "../command"
       }
   ],
   "include": [

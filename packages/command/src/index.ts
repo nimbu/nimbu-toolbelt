@@ -8,7 +8,6 @@ import * as flags from './flags'
 import * as completions from './flags/completions'
 import APIClient, { APIError, IOptions, IValidationError, isValidationError } from './nimbu/client'
 import * as APITypes from './nimbu/types'
-
 export type APIOptions = IOptions
 
 export { displayNimbuHeader } from './nimbu/ascii-art'
@@ -27,4 +26,6 @@ export {
   isValidationError,
   paths,
 }
+export { ux } from './ux'
+export type { TableColumns } from './ux'
 export default Command

@@ -1,7 +1,8 @@
-import { Command, APITypes as Nimbu } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { Command, APITypes as Nimbu, ux } from '@nimbu-cli/command'
+import { Flags } from '@oclif/core'
 import * as fs from 'fs-extra'
 import yaml from 'js-yaml'
+import { Listr } from 'listr2'
 
 export default class PullMails extends Command {
   static description = 'download all notification templates'
@@ -16,7 +17,6 @@ export default class PullMails extends Command {
   }
 
   async execute() {
-    const Listr = require('listr')
 
     const { flags } = await this.parse(PullMails)
 
@@ -26,6 +26,9 @@ export default class PullMails extends Command {
         title: 'Fetching notifications',
       },
       {
+        rendererOptions: {
+          persistentOutput: true,
+        },
         task: (ctx) => this.writeAll(ctx, flags),
         title: 'Writing all templates to disk',
       },

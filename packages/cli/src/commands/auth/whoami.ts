@@ -1,4 +1,4 @@
-import { Command, HTTPError, APITypes as Nimbu, color } from '@nimbu-cli/command'
+import { APIError, Command, HTTPError, APITypes as Nimbu, color } from '@nimbu-cli/command'
 
 export default class Whoami extends Command {
   static aliases = ['whoami']
@@ -17,6 +17,10 @@ export default class Whoami extends Command {
     } catch (error) {
       if (error instanceof HTTPError) {
         if (error.statusCode === 401) this.notloggedin()
+        else throw error
+      } else if (error instanceof APIError) {
+        if (error.http.statusCode === 401) this.notloggedin()
+        else throw error
       } else {
         throw error
       }

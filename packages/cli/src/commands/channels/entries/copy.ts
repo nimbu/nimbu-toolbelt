@@ -1,7 +1,8 @@
-import { APIError, APIOptions, Command, APITypes as Nimbu } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { APIError, APIOptions, Command, APITypes as Nimbu, ux } from '@nimbu-cli/command'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
+import { Listr } from 'listr2'
 import { chunk, cloneDeep, compact, flatten, intersection, sum, uniq } from 'lodash'
 import { Observable } from 'rxjs'
 
@@ -53,6 +54,7 @@ type CopySingle = {
 
 type CopySingleRecursive = {
   channels: Channel[]
+  dryRun?: boolean
   fromChannel: string
   fromSite: string
   only?: string
@@ -142,13 +144,11 @@ export default class CopyChannelEntries extends Command {
   }
 
   async executeRecursiveCopy() {
-    const Listr = require('listr')
-    const ListrMultilineRenderer = require('listr-multiline-renderer')
     const { flags } = await this.parse(CopyChannelEntries)
 
     const { fromChannel, fromSite, toChannel, toSite } = await this.getFromTo()
 
-    const tasks = new Listr(
+    const tasks = new Listr<any>(
       [
         {
           task: (ctx: CopySingleRecursive) => this.fetchAllChannels(ctx),
@@ -156,25 +156,32 @@ export default class CopyChannelEntries extends Command {
         },
         {
           enabled: (ctx: CopySingleRecursive) => ctx.query != null || ctx.where != null,
-          task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
+          rendererOptions: {
+            persistentOutput: true,
+          },
+          task: (ctx, task) => this.queryChannel(ctx, task),
           title: `Fetching which entries to copy from ${chalk.bold(fromChannel)}`,
         },
         {
           enabled: (ctx: CopySingleRecursive) => ctx.channels != null && ctx.channels.length > 0,
           task: (ctx: CopySingleRecursive, _task) =>
-            new Listr(
+            new Listr<any>(
               ctx.channels.map((channel) => ({
                 task: (ctx, _task) => {
-                  ctx.fromChannel = channel.slug
-                  ctx.toChannel = channel.slug
+                  const channelCtx = ctx as CopySingle
+                  channelCtx.fromChannel = channel.slug
+                  channelCtx.toChannel = channel.slug
 
-                  return new Listr(
+                  return new Listr<any>(
                     [
                       {
                         task: (ctx: CopySingle) => this.fetchChannel(ctx),
                         title: `Fetching detailed channel information for ${chalk.bold(channel.slug)}`,
                       },
                       {
+                        rendererOptions: {
+                          persistentOutput: true,
+                        },
                         task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
                         title: `Querying channel entries`,
                       },
@@ -188,35 +195,58 @@ export default class CopyChannelEntries extends Command {
                         enabled: (ctx: CopySingle) =>
                           (ctx.fileFields && ctx.fileFields.length > 0) ||
                           (ctx.galleryFields && ctx.galleryFields.length > 0),
+                        rendererOptions: {
+                          persistentOutput: true,
+                        },
                         task: (ctx: CopySingle) => this.downloadAttachments(ctx),
                         title: `Downloading attachments`,
                       },
                       {
+                        rendererOptions: {
+                          persistentOutput: true,
+                        },
                         skip: (ctx: CopySingle) => {
                           if (ctx.entries.length === 0) return true
                           if (ctx.dryRun) return this.generateDryRun(ctx)
+
+                          return false
                         },
                         task: (ctx: CopySingle) => this.createEntries(ctx),
                         title: `Creating entries in site ${chalk.bold(toSite)}`,
                       },
                       {
                         enabled: (ctx: CopySingle) => ctx.selfReferences && ctx.selfReferences.length > 0,
+                        rendererOptions: {
+                          persistentOutput: true,
+                        },
                         skip: (ctx) => ctx.dryRun,
                         task: (ctx: CopySingle) => this.updateEntries(ctx),
                         title: `Updating self-references`,
                       },
                     ],
-                    { collapse: false, renderer: ListrMultilineRenderer },
+                    {
+                      rendererOptions: {
+                        collapseSubtasks: false,
+                      },
+                    },
                   )
                 },
                 title: `Copying ${chalk.bold(channel.name)} (${channel.slug})`,
               })),
-              { collapse: false, renderer: ListrMultilineRenderer },
+              {
+                rendererOptions: {
+                  collapseSubtasks: false,
+                },
+              },
             ),
           title: `Copying related channel entries to site ${chalk.bold(toSite)}`,
         },
       ],
-      { collapse: false, renderer: ListrMultilineRenderer },
+      {
+        rendererOptions: {
+          collapseSubtasks: false,
+        },
+      },
     )
 
     await tasks
@@ -239,44 +269,60 @@ export default class CopyChannelEntries extends Command {
   }
 
   async executeSingleCopy(channel?: string) {
-    const Listr = require('listr')
-    const ListrMultilineRenderer = require('listr-multiline-renderer')
     const { flags } = await this.parse(CopyChannelEntries)
 
     const { fromChannel, fromSite, toChannel, toSite } = await this.getFromTo()
 
-    const tasks = new Listr(
+    const tasks = new Listr<any>(
       [
         {
           task: (ctx: CopySingle) => this.fetchChannel(ctx),
           title: `Fetching channel information ${chalk.bold(channel || fromChannel)} from site ${chalk.bold(fromSite)}`,
         },
         {
+          rendererOptions: {
+            persistentOutput: true,
+          },
           task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
           title: `Querying entries from channel ${chalk.bold(channel || fromChannel)}`,
         },
         {
           enabled: (ctx: CopySingle) =>
             (ctx.fileFields && ctx.fileFields.length > 0) || (ctx.galleryFields && ctx.galleryFields.length > 0),
+          rendererOptions: {
+            persistentOutput: true,
+          },
           task: (ctx: CopySingle) => this.downloadAttachments(ctx),
           title: `Downloading attachments from channel ${chalk.bold(channel || fromChannel)}`,
         },
         {
+          rendererOptions: {
+            persistentOutput: true,
+          },
           skip: (ctx) => {
             if (ctx.entries.length === 0) return true
             if (ctx.dryRun) return this.generateDryRun(ctx)
+
+            return false
           },
           task: (ctx: CopySingle) => this.createEntries(ctx),
           title: `Creating entries in channel ${chalk.bold(toChannel)} for site ${chalk.bold(toSite)}`,
         },
         {
           enabled: (ctx: CopySingle) => ctx.selfReferences && ctx.selfReferences.length > 0,
+          rendererOptions: {
+            persistentOutput: true,
+          },
           skip: (ctx) => ctx.dryRun,
           task: (ctx: CopySingle) => this.updateEntries(ctx),
           title: `Updating self-references for new entries in channel ${chalk.bold(toChannel)}`,
         },
       ],
-      { renderer: ListrMultilineRenderer },
+      {
+        rendererOptions: {
+          collapseSubtasks: false,
+        },
+      },
     )
 
     await tasks
@@ -701,7 +747,7 @@ export default class CopyChannelEntries extends Command {
     }
   }
 
-  private async queryChannel(ctx: CopySingle, task: any) {
+  private async queryChannel(ctx: any, task: any) {
     const apiOptions: APIOptions = { fetchAll: true, site: ctx.fromSite }
 
     const baseUrl = `/channels/${ctx.fromChannel}/entries`

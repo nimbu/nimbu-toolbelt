@@ -1,5 +1,4 @@
-import { Command, APITypes as Nimbu } from '@nimbu-cli/command'
-import { ux } from '@oclif/core'
+import { Command, APITypes as Nimbu, ux } from '@nimbu-cli/command'
 import { pathExists } from 'fs-extra'
 
 export default class AppsConfig extends Command {

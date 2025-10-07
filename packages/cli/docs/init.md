@@ -11,12 +11,15 @@ initialize your working directory to code a selected theme
 
 ```
 USAGE
-  $ nimbu init
+  $ nimbu init [-c] [-h] [-s <value>]
 
-OPTIONS
-  -c, --cloudcode  Create CloudCode directory
-  -h, --haml       Use HAML for the templates in this project
-  -s, --site=site  The site (use the Nimbu subdomain) to link to this project.
+FLAGS
+  -c, --cloudcode     Create CloudCode directory
+  -h, --haml          Use HAML for the templates in this project
+  -s, --site=<value>  The site (use the Nimbu subdomain) to link to this project.
+
+DESCRIPTION
+  initialize your working directory to code a selected theme
 ```
 
-_See code: [lib/commands/init/index.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/init/index.js)_
+_See code: [lib/commands/init/index.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/init/index.js)_

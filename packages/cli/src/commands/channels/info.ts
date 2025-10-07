@@ -1,5 +1,5 @@
-import { Command } from '@nimbu-cli/command'
-import { Args, Flags, ux } from '@oclif/core'
+import { Command, ux } from '@nimbu-cli/command'
+import { Args, Flags } from '@oclif/core'
 import chalk from 'chalk'
 
 import { CustomField, isCalculatedField, isRelationalField, isSelectField } from '../../nimbu/types'
@@ -81,7 +81,7 @@ export default class ChannelsInfo extends Command {
 
   static description = 'list info about this channel'
 
-  static flags = {
+  static flags: Record<string, any> = {
     ...ux.table.flags(),
     output: Flags.string({
       description: 'output in a more machine friendly format',
@@ -143,6 +143,11 @@ export default class ChannelsInfo extends Command {
       return
     }
 
+    const tableOptions = {
+      ...flags,
+      printLine: this.log.bind(this),
+    } as Record<string, any>
+
     ux.table(
       channelForInfo.customizations,
       {
@@ -184,10 +189,7 @@ export default class ChannelsInfo extends Command {
           get: (row) => (tty ? (row.unique ? '✓' : '') : Boolean(row.unique)),
         },
       },
-      {
-        printLine: this.log.bind(this),
-        ...flags, // parsed flags
-      },
+      tableOptions,
     )
 
     if (tty) {

@@ -1,8 +1,8 @@
-import { APIError, APIOptions, Command } from '@nimbu-cli/command'
-import { Flags, ux } from '@oclif/core'
+import { APIError, APIOptions, Command, ux } from '@nimbu-cli/command'
+import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import inquirer from 'inquirer'
-import Listr from 'listr'
+import { Listr } from 'listr2'
 import { Observable } from 'rxjs'
 import through from 'through'
 
@@ -240,43 +240,65 @@ export default class CopyChannels extends Command {
       },
       {
         enabled: (ctx: CopyAll) => ctx.channels != null && ctx.channels.length > 0,
-        task: (ctx: CopyAllChannelsKnown, _task) =>
-          new Listr([
+        task: (ctx, _task) => {
+          const knownCtx = ctx as CopyAllChannelsKnown
+
+          return new Listr(
+            [
+              {
+                enabled: (ctx: CopyAll) => ctx.circularDependencies != null && ctx.circularDependencies.length > 0,
+                rendererOptions: {
+                  persistentOutput: true,
+                },
+                task: (ctx: CopyAll) => this.ensureCircularDependencies(ctx),
+                title: 'Ensure circular dependencies are created first',
+              },
+              ...knownCtx.channels.map((channel) => ({
+                rendererOptions: {
+                  persistentOutput: true,
+                },
+                task: (_ctx, task) =>
+                  this.copy(
+                    {
+                      channel,
+                      copyAll: true,
+                      fromChannel: channel.slug,
+                      fromSite,
+                      overwrite,
+                      toChannel: channel.slug,
+                      toSite,
+                    },
+                    task,
+                  ),
+                title: `${chalk.bold(channel.name)} (${channel.slug})`,
+              })),
+            ],
             {
-              enabled: (ctx: CopyAll) => ctx.circularDependencies != null && ctx.circularDependencies.length > 0,
-              task: (ctx: CopyAll) => this.ensureCircularDependencies(ctx),
-              title: 'Ensure circular dependencies are created first',
+              rendererOptions: {
+                collapseSubtasks: false,
+              },
             },
-            ...ctx.channels.map((channel) => ({
-              task: (_ctx, task) =>
-                this.copy(
-                  {
-                    channel,
-                    copyAll: true,
-                    fromChannel: channel.slug,
-                    fromSite,
-                    overwrite,
-                    toChannel: channel.slug,
-                    toSite,
-                  },
-                  task,
-                ),
-              title: `${chalk.bold(channel.name)} (${channel.slug})`,
-            })),
-          ]),
+          )
+        },
         title: upsertTitle,
       },
-    ])
+    ],
+    {
+      rendererOptions: {
+        collapseSubtasks: false,
+      },
+    })
 
     await tasks
       .run({
         fromSite,
+        overwrite,
         toSite,
       })
       .catch((error) => this.error(error))
   }
 
-  private async executeCopySingle({ fromChannel, fromSite, toChannel, toSite }: CopySingle) {
+  private async executeCopySingle({ fromChannel, fromSite, overwrite, toChannel, toSite }: CopySingle) {
     this.debug('Running executeCopySingle')
 
     const fetchTitle = `Fetching channel ${chalk.bold(fromChannel)} from site ${chalk.bold(fromSite)}`
@@ -289,7 +311,10 @@ export default class CopyChannels extends Command {
       },
       {
         enabled: (ctx: CopySingle) => ctx.channel != null,
-        task: (ctx: CopySingleChannelKnown, task) => this.copy(ctx, task),
+        rendererOptions: {
+          persistentOutput: true,
+        },
+        task: (ctx, task) => this.copy(ctx as CopySingleChannelKnown, task),
         title: upsertTitle,
       },
     ])
@@ -298,6 +323,7 @@ export default class CopyChannels extends Command {
       .run({
         fromChannel,
         fromSite,
+        overwrite,
         toChannel,
         toSite,
       })

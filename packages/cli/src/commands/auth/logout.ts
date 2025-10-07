@@ -1,5 +1,4 @@
-import { Command } from '@nimbu-cli/command'
-import { ux } from '@oclif/core'
+import { Command, ux } from '@nimbu-cli/command'
 
 export default class Logout extends Command {
   static aliases = ['logout']

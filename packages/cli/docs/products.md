@@ -12,14 +12,17 @@ copy product customizations from one to another
 
 ```
 USAGE
-  $ nimbu products:config:copy
+  $ nimbu products:config:copy [-f <value>] [-t <value>]
 
-OPTIONS
-  -f, --from=from  subdomain of the source site
-  -t, --to=to      subdomain of the destination site
+FLAGS
+  -f, --from=<value>  subdomain of the source site
+  -t, --to=<value>    subdomain of the destination site
+
+DESCRIPTION
+  copy product customizations from one to another
 ```
 
-_See code: [lib/commands/products/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/products/config/copy.js)_
+_See code: [lib/commands/products/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/products/config/copy.js)_
 
 ## `nimbu products:config:diff`
 
@@ -27,11 +30,14 @@ check differences between product customizations from one to another
 
 ```
 USAGE
-  $ nimbu products:config:diff
+  $ nimbu products:config:diff -f <value> -t <value>
 
-OPTIONS
-  -f, --from=from  (required) slug of the source channel
-  -t, --to=to      (required) slug of the target channel
+FLAGS
+  -f, --from=<value>  (required) slug of the source channel
+  -t, --to=<value>    (required) slug of the target channel
+
+DESCRIPTION
+  check differences between product customizations from one to another
 ```
 
-_See code: [lib/commands/products/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/lib/commands/products/config/diff.js)_
+_See code: [lib/commands/products/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/products/config/diff.js)_
