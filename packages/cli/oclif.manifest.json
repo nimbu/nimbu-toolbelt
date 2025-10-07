@@ -167,109 +167,6 @@
         "simulator.js"
       ]
     },
-    "auth:login": {
-      "aliases": [
-        "login"
-      ],
-      "args": {},
-      "description": "login with your nimbu credentials",
-      "flags": {
-        "expires-in": {
-          "char": "e",
-          "description": "duration of token in seconds (default 1 year)",
-          "name": "expires-in",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "auth:login",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "auth",
-        "login.js"
-      ]
-    },
-    "auth:logout": {
-      "aliases": [
-        "logout"
-      ],
-      "args": {},
-      "description": "clears local login credentials and invalidates API session",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "auth:logout",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "auth",
-        "logout.js"
-      ]
-    },
-    "auth:token": {
-      "aliases": [],
-      "args": {},
-      "description": "outputs current CLI authentication token.\nBy default, the CLI auth token is only valid for 1 year. To generate a long-lived token, use nimbu authorizations:create",
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "auth:token",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "auth",
-        "token.js"
-      ]
-    },
-    "auth:whoami": {
-      "aliases": [
-        "whoami"
-      ],
-      "args": {},
-      "description": "display the current logged in user",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "auth:whoami",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "auth",
-        "whoami.js"
-      ]
-    },
     "channels:copy": {
       "aliases": [],
       "args": {},
@@ -464,6 +361,109 @@
         "commands",
         "channels",
         "info.js"
+      ]
+    },
+    "auth:login": {
+      "aliases": [
+        "login"
+      ],
+      "args": {},
+      "description": "login with your nimbu credentials",
+      "flags": {
+        "expires-in": {
+          "char": "e",
+          "description": "duration of token in seconds (default 1 year)",
+          "name": "expires-in",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:login",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "login.js"
+      ]
+    },
+    "auth:logout": {
+      "aliases": [
+        "logout"
+      ],
+      "args": {},
+      "description": "clears local login credentials and invalidates API session",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:logout",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "logout.js"
+      ]
+    },
+    "auth:token": {
+      "aliases": [],
+      "args": {},
+      "description": "outputs current CLI authentication token.\nBy default, the CLI auth token is only valid for 1 year. To generate a long-lived token, use nimbu authorizations:create",
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:token",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "token.js"
+      ]
+    },
+    "auth:whoami": {
+      "aliases": [
+        "whoami"
+      ],
+      "args": {},
+      "description": "display the current logged in user",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:whoami",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "whoami.js"
       ]
     },
     "customers:copy": {

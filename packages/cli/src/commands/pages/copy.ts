@@ -2,6 +2,7 @@ import { APIError, Command, ux } from '@nimbu-cli/command'
 import { Args, Flags } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
+import { Listr } from 'listr2'
 import { cloneDeep } from 'lodash'
 import { Observable } from 'rxjs'
 
@@ -37,7 +38,6 @@ export default class CopyPages extends Command {
   }
 
   async execute() {
-    const Listr = require('listr')
     const { args, flags } = await this.parse(CopyPages)
 
     const fromSite = flags.from === undefined ? this.nimbuConfig.site : flags.from
@@ -63,11 +63,17 @@ export default class CopyPages extends Command {
         title: fetchTitle,
       },
       {
+        rendererOptions: {
+          persistentOutput: true,
+        },
         skip: (ctx) => ctx.pages.length === 0,
         task: (ctx) => this.downloadAttachments(ctx),
         title: downloadTitle,
       },
       {
+        rendererOptions: {
+          persistentOutput: true,
+        },
         skip: (ctx) => ctx.pages.length === 0,
         task: (ctx) => this.createPages(ctx),
         title: createTitle,

@@ -2,6 +2,7 @@ import { Command, ux } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
+import { Listr } from 'listr2'
 import * as pathFinder from 'node:path'
 import { Observable } from 'rxjs'
 
@@ -30,7 +31,6 @@ export default class PullThemes extends Command {
       process.stdout.isTTY = false
     }
 
-    const Listr = require('listr')
     const { flags } = await this.parse(PullThemes)
 
     const fromTheme = flags.theme
@@ -50,6 +50,9 @@ export default class PullThemes extends Command {
     for (const type of types) {
       taskList.push({
         enabled: (ctx) => ctx[type] != null || types.indexOf(type) === ctx.currentStep,
+        rendererOptions: {
+          persistentOutput: true,
+        },
         task: (ctx) => this.fetchType(type, ctx),
         title: `Downloading ${type} from theme ${chalk.bold(fromTheme)} in site ${chalk.bold(fromSite)}`,
       })

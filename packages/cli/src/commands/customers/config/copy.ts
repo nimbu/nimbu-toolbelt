@@ -1,6 +1,7 @@
 import { APIError, Command, ux } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
+import { Listr } from 'listr2'
 import { Observable } from 'rxjs'
 const through = require('through')
 const inquirer = require('inquirer')
@@ -20,7 +21,6 @@ export default class CopyCustomerConfig extends Command {
   }
 
   async execute() {
-    const Listr = require('listr')
     const { flags } = await this.parse(CopyCustomerConfig)
 
     const fromSite = flags.from === undefined ? this.nimbuConfig.site : flags.from
@@ -44,6 +44,9 @@ export default class CopyCustomerConfig extends Command {
       },
       {
         enabled: (ctx) => ctx.customizations != null,
+        rendererOptions: {
+          persistentOutput: true,
+        },
         task: (ctx, task) => this.copy(ctx, task),
         title: upsertTitle,
       },

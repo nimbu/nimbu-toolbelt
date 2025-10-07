@@ -1,6 +1,7 @@
 import { APIError, Command, ux } from '@nimbu-cli/command'
 import { Args, Flags } from '@oclif/core'
 import chalk from 'chalk'
+import { Listr } from 'listr2'
 import { cloneDeep } from 'lodash'
 import { Observable } from 'rxjs'
 const through = require('through')
@@ -29,7 +30,6 @@ export default class CopyMenus extends Command {
   }
 
   async execute() {
-    const Listr = require('listr')
     const { args, flags } = await this.parse(CopyMenus)
 
     const fromSite = flags.from === undefined ? this.nimbuConfig.site : flags.from
@@ -53,6 +53,9 @@ export default class CopyMenus extends Command {
         title: fetchTitle,
       },
       {
+        rendererOptions: {
+          persistentOutput: true,
+        },
         task: (ctx) => this.uploadMenus(ctx),
         title: updateTitle,
       },

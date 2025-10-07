@@ -1,6 +1,7 @@
 import { APIError, Command, ux } from '@nimbu-cli/command'
 import { Args, Flags } from '@oclif/core'
 import chalk from 'chalk'
+import { Listr } from 'listr2'
 import { Observable } from 'rxjs'
 
 const timeUnitMapping = {
@@ -60,8 +61,6 @@ export default class CopyTranslations extends Command {
   }
 
   async execute() {
-    const Listr = require('listr')
-    const ListrMultilineRenderer = require('listr-multiline-renderer')
     const { args, flags } = await this.parse(CopyTranslations)
 
     const fromSite = flags.from === undefined ? this.nimbuConfig.site : flags.from
@@ -87,6 +86,9 @@ export default class CopyTranslations extends Command {
           title: fetchTitle,
         },
         {
+          rendererOptions: {
+            persistentOutput: true,
+          },
           skip(ctx) {
             if (ctx.translations.length === 0) return true
             if (ctx.dryRun) {
@@ -104,13 +106,17 @@ export default class CopyTranslations extends Command {
 
               return dryRunLogs.join('\n')
             }
+
+            return false
           },
           task: (ctx) => this.createTranslations(ctx),
           title: createTitle,
         },
       ],
       {
-        renderer: ListrMultilineRenderer,
+        rendererOptions: {
+          collapseSubtasks: false,
+        },
       },
     )
 

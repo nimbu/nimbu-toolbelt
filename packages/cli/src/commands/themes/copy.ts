@@ -2,6 +2,7 @@ import { Command } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
+import { Listr } from 'listr2'
 import { capitalize } from 'lodash'
 import * as pathFinder from 'node:path'
 import { Observable } from 'rxjs'
@@ -34,7 +35,6 @@ export default class CopyThemes extends Command {
   }
 
   async execute() {
-    const Listr = require('listr')
     const { flags } = await this.parse(CopyThemes)
 
     let fromTheme: string
@@ -77,24 +77,41 @@ export default class CopyThemes extends Command {
     for (const type of types) {
       taskList.push({
         task: (_ctx, _task) =>
-          new Listr([
+          new Listr(
+            [
+              {
+                enabled: (ctx) => ctx[type] != null || types.indexOf(type) === ctx.currentStep,
+                rendererOptions: {
+                  persistentOutput: true,
+                },
+                task: (ctx) => this.fetchType(type, ctx),
+                title: `Downloading ${type}`,
+              },
+              {
+                enabled: (ctx) => ctx[type] != null,
+                rendererOptions: {
+                  persistentOutput: true,
+                },
+                skip: (ctx) => ctx[type].length === 0,
+                task: (ctx) => this.uploadType(type, ctx),
+                title: `Uploading ${type}`,
+              },
+            ],
             {
-              enabled: (ctx) => ctx[type] != null || types.indexOf(type) === ctx.currentStep,
-              task: (ctx) => this.fetchType(type, ctx),
-              title: `Downloading ${type}`,
+              rendererOptions: {
+                collapseSubtasks: false,
+              },
             },
-            {
-              enabled: (ctx) => ctx[type] != null,
-              skip: (ctx) => ctx[type].length === 0,
-              task: (ctx) => this.uploadType(type, ctx),
-              title: `Uploading ${type}`,
-            },
-          ]),
+          ),
         title: capitalize(type),
       })
     }
 
-    const tasks = new Listr(taskList)
+    const tasks = new Listr(taskList, {
+      rendererOptions: {
+        collapseSubtasks: false,
+      },
+    })
 
     await tasks
       .run({

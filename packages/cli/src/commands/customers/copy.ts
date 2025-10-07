@@ -2,6 +2,7 @@ import { APIError, APIOptions, Command, APITypes as Nimbu, type TableColumns, co
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
+import { Listr } from 'listr2'
 import { chunk, cloneDeep, sum } from 'lodash'
 import { Observable } from 'rxjs'
 
@@ -127,33 +128,44 @@ export default class CopyCustomers extends Command {
   }
 
   async executeCopy() {
-    const Listr = require('listr')
     const { flags } = await this.parse(CopyCustomers)
 
     const { fromSite, toSite } = await this.getFromTo()
 
-    const tasks = new Listr([
+    const tasks = new Listr<any>([
       {
         task: (ctx: CopySingle) => this.fetchCustomerInfo(ctx),
         title: `Fetching customer fields from site ${chalk.bold(fromSite)}`,
       },
       {
+        rendererOptions: {
+          persistentOutput: true,
+        },
         task: (ctx: CopySingle, task) => this.queryCustomers(ctx, task),
         title: `Querying customers`,
       },
       {
         enabled: (ctx: CopySingle) =>
           (ctx.fileFields && ctx.fileFields.length > 0) || (ctx.galleryFields && ctx.galleryFields.length > 0),
+        rendererOptions: {
+          persistentOutput: true,
+        },
         task: (ctx: CopySingle) => this.downloadAttachments(ctx),
         title: `Downloading attachments`,
       },
       {
+        rendererOptions: {
+          persistentOutput: true,
+        },
         skip: (ctx: CopySingle) => ctx.entries.length === 0,
         task: (ctx: CopySingle) => this.createCustomers(ctx),
         title: `Upserting customers in site ${chalk.bold(toSite)}`,
       },
       {
         enabled: (ctx: CopySingle) => ctx.selfReferences && ctx.selfReferences.length > 0,
+        rendererOptions: {
+          persistentOutput: true,
+        },
         task: (ctx: CopySingle) => this.updateCustomers(ctx),
         title: `Updating self-references for new entries in site ${chalk.bold(toSite)}`,
       },
@@ -161,7 +173,6 @@ export default class CopyCustomers extends Command {
 
     await tasks
       .run({
-        createdEntries: [],
         fromSite,
         passwordLength: flags['password-length'],
         per_page: flags['per-page'],
