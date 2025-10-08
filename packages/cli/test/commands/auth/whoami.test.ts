@@ -1,25 +1,12 @@
+import { APIClient, APIError, HTTPError } from '@nimbu-cli/command'
 import { expect } from 'chai'
-import test, { nockActivate, nockCleanup } from '../../helpers/setup'
 
-beforeEach(function (done) {
-  nockActivate()
-  done()
-})
-
-afterEach(function (done) {
-  nockCleanup()
-  done()
-})
+import test from '../../helpers/setup'
 
 describe('auth:whoami', () => {
   test
     .env({ NIMBU_API_KEY: 'foobar' }, { clear: true })
-    .nock('https://api.nimbu.io', (api) =>
-      api
-        .get('/user')
-        // user is logged in, return their name
-        .reply(200, { email: 'jeff@example.com', name: 'Jeff' }),
-    )
+    .stub(APIClient.prototype, 'get', () => Promise.resolve({ email: 'jeff@example.com', name: 'Jeff' }))
     .stdout()
     .stderr()
     .command(['auth:whoami'])
@@ -30,7 +17,14 @@ describe('auth:whoami', () => {
 
   test
     .env({ NIMBU_API_KEY: 'foobar' }, { clear: true })
-    .nock('https://api.nimbu.io', (api) => api.get('/user').reply(401))
+    .stub(APIClient.prototype, 'get', () => {
+      const httpError = Object.assign(new HTTPError(), {
+        statusCode: 401,
+        body: { message: 'Unauthorized' },
+      })
+
+      return Promise.reject(new APIError(httpError as HTTPError))
+    })
     .stderr()
     .command(['auth:whoami'])
     .exit(100)
