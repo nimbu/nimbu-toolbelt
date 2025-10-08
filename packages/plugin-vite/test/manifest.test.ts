@@ -1,15 +1,13 @@
 import type { InlineConfig } from 'vite'
 
 import { expect } from 'chai'
-import { createRequire } from 'node:module'
+import { ensureDir, mkdtemp, writeJson } from 'fs-extra'
 import os from 'node:os'
 import path from 'node:path'
 
 import type { EntryPoint } from '../src/utils/types'
 
-const requireModule = createRequire(import.meta.url)
-const { ensureDir, mkdtemp, writeJson } = requireModule('fs-extra') as typeof import('fs-extra')
-const { buildSnippetDataFromManifest, resolveManifestPath } = requireModule('../src/utils/manifest') as typeof import('../src/utils/manifest')
+import { buildSnippetDataFromManifest, resolveManifestPath } from '../src/utils/manifest'
 
 describe('buildSnippetDataFromManifest', () => {
   it('returns chunk mappings based on manifest entries', async () => {

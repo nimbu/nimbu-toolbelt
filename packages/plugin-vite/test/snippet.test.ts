@@ -1,38 +1,19 @@
+import { paths } from '@nimbu-cli/command'
 import { expect } from 'chai'
-import { createRequire } from 'node:module'
+import { mkdtemp, readFile } from 'fs-extra'
 import os from 'node:os'
 import path from 'node:path'
 
-const requireModule = createRequire(import.meta.url)
+import { createSnippetData, writeSnippets } from '../src/utils/snippet'
 
-const { mkdtemp, readFile } = requireModule('fs-extra') as typeof import('fs-extra')
-
-type SnippetModule = typeof import('../src/utils/snippet')
-
-async function loadSnippetModule(): Promise<SnippetModule> {
-  const modulesToReset = [
-    '../src/utils/snippet',
-    '../src/utils/project',
-    '@nimbu-cli/command',
-    '@nimbu-cli/command/lib/config/paths',
-  ]
-
-  for (const specifier of modulesToReset) {
-    try {
-      const resolved = requireModule.resolve(specifier)
-      delete requireModule.cache[resolved]
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND') {
-        throw error
-      }
-    }
-  }
-
-  return requireModule('../src/utils/snippet') as SnippetModule
+function setThemeRoot(themeRoot: string) {
+  process.env.NIMBU_DIRECTORY = themeRoot
+  ;(paths as unknown as { NIMBU_DIRECTORY: string }).NIMBU_DIRECTORY = themeRoot
 }
 
 describe('snippet writer', () => {
   const originalEnv = process.env.NIMBU_DIRECTORY
+  const originalThemeRoot = paths.NIMBU_DIRECTORY
 
   afterEach(() => {
     if (originalEnv === undefined) {
@@ -40,13 +21,13 @@ describe('snippet writer', () => {
     } else {
       process.env.NIMBU_DIRECTORY = originalEnv
     }
+
+    ;(paths as unknown as { NIMBU_DIRECTORY: string }).NIMBU_DIRECTORY = originalThemeRoot
   })
 
   it('writes the snippet under the theme root', async () => {
     const themeRoot = await mkdtemp(path.join(os.tmpdir(), 'plugin-vite-snippet-'))
-    process.env.NIMBU_DIRECTORY = themeRoot
-
-    const { createSnippetData, writeSnippets } = await loadSnippetModule()
+    setThemeRoot(themeRoot)
 
     const snippetData = createSnippetData({
       chunks: ['app'],
@@ -65,9 +46,7 @@ describe('snippet writer', () => {
 
   it('sanitises entry names for filenames and variables', async () => {
     const themeRoot = await mkdtemp(path.join(os.tmpdir(), 'plugin-vite-snippet-'))
-    process.env.NIMBU_DIRECTORY = themeRoot
-
-    const { createSnippetData, writeSnippets } = await loadSnippetModule()
+    setThemeRoot(themeRoot)
 
     const snippetData = createSnippetData({
       chunks: ['My-Entry'],
