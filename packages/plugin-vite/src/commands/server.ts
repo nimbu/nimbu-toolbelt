@@ -1,10 +1,9 @@
-import fs from 'node:fs'
-import path from 'node:path'
-
 import { Command, displayNimbuHeader } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import detectPort from 'detect-port'
+import fs from 'node:fs'
+import path from 'node:path'
 
 import { ViteDevelopmentServer } from '../dev/server'
 import { resolveEntryPoints } from '../utils/entries'
@@ -109,7 +108,7 @@ export default class Server extends Command {
       'main.ts',
       'main.jsx',
       'main.js',
-    ].filter((value): value is string => Boolean(value))
+    ].filter(Boolean)
 
     for (const candidate of candidates) {
       const entryPath = path.join(root, 'src', candidate)

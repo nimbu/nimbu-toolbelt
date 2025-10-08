@@ -1,30 +1,33 @@
 import { expect } from 'chai'
-import fs from 'fs-extra'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 
-import { buildSnippetDataFromManifest } from '../src/utils/manifest'
-import { EntryPoint } from '../src/utils/types'
+import type { EntryPoint } from '../src/utils/types'
+
+const requireModule = createRequire(import.meta.url)
+const { mkdtemp, writeJson } = requireModule('fs-extra') as typeof import('fs-extra')
+const { buildSnippetDataFromManifest } = requireModule('../src/utils/manifest') as typeof import('../src/utils/manifest')
 
 describe('buildSnippetDataFromManifest', () => {
   it('returns chunk mappings based on manifest entries', async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'plugin-vite-manifest-'))
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'plugin-vite-manifest-'))
     const manifestPath = path.join(tmpDir, 'manifest.json')
 
     const manifest = {
       'src/main.ts': {
+        css: ['stylesheets/app.css'],
         file: 'javascripts/app.js',
         isEntry: true,
-        css: ['stylesheets/app.css'],
       },
     }
 
-    await fs.writeJson(manifestPath, manifest)
+    await writeJson(manifestPath, manifest)
 
     const entryPoints: EntryPoint[] = [
       {
-        name: 'app',
         absolutePath: path.join(tmpDir, '..', 'src', 'main.ts'),
+        name: 'app',
         relativePath: 'src/main.ts',
       },
     ]

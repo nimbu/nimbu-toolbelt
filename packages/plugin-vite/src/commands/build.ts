@@ -1,11 +1,10 @@
-import fs from 'node:fs'
-import path from 'node:path'
-
 import type { InlineConfig } from 'vite'
 
 import { Command, displayNimbuHeader } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
+import fs from 'node:fs'
+import path from 'node:path'
 
 import { runViteBuild } from '../build/builder'
 import { resolveEntryPoints } from '../utils/entries'
@@ -31,13 +30,13 @@ export default class Build extends Command {
     const root = process.cwd()
 
     const overrides: InlineConfig = {
-      root,
       mode: flags.mode,
+      root,
     }
 
     if (flags.outdir) {
       overrides.build = {
-        ...(overrides.build ?? {}),
+        ...overrides.build,
         outDir: flags.outdir,
       }
     }
@@ -67,7 +66,7 @@ export default class Build extends Command {
       'main.ts',
       'main.jsx',
       'main.js',
-    ].filter((value): value is string => Boolean(value))
+    ].filter(Boolean)
 
     for (const candidate of candidates) {
       const filePath = path.join(root, 'src', candidate)

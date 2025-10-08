@@ -1,20 +1,20 @@
 export interface EntryPoint {
-  name: string
   absolutePath: string
+  name: string
   relativePath: string
 }
 
 export interface SnippetData {
   buildTimestamp: string
   chunks: string[]
+  css: Record<string, string[]>
   entries: string[]
   js: Record<string, string>
-  css: Record<string, string[]>
 }
 
 export interface DevSnippetOptions {
-  entryPoints: EntryPoint[]
   devBaseUrl: string
+  entryPoints: EntryPoint[]
 }
 
 export interface ManifestSnippetOptions {

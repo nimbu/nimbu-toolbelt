@@ -1,16 +1,16 @@
-import fs from 'fs-extra'
+import { readJson } from 'fs-extra'
 import path from 'node:path'
 
 import { createSnippetData } from './snippet'
 import { EntryPoint, SnippetData } from './types'
 
 interface ViteManifestEntry {
+  assets?: string[]
+  css?: string[]
   file: string
+  isEntry?: boolean
   name?: string
   src?: string
-  isEntry?: boolean
-  css?: string[]
-  assets?: string[]
 }
 
 type ViteManifest = Record<string, ViteManifestEntry>
@@ -23,7 +23,7 @@ export async function buildSnippetDataFromManifest(
   manifestPath: string,
   entryPoints: EntryPoint[],
 ): Promise<SnippetData> {
-  const manifest: ViteManifest = await fs.readJson(manifestPath)
+  const manifest: ViteManifest = await readJson(manifestPath)
 
   const entryAliasBySrc = new Map<string, string>()
   for (const entry of entryPoints) {
@@ -49,8 +49,8 @@ export async function buildSnippetDataFromManifest(
   return createSnippetData({
     buildTimestamp: new Date().toISOString(),
     chunks: Array.from(chunks),
+    css,
     entries: Array.from(chunks),
     js,
-    css,
   })
 }

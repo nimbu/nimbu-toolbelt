@@ -1,27 +1,26 @@
-import path from 'node:path'
-import { createRequire } from 'node:module'
-
 import type { InlineConfig, UserConfig } from 'vite'
+
+import { createRequire } from 'node:module'
+import path from 'node:path'
 
 import { getThemeRoot } from './project'
 
-function assetFileNamesPattern(assetName?: string) {
-  const name = assetName ?? ''
-  const ext = path.extname(name)
+function assetFileNamesPattern(assetName = '') {
+  const ext = path.extname(assetName)
 
   if (ext === '.css') {
     return 'stylesheets/[name][extname]'
   }
 
-  if (/\.(png|jpe?g|gif|svg|webp|avif)$/i.test(name)) {
+  if (/\.(png|jpe?g|gif|svg|webp|avif)$/i.test(assetName)) {
     return 'images/[name][extname]'
   }
 
-  if (/\.(woff2?|ttf|otf|eot)$/i.test(name)) {
+  if (/\.(woff2?|ttf|otf|eot)$/i.test(assetName)) {
     return 'fonts/[name][extname]'
   }
 
-  if (/\.(mp4|mp3|webm|ogg)$/i.test(name)) {
+  if (/\.(mp4|mp3|webm|ogg)$/i.test(assetName)) {
     return 'media/[name][extname]'
   }
 
@@ -37,9 +36,9 @@ function withStableFilenames(config: UserConfig): UserConfig {
         ...config.build?.rollupOptions,
         output: {
           ...config.build?.rollupOptions?.output,
-          entryFileNames: 'javascripts/[name].js',
-          chunkFileNames: 'javascripts/[name].js',
           assetFileNames: (assetInfo) => assetFileNamesPattern(assetInfo.name),
+          chunkFileNames: 'javascripts/[name].js',
+          entryFileNames: 'javascripts/[name].js',
         },
       },
     },
@@ -50,19 +49,19 @@ function getResolver(root: string) {
   try {
     return createRequire(path.join(root, 'package.json'))
   } catch {
-    return undefined
+    
   }
 }
 
 function loadOptional(root: string, id: string) {
   const resolver = getResolver(root)
-  if (!resolver) return undefined
+  if (!resolver) return
 
   try {
     const mod = resolver(id)
     return mod?.default ?? mod
   } catch {
-    return undefined
+    
   }
 }
 
@@ -72,7 +71,7 @@ function resolveTailwindMajorVersion(root: string) {
 
   try {
     const pkgPath = resolver.resolve('tailwindcss/package.json')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const pkg = resolver(pkgPath) as { version?: string }
     const major = Number.parseInt((pkg?.version ?? '0').split('.')[0] ?? '0', 10)
     return Number.isNaN(major) ? 0 : major
@@ -103,7 +102,7 @@ function resolvePostcssPlugins(root: string) {
 
 function createCssConfig(root: string) {
   const plugins = resolvePostcssPlugins(root)
-  if (plugins.length === 0) return undefined
+  if (plugins.length === 0) return
 
   return {
     postcss: {
@@ -118,23 +117,23 @@ function createDefaultConfig(root: string): InlineConfig {
   const cssConfig = createCssConfig(root)
 
   const baseConfig: UserConfig = {
-    root: tmplRoot,
-    cacheDir: path.join(tmplRoot, 'node_modules/.vite'),
-    envDir: tmplRoot,
-    publicDir: path.join(tmplRoot, 'public'),
-    server: {
-      host: 'localhost',
-      port: 5173,
-    },
     build: {
-      outDir: path.join(tmplRoot, '.nimbu-vite'),
       emptyOutDir: true,
       manifest: true,
+      outDir: path.join(tmplRoot, '.nimbu-vite'),
       rollupOptions: {
         input: {
           app: defaultEntry,
         },
       },
+    },
+    cacheDir: path.join(tmplRoot, 'node_modules/.vite'),
+    envDir: tmplRoot,
+    publicDir: path.join(tmplRoot, 'public'),
+    root: tmplRoot,
+    server: {
+      host: 'localhost',
+      port: 5173,
     },
   }
 
@@ -151,7 +150,7 @@ export interface ResolvedViteConfig {
 }
 
 export async function resolveViteConfig(
-  command: 'serve' | 'build',
+  command: 'build' | 'serve',
   overrides: InlineConfig = {},
 ): Promise<ResolvedViteConfig> {
   const root = overrides.root ? path.resolve(overrides.root) : getThemeRoot()
@@ -165,11 +164,11 @@ export async function resolveViteConfig(
     mergeConfig(defaultConfig, userConfigResult?.config ?? {}),
     {
       ...overrides,
-      root,
       build: {
         manifest: true,
         ...overrides.build,
       },
+      root,
     },
   )
 

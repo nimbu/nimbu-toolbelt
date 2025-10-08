@@ -1,0 +1,8 @@
+{
+  "extension": ["ts"],
+  "require": ["ts-node/register/transpile-only"],
+  "watchExtensions": ["ts"],
+  "reporter": "spec",
+  "timeout": 60000,
+  "ui": "bdd"
+}

@@ -1,4 +1,4 @@
-import fs from 'fs-extra'
+import { ensureDir, writeFile } from 'fs-extra'
 import path from 'node:path'
 
 import { resolveSnippetPath } from './project'
@@ -7,12 +7,12 @@ import { SnippetData } from './types'
 const AGGREGATE_HEADER = '{% assign vite_build_timestamp = "%BUILD_TIMESTAMP%" %}'
 
 function sanitizeEntryName(entry: string): string {
-  const normalized = entry.toLowerCase().replace(/[^a-z0-9_]+/g, '_')
+  const normalized = entry.toLowerCase().replaceAll(/[^\d_a-z]+/g, '_')
   return normalized.length > 0 ? normalized : 'entry'
 }
 
 function renderAggregateSnippet(data: SnippetData): string {
-  const chunks = [...new Set(data.chunks.length ? data.chunks : Object.keys(data.js))]
+  const chunks = [...new Set(data.chunks.length > 0 ? data.chunks : Object.keys(data.js))]
   const sortedChunks = chunks.sort()
 
   const buildTimestamp = data.buildTimestamp || new Date().toISOString()
@@ -58,8 +58,8 @@ export interface WrittenSnippets {
 
 export async function writeSnippets(data: SnippetData): Promise<WrittenSnippets> {
   const aggregatePath = resolveSnippetPath('vite.liquid')
-  await fs.ensureDir(path.dirname(aggregatePath))
-  await fs.writeFile(aggregatePath, renderAggregateSnippet(data), 'utf8')
+  await ensureDir(path.dirname(aggregatePath))
+  await writeFile(aggregatePath, renderAggregateSnippet(data), 'utf8')
 
   const entryNames = ((data.entries?.length ? data.entries : data.chunks) ?? [])
     .filter((entry) => entry !== 'vite_client')
@@ -72,7 +72,7 @@ export async function writeSnippets(data: SnippetData): Promise<WrittenSnippets>
     if (writtenEntries.has(sanitized)) continue
     writtenEntries.add(sanitized)
     const entryPath = resolveSnippetPath(`vite_${sanitized}.liquid`)
-    await fs.writeFile(entryPath, renderEntrySnippet(data, entry), 'utf8')
+    await writeFile(entryPath, renderEntrySnippet(data, entry), 'utf8')
     entryPaths.push(entryPath)
   }
 
@@ -85,8 +85,8 @@ export function createSnippetData(partial: Partial<SnippetData>): SnippetData {
   return {
     buildTimestamp: partial.buildTimestamp ?? new Date().toISOString(),
     chunks,
+    css: partial.css ?? {},
     entries,
     js: partial.js ?? {},
-    css: partial.css ?? {},
   }
 }

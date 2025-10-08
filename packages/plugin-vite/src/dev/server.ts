@@ -1,10 +1,9 @@
+import type { InlineConfig, ViteDevServer } from 'vite'
+
+import { ProxyServer } from '@nimbu-cli/proxy-server'
 import chalk from 'chalk'
 import debugFactory from 'debug'
 import open from 'open'
-import path from 'node:path'
-
-import { ProxyServer } from '@nimbu-cli/proxy-server'
-import type { InlineConfig, ViteDevServer } from 'vite'
 
 import { createSnippetData, writeSnippets } from '../utils/snippet'
 import { EntryPoint } from '../utils/types'
@@ -12,26 +11,40 @@ import { EntryPoint } from '../utils/types'
 const debug = debugFactory('nimbu:vite')
 
 export interface ViteDevOptions {
-  host: string
-  port: number
-  vitePort: number
-  openBrowser: boolean
   debug?: boolean
-  templatePath: string
   entryPoints: EntryPoint[]
-  viteConfig: InlineConfig
+  host: string
   nimbuClient: any
+  openBrowser: boolean
+  port: number
+  templatePath: string
+  viteConfig: InlineConfig
+  vitePort: number
 }
 
 export class ViteDevelopmentServer {
   private proxy?: ProxyServer
   private vite?: ViteDevServer
 
-  constructor(private readonly options: ViteDevOptions) {}
+  private readonly options: ViteDevOptions
+
+  constructor(options: ViteDevOptions) {
+    this.options = options
+  }
 
   async start(): Promise<void> {
     debug('Starting Vite development server with proxy integration')
-    const { host, port, vitePort, templatePath, entryPoints, viteConfig } = this.options
+    const {
+      debug: proxyDebug,
+      entryPoints,
+      host,
+      nimbuClient,
+      openBrowser,
+      port,
+      templatePath,
+      viteConfig,
+      vitePort,
+    } = this.options
 
     const devBaseUrl = `http://${host}:${vitePort}`
 
@@ -39,7 +52,7 @@ export class ViteDevelopmentServer {
       ...viteConfig,
       root: viteConfig.root ?? templatePath,
       server: {
-        ...(viteConfig.server ?? {}),
+        ...viteConfig.server,
         host,
         port: vitePort,
         strictPort: true,
@@ -52,30 +65,31 @@ export class ViteDevelopmentServer {
     this.vite.printUrls()
 
     const entryNames = entryPoints.map((entry) => entry.name)
+    const cssAssets: Record<string, string[]> = {}
+    const entryJs: Record<string, string> = {}
+
+    for (const { name, relativePath } of entryPoints) {
+      cssAssets[name] = []
+      entryJs[name] = `${devBaseUrl}/${relativePath}`
+    }
 
     const devSnippet = createSnippetData({
       buildTimestamp: new Date().toISOString(),
       chunks: ['vite_client', ...entryNames],
+      css: cssAssets,
       entries: entryNames,
       js: {
         vite_client: `${devBaseUrl}/@vite/client`,
-        ...entryPoints.reduce<Record<string, string>>((memo, entry) => {
-          memo[entry.name] = `${devBaseUrl}/${entry.relativePath}`
-          return memo
-        }, {}),
+        ...entryJs,
       },
-      css: entryPoints.reduce<Record<string, string[]>>((memo, entry) => {
-        memo[entry.name] = []
-        return memo
-      }, {}),
     })
 
     await writeSnippets(devSnippet)
 
     this.proxy = new ProxyServer({
-      debug: this.options.debug,
+      debug: proxyDebug,
       host,
-      nimbuClient: this.options.nimbuClient,
+      nimbuClient,
       port,
       templatePath,
     })
@@ -86,7 +100,7 @@ export class ViteDevelopmentServer {
 Nimbu proxy server ready at http://${host}:${port}`))
     console.log(chalk.cyan(`Vite dev server running at ${devBaseUrl}`))
 
-    if (this.options.openBrowser) {
+    if (openBrowser) {
       await open(`http://${host}:${port}`)
     }
   }

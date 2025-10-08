@@ -1,6 +1,5 @@
-import path from 'node:path'
-
 import { paths } from '@nimbu-cli/command'
+import path from 'node:path'
 
 export function getThemeRoot(): string {
   return paths.NIMBU_DIRECTORY

@@ -1,53 +1,53 @@
 declare module 'vite' {
   export interface ServerConfig {
-    host?: string | boolean
+    [key: string]: unknown
+    host?: boolean | string
     port?: number
     strictPort?: boolean
-    [key: string]: unknown
   }
 
   export interface RollupOutputOptions {
-    entryFileNames?: string | ((chunk: unknown) => string)
-    chunkFileNames?: string | ((chunk: unknown) => string)
-    assetFileNames?: string | ((assetInfo: { name?: string }) => string)
     [key: string]: unknown
+    assetFileNames?: ((assetInfo: { name?: string }) => string) | string
+    chunkFileNames?: ((chunk: unknown) => string) | string
+    entryFileNames?: ((chunk: unknown) => string) | string
   }
 
   export interface BuildOptions {
-    outDir?: string
+    [key: string]: unknown
     emptyOutDir?: boolean
     manifest?: boolean | string
+    outDir?: string
     rollupOptions?: {
+      [key: string]: unknown
       input?: Record<string, string> | string | string[]
       output?: RollupOutputOptions
-      [key: string]: unknown
     }
-    [key: string]: unknown
   }
 
   export interface InlineConfig {
+    [key: string]: unknown
+    build?: BuildOptions
     cacheDir?: string
     envDir?: string
     mode?: string
-    publicDir?: string | false
+    publicDir?: false | string
     root?: string
     server?: ServerConfig
-    build?: BuildOptions
-    [key: string]: unknown
   }
 
-  export interface UserConfig extends InlineConfig {}
+  export type UserConfig = InlineConfig
 
   export interface LoadConfigResult {
-    path: string
     config: UserConfig
+    path: string
   }
 
   export interface ViteDevServer {
+    [key: string]: unknown
     close(): Promise<void>
     listen(port?: number, isRestart?: boolean): Promise<ViteDevServer>
     printUrls(): void
-    [key: string]: unknown
   }
 
   export function createServer(config: InlineConfig): Promise<ViteDevServer>

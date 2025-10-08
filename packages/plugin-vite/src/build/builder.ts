@@ -1,7 +1,7 @@
+import type { InlineConfig } from 'vite'
+
 import chalk from 'chalk'
 import path from 'node:path'
-
-import type { InlineConfig } from 'vite'
 
 import { buildSnippetDataFromManifest } from '../utils/manifest'
 import { syncBuildOutput } from '../utils/output'

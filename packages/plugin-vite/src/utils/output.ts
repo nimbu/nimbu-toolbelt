@@ -1,17 +1,17 @@
-import fs from 'fs-extra'
+import { copyFile, ensureDir, pathExists } from 'fs-extra'
 import path from 'node:path'
 
 import { getThemeRoot } from './project'
 import { SnippetData } from './types'
 
 async function copyFileWithMap(source: string, destination: string) {
-  await fs.ensureDir(path.dirname(destination))
-  await fs.copyFile(source, destination)
+  await ensureDir(path.dirname(destination))
+  await copyFile(source, destination)
 
   const sourceMap = `${source}.map`
-  if (await fs.pathExists(sourceMap)) {
-    await fs.ensureDir(path.dirname(`${destination}.map`))
-    await fs.copyFile(sourceMap, `${destination}.map`)
+  if (await pathExists(sourceMap)) {
+    await ensureDir(path.dirname(`${destination}.map`))
+    await copyFile(sourceMap, `${destination}.map`)
   }
 }
 
@@ -31,7 +31,7 @@ export async function syncBuildOutput(outDir: string, snippetData: SnippetData):
     const sourcePath = path.join(outDir, relative)
     const destinationPath = path.join(themeRoot, relative)
 
-    if (await fs.pathExists(sourcePath)) {
+    if (await pathExists(sourcePath)) {
       await copyFileWithMap(sourcePath, destinationPath)
     }
   }
