@@ -37,7 +37,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # [5.0.0-alpha.3](https://github.com/zenjoy/nimbu-toolbelt/compare/v4.1.7...v5.0.0-alpha.3) (2021-10-13)
 
-**Note:** Version bump only for package @nimbu-cli/plugin-webpack-v4
+**Note:** Version bump only for package @nimbu-cli/plugin-webpack-v5
 
 
 
@@ -45,7 +45,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # [5.0.0-alpha.2](https://github.com/zenjoy/nimbu-toolbelt/compare/v4.1.6...v5.0.0-alpha.2) (2021-10-13)
 
-**Note:** Version bump only for package @nimbu-cli/plugin-webpack-v4
+**Note:** Version bump only for package @nimbu-cli/plugin-webpack-v5
 
 
 
@@ -53,7 +53,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # [5.0.0-alpha.1](https://github.com/zenjoy/nimbu-toolbelt/compare/v4.1.6...v5.0.0-alpha.1) (2021-10-12)
 
-**Note:** Version bump only for package @nimbu-cli/plugin-webpack-v4
+**Note:** Version bump only for package @nimbu-cli/plugin-webpack-v5
 
 
 
@@ -61,4 +61,4 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # [5.0.0-alpha.0](https://github.com/zenjoy/nimbu-toolbelt/compare/v4.1.6...v5.0.0-alpha.0) (2021-10-12)
 
-**Note:** Version bump only for package @nimbu-cli/plugin-webpack-v4
+**Note:** Version bump only for package @nimbu-cli/plugin-webpack-v5

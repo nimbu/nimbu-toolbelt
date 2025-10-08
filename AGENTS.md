@@ -6,11 +6,11 @@ Nimbu Toolbelt is a TypeScript/Node.js CLI for developing and managing Nimbu CMS
 
 ## Project Structure & Architecture
 
-All publishable workspaces live in `packages/*`. `packages/cli` hosts the oclif-based CLI (40+ commands spanning auth, themes, sites, channels, apps, notifications, and more). `packages/command` supplies the shared command base, API helpers, and output utilities. `packages/proxy-server` exposes an Express-based proxy for local development. `packages/webpack-v4`, `packages/webpack-v5`, and `packages/plugin-vite` deliver optional bundlers loaded via `lib/hooks/optional-plugins`; v5 is the default modern stack while v4 remains for legacy themes and the Vite plugin provides an alternative bundler. TypeScript sources stay under each package’s `src/`, compiled output in `lib/`, and tests colocated in `test/`. Update supporting docs in `docs/` whenever command behavior changes.
+All publishable workspaces live in `packages/*`. `packages/cli` hosts the oclif-based CLI (40+ commands spanning auth, themes, sites, channels, apps, notifications, and more). `packages/command` supplies the shared command base, API helpers, and output utilities. `packages/proxy-server` exposes an Express-based proxy for local development. `packages/webpack-v5` and `packages/plugin-vite` deliver optional bundlers loaded via `lib/hooks/optional-plugins`; webpack v5 is the default modern stack while the Vite plugin provides an alternative bundler. TypeScript sources stay under each package’s `src/`, compiled output in `lib/`, and tests colocated in `test/`. Update supporting docs in `docs/` whenever command behavior changes.
 
 ## Technology Stack
 
-Webpack 5 (and 4 for legacy themes), plus an optional Vite pipeline, sit on top of Babel, CoffeeScript 2, SCSS/PostCSS, autoprefixer, and React tooling. Development builds inject CSS via the respective dev server (Webpack `style-loader` or Vite HMR), while production extracts `stylesheets/app.css`; use `EXTRACT_CSS=true pnpm exec nimbu server` with the webpack plugin or rely on Vite’s plugin-based CSS handling during debugging. Webpack emits `snippets/webpack.liquid` (and `snippets/webpack_<entry>.liquid`) exposing `webpack_chunks`, `webpack_js`, and `webpack_css` for cache-aware asset loading—for example:
+Webpack 5, plus an optional Vite pipeline, sit on top of Babel, CoffeeScript 2, SCSS/PostCSS, autoprefixer, and React tooling. Development builds inject CSS via the respective dev server (Webpack `style-loader` or Vite HMR), while production extracts `stylesheets/app.css`; use `EXTRACT_CSS=true pnpm exec nimbu server` with the webpack plugin or rely on Vite’s plugin-based CSS handling during debugging. Webpack emits `snippets/webpack.liquid` (and `snippets/webpack_<entry>.liquid`) exposing `webpack_chunks`, `webpack_js`, and `webpack_css` for cache-aware asset loading—for example:
 
 ```liquid
 {% include 'webpack' %}
@@ -51,7 +51,7 @@ Name test files `*.test.ts` and place them alongside the code under `test/`. Lev
 
 ## Environment, Security & Configuration
 
-Key environment variables include `NIMBU_API_KEY` and `NIMBU_SITE`; keep them in local `.env` files (already git-ignored). Never commit credentials or customer data—scrub fixtures before sharing. When debugging styles, use the proxy server or bundler options rather than editing live services. Optional plugins (`@nimbu-cli/plugin-webpack-v4`, `@nimbu-cli/plugin-webpack-v5`, and `@nimbu-cli/plugin-vite`) register through the init hook; confirm their manifests with `pnpm --filter <plugin> run build` after changes.
+Key environment variables include `NIMBU_API_KEY` and `NIMBU_SITE`; keep them in local `.env` files (already git-ignored). Never commit credentials or customer data—scrub fixtures before sharing. When debugging styles, use the proxy server or bundler options rather than editing live services. Optional plugins (`@nimbu-cli/plugin-webpack-v5` and `@nimbu-cli/plugin-vite`) register through the init hook; confirm their manifests with `pnpm --filter <plugin> run build` after changes.
 
 ## Commit & Pull Request Guidelines
 
