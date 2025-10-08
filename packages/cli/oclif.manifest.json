@@ -127,6 +127,109 @@
         "transpile.js"
       ]
     },
+    "auth:login": {
+      "aliases": [
+        "login"
+      ],
+      "args": {},
+      "description": "login with your nimbu credentials",
+      "flags": {
+        "expires-in": {
+          "char": "e",
+          "description": "duration of token in seconds (default 1 year)",
+          "name": "expires-in",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:login",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "login.js"
+      ]
+    },
+    "auth:logout": {
+      "aliases": [
+        "logout"
+      ],
+      "args": {},
+      "description": "clears local login credentials and invalidates API session",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:logout",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "logout.js"
+      ]
+    },
+    "auth:token": {
+      "aliases": [],
+      "args": {},
+      "description": "outputs current CLI authentication token.\nBy default, the CLI auth token is only valid for 1 year. To generate a long-lived token, use nimbu authorizations:create",
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:token",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "token.js"
+      ]
+    },
+    "auth:whoami": {
+      "aliases": [
+        "whoami"
+      ],
+      "args": {},
+      "description": "display the current logged in user",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "auth:whoami",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "auth",
+        "whoami.js"
+      ]
+    },
     "browse:admin": {
       "aliases": [],
       "args": {},
@@ -363,109 +466,6 @@
         "info.js"
       ]
     },
-    "auth:login": {
-      "aliases": [
-        "login"
-      ],
-      "args": {},
-      "description": "login with your nimbu credentials",
-      "flags": {
-        "expires-in": {
-          "char": "e",
-          "description": "duration of token in seconds (default 1 year)",
-          "name": "expires-in",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "auth:login",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "auth",
-        "login.js"
-      ]
-    },
-    "auth:logout": {
-      "aliases": [
-        "logout"
-      ],
-      "args": {},
-      "description": "clears local login credentials and invalidates API session",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "auth:logout",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "auth",
-        "logout.js"
-      ]
-    },
-    "auth:token": {
-      "aliases": [],
-      "args": {},
-      "description": "outputs current CLI authentication token.\nBy default, the CLI auth token is only valid for 1 year. To generate a long-lived token, use nimbu authorizations:create",
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "auth:token",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "auth",
-        "token.js"
-      ]
-    },
-    "auth:whoami": {
-      "aliases": [
-        "whoami"
-      ],
-      "args": {},
-      "description": "display the current logged in user",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "auth:whoami",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "auth",
-        "whoami.js"
-      ]
-    },
     "customers:copy": {
       "aliases": [],
       "args": {},
@@ -657,49 +657,6 @@
         "push.js"
       ]
     },
-    "menus:copy": {
-      "aliases": [],
-      "args": {
-        "slug": {
-          "description": "permalink of menu to be copied",
-          "name": "slug",
-          "required": false
-        }
-      },
-      "description": "copy menus from one site to another",
-      "flags": {
-        "from": {
-          "char": "f",
-          "description": "subdomain of the source site",
-          "name": "from",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "to": {
-          "char": "t",
-          "description": "subdomain of the destination site",
-          "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "menus:copy",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "menus",
-        "copy.js"
-      ]
-    },
     "pages:copy": {
       "aliases": [],
       "args": {
@@ -755,6 +712,49 @@
         "lib",
         "commands",
         "pages",
+        "copy.js"
+      ]
+    },
+    "menus:copy": {
+      "aliases": [],
+      "args": {
+        "slug": {
+          "description": "permalink of menu to be copied",
+          "name": "slug",
+          "required": false
+        }
+      },
+      "description": "copy menus from one site to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "menus:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "menus",
         "copy.js"
       ]
     },
@@ -870,6 +870,78 @@
         "commands",
         "sites",
         "list.js"
+      ]
+    },
+    "translations:copy": {
+      "aliases": [],
+      "args": {
+        "query": {
+          "default": "*",
+          "description": "query to match subset of translations to be copied",
+          "name": "query",
+          "required": false
+        }
+      },
+      "description": "copy translations from one site to another",
+      "flags": {
+        "dry-run": {
+          "description": "log which translations would be copied without actually copying them",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "fromHost": {
+          "description": "hostname of origin Nimbu API",
+          "name": "fromHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "since": {
+          "char": "s",
+          "description": "copy translations updated since the given date (use ISO 8601 format or a time unit like 1d, 1w, 1m, 1y)",
+          "name": "since",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "toHost": {
+          "description": "hostname of target Nimbu API",
+          "name": "toHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "translations:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "translations",
+        "copy.js"
       ]
     },
     "themes:copy": {
@@ -1124,78 +1196,6 @@
         "commands",
         "themes",
         "push.js"
-      ]
-    },
-    "translations:copy": {
-      "aliases": [],
-      "args": {
-        "query": {
-          "default": "*",
-          "description": "query to match subset of translations to be copied",
-          "name": "query",
-          "required": false
-        }
-      },
-      "description": "copy translations from one site to another",
-      "flags": {
-        "dry-run": {
-          "description": "log which translations would be copied without actually copying them",
-          "name": "dry-run",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "from": {
-          "char": "f",
-          "description": "subdomain of the source site",
-          "name": "from",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "fromHost": {
-          "description": "hostname of origin Nimbu API",
-          "name": "fromHost",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "since": {
-          "char": "s",
-          "description": "copy translations updated since the given date (use ISO 8601 format or a time unit like 1d, 1w, 1m, 1y)",
-          "name": "since",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "to": {
-          "char": "t",
-          "description": "subdomain of the destination site",
-          "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "toHost": {
-          "description": "hostname of target Nimbu API",
-          "name": "toHost",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "translations:copy",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "translations",
-        "copy.js"
       ]
     },
     "channels:entries:copy": {

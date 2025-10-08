@@ -19,6 +19,10 @@ export async function syncBuildOutput(outDir: string, snippetData: SnippetData):
   const themeRoot = getThemeRoot()
 
   const assets = new Set<string>()
+  for (const file of snippetData.assets ?? []) {
+    assets.add(file)
+  }
+
   for (const file of Object.values(snippetData.js)) {
     assets.add(file)
   }

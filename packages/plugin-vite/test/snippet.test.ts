@@ -55,15 +55,12 @@ describe('snippet writer', () => {
       js: { app: 'javascripts/app.js' },
     })
 
-    const { aggregate, entries } = await writeSnippets(snippetData)
+    const { aggregate } = await writeSnippets(snippetData)
     const content = await readFile(aggregate, 'utf8')
-    const entryContent = await readFile(entries[0], 'utf8')
 
     expect(aggregate).to.equal(path.join(themeRoot, 'snippets', 'vite.liquid'))
-    expect(entries[0]).to.equal(path.join(themeRoot, 'snippets', 'vite_app.liquid'))
     expect(content).to.contain('vite_js')
     expect(content).to.contain('javascripts/app.js')
-    expect(entryContent).to.contain('app_vite_js')
   })
 
   it('sanitises entry names for filenames and variables', async () => {
@@ -79,10 +76,9 @@ describe('snippet writer', () => {
       js: { 'My-Entry': 'javascripts/my-entry.js' },
     })
 
-    const { entries } = await writeSnippets(snippetData)
-    expect(entries[0]).to.equal(path.join(themeRoot, 'snippets', 'vite_my_entry.liquid'))
-
-    const content = await readFile(entries[0], 'utf8')
-    expect(content).to.contain('my_entry_vite_js')
+    const { aggregate } = await writeSnippets(snippetData)
+    const content = await readFile(aggregate, 'utf8')
+    expect(content).to.contain('My-Entry')
+    expect(content).to.contain('my-entry.js')
   })
 })

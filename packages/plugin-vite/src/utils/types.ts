@@ -5,6 +5,7 @@ export interface EntryPoint {
 }
 
 export interface SnippetData {
+  assets: string[]
   buildTimestamp: string
   chunks: string[]
   css: Record<string, string[]>

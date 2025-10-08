@@ -14,7 +14,6 @@ interface ServerFlags {
   host?: string
   noopen: boolean
   port: number
-  'vite-port': number
 }
 
 export default class Server extends Command {
@@ -26,7 +25,7 @@ export default class Server extends Command {
       description: 'Enable verbose proxy logging',
     }),
     host: Flags.string({
-      description: 'Hostname to bind the proxy and Vite servers on',
+      description: 'Hostname to bind the development server on',
       env: 'HOST',
     }),
     noopen: Flags.boolean({
@@ -35,13 +34,8 @@ export default class Server extends Command {
     }),
     port: Flags.integer({
       default: 4567,
-      description: 'Port for the Nimbu proxy server',
+      description: 'Port for the development server',
       env: 'DEFAULT_PORT',
-    }),
-    'vite-port': Flags.integer({
-      default: 5173,
-      description: 'Port for the Vite dev server',
-      env: 'VITE_PORT',
     }),
   }
 
@@ -55,10 +49,8 @@ export default class Server extends Command {
 
     const host = typedFlags.host ?? 'localhost'
     const port = typedFlags.port ?? 4567
-    const vitePort = typedFlags['vite-port'] ?? 5173
 
-    await this.ensurePortAvailable(port, 'proxy')
-    await this.ensurePortAvailable(vitePort, 'vite')
+    await this.ensurePortAvailable(port, 'development')
 
     await this.nimbu.validateLogin()
 
@@ -68,7 +60,7 @@ export default class Server extends Command {
       root,
       server: {
         host,
-        port: vitePort,
+        port,
       },
     })
 
@@ -83,7 +75,6 @@ export default class Server extends Command {
       port,
       templatePath: root,
       viteConfig: config,
-      vitePort,
     })
 
     try {
@@ -120,7 +111,7 @@ export default class Server extends Command {
     return { app: path.join(root, 'src', 'index.ts') }
   }
 
-  private async ensurePortAvailable(port: number, label: string) {
+  private async ensurePortAvailable(port: number, label: string): Promise<void> {
     const available = await detectPort(port)
     if (available !== port) {
       throw new Error(`${label} port ${port} is unavailable. Suggested free port: ${available}`)

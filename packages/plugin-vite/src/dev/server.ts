@@ -3,12 +3,15 @@ import type { InlineConfig, ViteDevServer } from 'vite'
 import { ProxyServer } from '@nimbu-cli/proxy-server'
 import chalk from 'chalk'
 import debugFactory from 'debug'
+import { Server as HttpServer, createServer as createHttpServer } from 'node:http'
 import open from 'open'
 
 import { createSnippetData, writeSnippets } from '../utils/snippet'
 import { EntryPoint } from '../utils/types'
 
 const debug = debugFactory('nimbu:vite')
+
+type ExpressLikeMiddleware = (req: unknown, res: unknown, next: (err?: unknown) => void) => void
 
 export interface ViteDevOptions {
   debug?: boolean
@@ -19,12 +22,12 @@ export interface ViteDevOptions {
   port: number
   templatePath: string
   viteConfig: InlineConfig
-  vitePort: number
 }
 
 export class ViteDevelopmentServer {
   private proxy?: ProxyServer
   private vite?: ViteDevServer
+  private httpServer?: HttpServer
 
   private readonly options: ViteDevOptions
 
@@ -33,7 +36,7 @@ export class ViteDevelopmentServer {
   }
 
   async start(): Promise<void> {
-    debug('Starting Vite development server with proxy integration')
+    debug('Starting Vite development server in middleware mode')
     const {
       debug: proxyDebug,
       entryPoints,
@@ -43,26 +46,57 @@ export class ViteDevelopmentServer {
       port,
       templatePath,
       viteConfig,
-      vitePort,
     } = this.options
 
-    const devBaseUrl = `http://${host}:${vitePort}`
+    const devBaseUrl = `http://${host}:${port}`
 
-    const config: InlineConfig = {
-      ...viteConfig,
-      root: viteConfig.root ?? templatePath,
-      server: {
-        ...viteConfig.server,
-        host,
-        port: vitePort,
-        strictPort: true,
-      },
+    this.proxy = new ProxyServer({
+      debug: proxyDebug,
+      host,
+      nimbuClient,
+      port,
+      templatePath,
+    })
+
+    const httpServer = createHttpServer(this.proxy.expressApp)
+    this.httpServer = httpServer
+
+    const existingHmrConfig =
+      typeof viteConfig.server?.hmr === 'object' ? viteConfig.server.hmr : undefined
+
+    const hmrConfig = {
+      ...(existingHmrConfig ? { ...existingHmrConfig } : {}),
+      server: httpServer,
     }
 
     const { createServer } = await import('vite')
-    this.vite = await createServer(config)
-    await this.vite.listen()
-    this.vite.printUrls()
+    this.vite = await createServer({
+      ...viteConfig,
+      appType: 'custom',
+      root: viteConfig.root ?? templatePath,
+      server: {
+        ...viteConfig.server,
+        hmr: hmrConfig,
+        middlewareMode: true,
+      },
+    })
+
+    this.proxy.use(this.vite.middlewares as ExpressLikeMiddleware)
+
+    await new Promise<void>((resolve, reject) => {
+      httpServer.on('error', (error) => {
+        reject(error)
+      })
+
+      httpServer.listen(port, host, () => {
+        const proxy = this.proxy as ProxyServer & {
+          registerExternalServer(server: HttpServer, serverHost: string, serverPort: number): void
+        }
+
+        proxy.registerExternalServer(httpServer, host, port)
+        resolve()
+      })
+    })
 
     const entryNames = entryPoints.map((entry) => entry.name)
     const cssAssets: Record<string, string[]> = {}
@@ -86,19 +120,9 @@ export class ViteDevelopmentServer {
 
     await writeSnippets(devSnippet)
 
-    this.proxy = new ProxyServer({
-      debug: proxyDebug,
-      host,
-      nimbuClient,
-      port,
-      templatePath,
-    })
-
-    await this.proxy.start()
-
     console.log(chalk.green(`
 Nimbu proxy server ready at http://${host}:${port}`))
-    console.log(chalk.cyan(`Vite dev server running at ${devBaseUrl}`))
+    console.log(chalk.cyan('Vite dev middleware attached (HMR on the same port)'))
 
     if (openBrowser) {
       await open(`http://${host}:${port}`)
@@ -116,6 +140,8 @@ Nimbu proxy server ready at http://${host}:${port}`))
       await this.proxy.stop()
       this.proxy = undefined
     }
+
+    this.httpServer = undefined
   }
 
   isRunning(): boolean {
