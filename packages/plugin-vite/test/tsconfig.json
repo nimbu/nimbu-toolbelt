@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "rootDir": "../.",
+    "sourceMap": true
+  },
+  "include": [
+    "./**/*",
+    "../src/**/*"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "name": "@nimbu-cli/plugin-vite",
+  "version": "6.0.0",
+  "author": "Zenjoy Engineering",
+  "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "dependencies": {
+    "@nimbu-cli/command": "workspace:^6.0.0",
+    "@nimbu-cli/proxy-server": "workspace:^6.0.0",
+    "@oclif/core": "^4.5.3",
+    "chalk": "^4.1.2",
+    "debug": "^4.3.6",
+    "detect-port": "^1.2.0",
+    "fs-extra": "^11.2.0",
+    "open": "^8.4.2",
+    "vite": "^5.4.0"
+  },
+  "devDependencies": {
+    "@oclif/test": "^4.1.14",
+    "@types/chai": "^4.3.14",
+    "@types/fs-extra": "^11.0.4",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20",
+    "chai": "^4.4.1",
+    "fancy-test": "^2.0.42",
+    "mocha": "^10.7.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.12.0"
+  },
+  "files": [
+    "/lib",
+    "/template",
+    "/README.md"
+  ],
+  "homepage": "https://github.com/zenjoy/nimbu-toolbelt",
+  "keywords": [
+    "oclif-plugin",
+    "nimbu",
+    "vite",
+    "nimbu-cli-plugin"
+  ],
+  "license": "MIT",
+  "oclif": {
+    "commands": "./lib/commands"
+  },
+  "repository": "zenjoy/nimbu-toolbelt",
+  "scripts": {
+    "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
+    "lint": "eslint . --ext .ts --config .eslintrc",
+    "postpack": "rm -f oclif.manifest.json",
+    "prepack": "pnpm run build",
+    "pretest": "tsc -p test --noEmit",
+    "test": "mocha --forbid-only 'test/**/*.test.ts' --timeout 60000",
+    "posttest": "pnpm run lint",
+    "yalc:publish": "pnpm run build && pnpm exec yalc publish --push --no-script"
+  }
+}

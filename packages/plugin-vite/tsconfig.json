@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.settings.json",
+  "compilerOptions": {
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "paths": {
+      "@nimbu-cli/command": ["../command"],
+      "@nimbu-cli/proxy-server": ["../proxy-server"]
+    }
+  },
+  "references": [
+    {
+      "path": "../command"
+    },
+    {
+      "path": "../proxy-server"
+    }
+  ],
+  "include": [
+    "./src/**/*"
+  ]
+}

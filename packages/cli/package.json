@@ -37,6 +37,7 @@
     "lodash": "^4.17.11",
     "log-symbols": "^3.0.0",
     "chalk": "^4.1.2",
+    "debug": "^4.3.6",
     "open": "^8.4.2",
     "pretty-bytes": "^5.3.0",
     "rxjs": "^6.5.2",
@@ -94,7 +95,8 @@
     ],
     "optionalPlugins": [
       "@nimbu-cli/plugin-webpack-v4",
-      "@nimbu-cli/plugin-webpack-v5"
+      "@nimbu-cli/plugin-webpack-v5",
+      "@nimbu-cli/plugin-vite"
     ],
     "hooks": {
       "init": "./lib/hooks/optional-plugins"

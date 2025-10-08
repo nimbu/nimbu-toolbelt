@@ -2,15 +2,15 @@
 
 ## Project Overview
 
-Nimbu Toolbelt is a TypeScript/Node.js CLI for developing and managing Nimbu CMS projects. The monorepo uses pnpm workspaces plus Lerna to coordinate multiple packages, optional webpack plugins, and a bundled proxy server that power theme development and deployment. The architecture pairs a Node-based CLI (via oclif) that talks directly to Nimbu APIs with webpack-driven theme tooling for Liquid layouts.
+Nimbu Toolbelt is a TypeScript/Node.js CLI for developing and managing Nimbu CMS projects. The monorepo uses pnpm workspaces plus Lerna to coordinate multiple packages, optional bundler plugins (webpack and Vite), and a bundled proxy server that power theme development and deployment. The architecture pairs a Node-based CLI (via oclif) that talks directly to Nimbu APIs with theme tooling that emits Liquid-aware asset manifests.
 
 ## Project Structure & Architecture
 
-All publishable workspaces live in `packages/*`. `packages/cli` hosts the oclif-based CLI (40+ commands spanning auth, themes, sites, channels, apps, notifications, and more). `packages/command` supplies the shared command base, API helpers, and output utilities. `packages/proxy-server` exposes an Express-based proxy for local development. `packages/webpack-v4` and `packages/webpack-v5` deliver optional bundlers loaded via `lib/hooks/optional-plugins`; v5 is the default modern stack while v4 remains for legacy themes. TypeScript sources stay under each package’s `src/`, compiled output in `lib/`, and tests colocated in `test/`. Update supporting docs in `docs/` whenever command behavior changes.
+All publishable workspaces live in `packages/*`. `packages/cli` hosts the oclif-based CLI (40+ commands spanning auth, themes, sites, channels, apps, notifications, and more). `packages/command` supplies the shared command base, API helpers, and output utilities. `packages/proxy-server` exposes an Express-based proxy for local development. `packages/webpack-v4`, `packages/webpack-v5`, and `packages/plugin-vite` deliver optional bundlers loaded via `lib/hooks/optional-plugins`; v5 is the default modern stack while v4 remains for legacy themes and the Vite plugin provides an alternative bundler. TypeScript sources stay under each package’s `src/`, compiled output in `lib/`, and tests colocated in `test/`. Update supporting docs in `docs/` whenever command behavior changes.
 
 ## Technology Stack
 
-Webpack 5 (and 4 for legacy themes), Babel, CoffeeScript 2, SCSS/PostCSS, autoprefixer, and React tooling drive the theme pipeline. Development builds inject CSS via `style-loader` for HMR, while production extracts `stylesheets/app.css`; use `EXTRACT_CSS=true pnpm exec nimbu server` to force extraction during debugging. The build emits `snippets/webpack.liquid`, exposing `webpack_chunks`, `webpack_js`, and `webpack_css` for cache-aware asset loading—for example:
+Webpack 5 (and 4 for legacy themes), plus an optional Vite pipeline, sit on top of Babel, CoffeeScript 2, SCSS/PostCSS, autoprefixer, and React tooling. Development builds inject CSS via the respective dev server (Webpack `style-loader` or Vite HMR), while production extracts `stylesheets/app.css`; use `EXTRACT_CSS=true pnpm exec nimbu server` with the webpack plugin or rely on Vite’s plugin-based CSS handling during debugging. Webpack emits `snippets/webpack.liquid` (and `snippets/webpack_<entry>.liquid`) exposing `webpack_chunks`, `webpack_js`, and `webpack_css` for cache-aware asset loading—for example:
 
 ```liquid
 {% include 'webpack' %}
@@ -29,10 +29,10 @@ Run `pnpm install` once, then `pnpm run build` (alias for `lerna run build`) to 
 ## Theme Development Workflow
 
 1. `pnpm exec nimbu init` to scaffold with the desired theme.
-2. `pnpm exec nimbu server` starts webpack-dev-server at http://localhost:4567 with HMR (set `EXTRACT_CSS=true` when you need extracted styles in dev).
-3. `pnpm exec nimbu build` prepares production bundles.
+2. `pnpm exec nimbu server` starts the selected bundler (webpack dev server or Vite dev server) alongside the proxy at http://localhost:4567 (webpack serves assets from the same port, Vite uses 5173 by default).
+3. `pnpm exec nimbu build` prepares production bundles using the active bundler plugin.
 4. `pnpm exec nimbu themes:push` deploys assets to Nimbu.  
-   Ensure `snippets/webpack.liquid` stays committed so layouts can load generated chunks.
+   Ensure the generated snippet files (`snippets/webpack*.liquid` or `snippets/vite*.liquid`, depending on the active bundler) stay committed so layouts can load generated chunks.
 
 ## Coding Style & Naming Conventions
 
@@ -46,11 +46,12 @@ Name test files `*.test.ts` and place them alongside the code under `test/`. Lev
 
 **Adding a command:** Create a file in the appropriate `packages/cli/src/commands/<topic>/` folder, extend the base class from `@nimbu-cli/command`, declare flags/args/description, add tests, run `pnpm run build`, and verify with `./bin/run <command>`.  
 **Modifying webpack config:** Update files in `packages/webpack-v5/src/config/` (notably `config/paths.ts`), test with `pnpm exec nimbu server`, confirm production output via `pnpm exec nimbu build`, and validate the Liquid snippet for new assets.  
+**Modifying Vite config:** Update `packages/plugin-vite` defaults or your project’s `vite.config.*`, run `pnpm exec nimbu server --vite-port <port>` to test, and ensure `snippets/vite*.liquid` reflects stable filenames before pushing.
 **Proxy adjustments:** Use `packages/proxy-server` to debug network flows instead of touching production endpoints.
 
 ## Environment, Security & Configuration
 
-Key environment variables include `NIMBU_API_KEY` and `NIMBU_SITE`; keep them in local `.env` files (already git-ignored). Never commit credentials or customer data—scrub fixtures before sharing. When debugging styles, use the proxy server or webpack options rather than editing live services. Optional plugins (`@nimbu-cli/plugin-webpack-v4` and `@nimbu-cli/plugin-webpack-v5`) register through the init hook; confirm their manifests with `pnpm --filter <plugin> run build` after changes.
+Key environment variables include `NIMBU_API_KEY` and `NIMBU_SITE`; keep them in local `.env` files (already git-ignored). Never commit credentials or customer data—scrub fixtures before sharing. When debugging styles, use the proxy server or bundler options rather than editing live services. Optional plugins (`@nimbu-cli/plugin-webpack-v4`, `@nimbu-cli/plugin-webpack-v5`, and `@nimbu-cli/plugin-vite`) register through the init hook; confirm their manifests with `pnpm --filter <plugin> run build` after changes.
 
 ## Commit & Pull Request Guidelines
 

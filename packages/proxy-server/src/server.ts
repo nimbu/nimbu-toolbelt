@@ -50,8 +50,7 @@ export class ProxyServer implements ServerAdapter {
 
     return new Promise((resolve, reject) => {
       this.server = this.app.listen(config.port, host, () => {
-        console.log(`✅ Proxy server running on http://${host}:${config.port}`)
-        this.isRunning = true
+        this.registerExternalServer(this.server as Server, host, config.port)
         resolve()
       })
 
@@ -59,11 +58,28 @@ export class ProxyServer implements ServerAdapter {
         console.error('Server error:', error)
         reject(error)
       })
-
-      // Set server timeouts for security
-      this.server.timeout = 30_000 // 30 seconds
-      this.server.keepAliveTimeout = 5000 // 5 seconds
     })
+  }
+
+  registerExternalServer(server: Server, host: string, port: number): void {
+    if (this.server && this.server !== server) {
+      throw new Error('Proxy server is already bound to a different HTTP server instance')
+    }
+
+    this.options = { ...this.options, host, port }
+    this.server = server
+    this.isRunning = true
+
+    // Set server timeouts for security
+    this.server.timeout = 30_000 // 30 seconds
+    this.server.keepAliveTimeout = 5000 // 5 seconds
+
+    this.server.on('close', () => {
+      this.isRunning = false
+      this.server = null
+    })
+
+    console.log(`✅ Proxy server running on http://${host}:${port}`)
   }
 
   async stop(): Promise<void> {
