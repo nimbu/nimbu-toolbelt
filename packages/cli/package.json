@@ -52,12 +52,11 @@
     "@types/follow-redirects": "^1.13.1",
     "@types/glob": "^7.1.4",
     "@types/mock-fs": "^4.13.1",
-    "@types/nock": "^11.1.0",
     "chai": "^4.4.1",
     "fancy-test": "^2.0.42",
     "mock-fs": "^4.8.0",
     "mocha": "^10.7.3",
-    "nock": "^13.5.4"
+    "nock": "^14.0.10"
   },
   "engines": {
     "node": ">=18.0.0"

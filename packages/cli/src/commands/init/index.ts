@@ -154,7 +154,6 @@ export default class Init extends Command {
       this.log(`- ${d}`)
       try {
         await fs.mkdirp(currentDir + '/' + d)
-        // tslint:disable-next-line: no-unused
       } catch {
         // do nothing
       }

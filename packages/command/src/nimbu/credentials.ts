@@ -165,6 +165,7 @@ export class Credentials {
   }
 
   private migrateFromNimbuToken(): string | undefined {
+    if (process.env.NODE_ENV === 'test') return undefined
     let token
 
     const credentialsExist = pathExistsSync(this.credentialsFile)

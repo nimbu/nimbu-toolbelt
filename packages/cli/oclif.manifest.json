@@ -382,12 +382,24 @@
           "multiple": false,
           "type": "option"
         },
-        "sort": {
-          "description": "property to sort by (prepend '-' for descending)",
-          "name": "sort",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
+        "csv": {
+          "description": "output is csv format [alias: --output=csv]",
+          "exclusive": [
+            "no-truncate"
+          ],
+          "name": "csv",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "extended": {
+          "char": "x",
+          "description": "show extra columns",
+          "exclusive": [
+            "columns"
+          ],
+          "name": "extended",
+          "allowNo": false,
+          "type": "boolean"
         },
         "filter": {
           "description": "filter property by partial string matching, ex: name=foo",
@@ -396,12 +408,21 @@
           "multiple": false,
           "type": "option"
         },
-        "csv": {
-          "description": "output is csv format [alias: --output=csv]",
+        "no-header": {
+          "description": "hide table header from output",
           "exclusive": [
-            "no-truncate"
+            "csv"
           ],
-          "name": "csv",
+          "name": "no-header",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "no-truncate": {
+          "description": "do not truncate output to fit screen",
+          "exclusive": [
+            "csv"
+          ],
+          "name": "no-truncate",
           "allowNo": false,
           "type": "boolean"
         },
@@ -422,33 +443,12 @@
           ],
           "type": "option"
         },
-        "extended": {
-          "char": "x",
-          "description": "show extra columns",
-          "exclusive": [
-            "columns"
-          ],
-          "name": "extended",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "no-truncate": {
-          "description": "do not truncate output to fit screen",
-          "exclusive": [
-            "csv"
-          ],
-          "name": "no-truncate",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "no-header": {
-          "description": "hide table header from output",
-          "exclusive": [
-            "csv"
-          ],
-          "name": "no-header",
-          "allowNo": false,
-          "type": "boolean"
+        "sort": {
+          "description": "property to sort by (prepend '-' for descending)",
+          "name": "sort",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -657,6 +657,49 @@
         "push.js"
       ]
     },
+    "menus:copy": {
+      "aliases": [],
+      "args": {
+        "slug": {
+          "description": "permalink of menu to be copied",
+          "name": "slug",
+          "required": false
+        }
+      },
+      "description": "copy menus from one site to another",
+      "flags": {
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "menus:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "menus",
+        "copy.js"
+      ]
+    },
     "pages:copy": {
       "aliases": [],
       "args": {
@@ -712,49 +755,6 @@
         "lib",
         "commands",
         "pages",
-        "copy.js"
-      ]
-    },
-    "menus:copy": {
-      "aliases": [],
-      "args": {
-        "slug": {
-          "description": "permalink of menu to be copied",
-          "name": "slug",
-          "required": false
-        }
-      },
-      "description": "copy menus from one site to another",
-      "flags": {
-        "from": {
-          "char": "f",
-          "description": "subdomain of the source site",
-          "name": "from",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "to": {
-          "char": "t",
-          "description": "subdomain of the destination site",
-          "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "menus:copy",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "menus",
         "copy.js"
       ]
     },
@@ -870,78 +870,6 @@
         "commands",
         "sites",
         "list.js"
-      ]
-    },
-    "translations:copy": {
-      "aliases": [],
-      "args": {
-        "query": {
-          "default": "*",
-          "description": "query to match subset of translations to be copied",
-          "name": "query",
-          "required": false
-        }
-      },
-      "description": "copy translations from one site to another",
-      "flags": {
-        "dry-run": {
-          "description": "log which translations would be copied without actually copying them",
-          "name": "dry-run",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "from": {
-          "char": "f",
-          "description": "subdomain of the source site",
-          "name": "from",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "fromHost": {
-          "description": "hostname of origin Nimbu API",
-          "name": "fromHost",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "since": {
-          "char": "s",
-          "description": "copy translations updated since the given date (use ISO 8601 format or a time unit like 1d, 1w, 1m, 1y)",
-          "name": "since",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "to": {
-          "char": "t",
-          "description": "subdomain of the destination site",
-          "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "toHost": {
-          "description": "hostname of target Nimbu API",
-          "name": "toHost",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "translations:copy",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "translations",
-        "copy.js"
       ]
     },
     "themes:copy": {
@@ -1196,6 +1124,78 @@
         "commands",
         "themes",
         "push.js"
+      ]
+    },
+    "translations:copy": {
+      "aliases": [],
+      "args": {
+        "query": {
+          "default": "*",
+          "description": "query to match subset of translations to be copied",
+          "name": "query",
+          "required": false
+        }
+      },
+      "description": "copy translations from one site to another",
+      "flags": {
+        "dry-run": {
+          "description": "log which translations would be copied without actually copying them",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from": {
+          "char": "f",
+          "description": "subdomain of the source site",
+          "name": "from",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "fromHost": {
+          "description": "hostname of origin Nimbu API",
+          "name": "fromHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "since": {
+          "char": "s",
+          "description": "copy translations updated since the given date (use ISO 8601 format or a time unit like 1d, 1w, 1m, 1y)",
+          "name": "since",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "to": {
+          "char": "t",
+          "description": "subdomain of the destination site",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "toHost": {
+          "description": "hostname of target Nimbu API",
+          "name": "toHost",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "translations:copy",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "translations",
+        "copy.js"
       ]
     },
     "channels:entries:copy": {
