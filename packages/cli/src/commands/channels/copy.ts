@@ -17,9 +17,9 @@ type CopyAll = {
   toSite: string
 }
 
-type CopyAllChannelsKnown = CopyAll & {
+type CopyAllChannelsKnown = {
   channels: Channel[]
-}
+} & CopyAll
 
 type CopySingle = {
   channel?: Channel
@@ -30,10 +30,10 @@ type CopySingle = {
   toSite: string
 }
 
-type CopySingleChannelKnown = CopySingle & {
+type CopySingleChannelKnown = {
   channel: Channel
   copyAll?: boolean
-}
+} & CopySingle
 
 export default class CopyChannels extends Command {
   static description = 'copy channel configuration from one to another'

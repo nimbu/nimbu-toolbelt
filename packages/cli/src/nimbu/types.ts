@@ -238,12 +238,12 @@ type BaseChannelEntryFile = {
   width: number
 }
 
-type BaseChannelEntryPrivateFile = BaseChannelEntryFile & {
+type BaseChannelEntryPrivateFile = {
   permanent_backend_url: string
   permanent_relative_url: string
   permanent_url: string
   private: true
-}
+} & BaseChannelEntryFile
 
 export type ChannelEntryFile = BaseChannelEntryFile | BaseChannelEntryPrivateFile
 

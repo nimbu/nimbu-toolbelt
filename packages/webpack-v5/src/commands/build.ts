@@ -1,5 +1,5 @@
-/* eslint-disable unicorn/no-process-exit */
-/* eslint-disable no-process-exit */
+/* eslint-disable unicorn/no-process-exit, n/no-process-exit */
+
 import { Command, buildConfig } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import ora from 'ora'
@@ -74,7 +74,7 @@ export default class Build extends Command {
               let errMessage = err.message
 
               // Add additional information for postcss errors
-              if (Object.prototype.hasOwnProperty.call(err, 'postcssNode')) {
+              if (Object.hasOwn(err, 'postcssNode')) {
                 errMessage += '\nCompileError: Begins at CSS selector ' + err.postcssNode.selector
               }
 

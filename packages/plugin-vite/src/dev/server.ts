@@ -4,8 +4,8 @@ import { ProxyServer } from '@nimbu-cli/proxy-server'
 import chalk from 'chalk'
 import debugFactory from 'debug'
 import { Server as HttpServer, createServer as createHttpServer } from 'node:http'
-import open from 'open'
 
+import { ensureViteNodeCompatibility } from '../utils/node-version'
 import { createSnippetData, writeSnippets } from '../utils/snippet'
 import { EntryPoint } from '../utils/types'
 
@@ -36,6 +36,8 @@ export class ViteDevelopmentServer {
   }
 
   async start(): Promise<void> {
+    ensureViteNodeCompatibility()
+
     debug('Starting Vite development server in middleware mode')
     const {
       debug: proxyDebug,
@@ -89,9 +91,9 @@ export class ViteDevelopmentServer {
       })
 
       httpServer.listen(port, host, () => {
-        const proxy = this.proxy as ProxyServer & {
+        const proxy = this.proxy as {
           registerExternalServer(server: HttpServer, serverHost: string, serverPort: number): void
-        }
+        } & ProxyServer
 
         proxy.registerExternalServer(httpServer, host, port)
         resolve()
@@ -125,6 +127,7 @@ Nimbu proxy server ready at http://${host}:${port}`))
     console.log(chalk.cyan('Vite dev middleware attached (HMR on the same port)'))
 
     if (openBrowser) {
+      const { default: open } = await import('open')
       await open(`http://${host}:${port}`)
     }
   }

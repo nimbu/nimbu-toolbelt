@@ -1,3 +1,5 @@
+/* eslint-disable import/no-named-as-default-member */
+
 import chalk from 'chalk'
 import compression from 'compression'
 import cors from 'cors'

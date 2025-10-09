@@ -26,7 +26,7 @@ export interface SimulatorRequestData {
 }
 
 export class SimulatorFormatter {
-  // eslint-disable-next-line no-useless-constructor
+   
   constructor(private readonly templatePacker: TemplatePacker) {}
 
   /**
@@ -134,11 +134,12 @@ export class SimulatorFormatter {
    */
   private captureRawBody(req: Request): string | undefined {
     // Check if we have raw body data attached to the request
-    const rawBody = (req as any).rawBody
+    const {rawBody} = (req as any)
     if (rawBody && Buffer.isBuffer(rawBody)) {
       // Base64 encode the raw body for JSON transport
       return rawBody.toString('base64')
     }
+
     return undefined
   }
 

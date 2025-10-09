@@ -1,5 +1,6 @@
 {
   "root": true,
+  "plugins": ["node"],
   "extends": ["oclif", "oclif-typescript", "prettier"],
   "rules": {
     "eqeqeq": ["error", "always", { "null": "ignore" }],

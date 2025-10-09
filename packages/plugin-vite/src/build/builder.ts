@@ -4,6 +4,7 @@ import chalk from 'chalk'
 import path from 'node:path'
 
 import { buildSnippetDataFromManifest, resolveManifestPath } from '../utils/manifest'
+import { ensureViteNodeCompatibility } from '../utils/node-version'
 import { syncBuildOutput } from '../utils/output'
 import { writeSnippets } from '../utils/snippet'
 import { EntryPoint } from '../utils/types'
@@ -14,6 +15,8 @@ export interface ViteBuildOptions {
 }
 
 export async function runViteBuild(options: ViteBuildOptions): Promise<void> {
+  ensureViteNodeCompatibility()
+
   const { config, entryPoints } = options
   const root = config.root ? path.resolve(config.root) : process.cwd()
   const outDir = path.resolve(root, config.build?.outDir ?? 'dist')

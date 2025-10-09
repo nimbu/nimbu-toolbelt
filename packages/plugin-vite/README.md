@@ -10,6 +10,8 @@ filenames stable, and routing the Nimbu proxy through the Node-based proxy serve
 pnpm add -D @nimbu-cli/plugin-vite
 ```
 
+> Requires Node.js 20.19 or newer. Vite 7 dropped support for earlier Node.js releases, and the plugin enforces the same minimum.
+
 Make sure you only keep one bundler plugin installed at a time (either the
 webpack plugin or this Vite plugin) to avoid command conflicts. The core CLI
 loads optional plugins listed in `package.json#oclif.optionalPlugins` when the

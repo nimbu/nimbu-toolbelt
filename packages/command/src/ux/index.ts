@@ -402,7 +402,7 @@ const computeTableFlags = ((opts?: TableFlagOptions) => {
   return result as any
 }) as TableFlagOverload
 
-type TableWithFlags = typeof table & { flags: TableFlagOverload }
+type TableWithFlags = { flags: TableFlagOverload } & typeof table
 
 const tableWithFlags = table as TableWithFlags
 tableWithFlags.flags = computeTableFlags
