@@ -14,6 +14,7 @@ const path = require('node:path')
 const resolve = require('resolve')
 const TerserPlugin = require('terser-webpack-plugin')
 const webpack = require('webpack')
+
 const { hasOptional } = require('./utils')
 const WorkboxWebpackPlugin = hasOptional('workbox-webpack-plugin') ? require('workbox-webpack-plugin') : null
 const ESLintPlugin = require('eslint-webpack-plugin')
@@ -60,6 +61,7 @@ const getESLintVersion = () => {
     return 9 // Default to latest if detection fails
   }
 }
+
 const eslintMajorVersion = getESLintVersion()
 
 const imageInlineSizeLimit = Number.parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT || '10000', 10) // smaller then 10000 bytes will be inlined as data url
