@@ -26,7 +26,6 @@ export interface SimulatorRequestData {
 }
 
 export class SimulatorFormatter {
-   
   constructor(private readonly templatePacker: TemplatePacker) {}
 
   /**
@@ -39,11 +38,13 @@ export class SimulatorFormatter {
     }
 
     // Skip webpack dev server specific paths
-    if (req.path.includes('/__webpack') || 
-        req.path.includes('/sockjs-node') ||
-        req.path.includes('.hot-update.') ||
-        req.path.startsWith('/__') ||
-        req.path === '/ws') {
+    if (
+      req.path.includes('/__webpack') ||
+      req.path.includes('/sockjs-node') ||
+      req.path.includes('.hot-update.') ||
+      req.path.startsWith('/__') ||
+      req.path === '/ws'
+    ) {
       return false
     }
 
@@ -127,14 +128,13 @@ export class SimulatorFormatter {
     return headers
   }
 
-
   /**
    * Capture raw HTTP body from request and base64 encode it for JSON transport
    * For v3, we send the exact raw body as received, letting the server parse it
    */
   private captureRawBody(req: Request): string | undefined {
     // Check if we have raw body data attached to the request
-    const {rawBody} = (req as any)
+    const { rawBody } = req as any
     if (rawBody && Buffer.isBuffer(rawBody)) {
       // Base64 encode the raw body for JSON transport
       return rawBody.toString('base64')
@@ -142,7 +142,6 @@ export class SimulatorFormatter {
 
     return undefined
   }
-
 
   /**
    * Sanitize any object for JSON serialization
@@ -211,5 +210,4 @@ export class SimulatorFormatter {
   private sanitizeParams(params: Record<string, any>): Record<string, any> {
     return this.sanitizeForJSON(params)
   }
-
 }

@@ -23,8 +23,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.19.19",
     "chai": "^4.5.0",
-    "fancy-test": "^2.0.42",
-    "mocha": "^10.8.2",
+    "mocha": "^11.7.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
@@ -50,12 +49,12 @@
   "repository": "zenjoy/nimbu-toolbelt",
   "scripts": {
     "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
-    "lint": "eslint . --ext .ts --config .eslintrc",
+    "lint": "eslint .",
     "postpack": "rm -f oclif.manifest.json",
     "prepack": "pnpm run build",
     "pretest": "tsc -p test --noEmit",
     "test": "mocha --forbid-only 'test/**/*.test.ts' --timeout 60000",
     "posttest": "pnpm run lint",
-    "yalc:publish": "pnpm run build && pnpm exec yalc publish --push --no-script"
+    "yalc:publish": "pnpm run build && pnpm dlx yalc publish --push --no-script"
   }
 }

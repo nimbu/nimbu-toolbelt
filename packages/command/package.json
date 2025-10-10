@@ -26,18 +26,15 @@
   "devDependencies": {
     "@types/chai": "^4.3.20",
     "@types/fs-extra": "^7.0.0",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^20.19.19",
     "@types/proxyquire": "^1.3.31",
-    "@types/sinon": "^9.0.11",
     "@types/supports-color": "^8.1.3",
     "chai": "^4.5.0",
-    "fancy-test": "^2.0.42",
-    "mocha": "^6.2.3",
+    "mocha": "^11.7.4",
     "mock-fs": "^4.14.0",
     "nock": "^14.0.10",
-    "nyc": "^14.1.1",
-    "sinon": "^9.2.4",
+    "sinon": "^19.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
@@ -56,11 +53,11 @@
   "repository": "zenjoy/nimbu-toolbelt",
   "scripts": {
     "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
-    "lint": "eslint . --ext .ts --config .eslintrc",
+    "lint": "eslint .",
     "posttest": "pnpm run lint",
     "prepack": "pnpm run build",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\" --timeout 10000",
-    "yalc:publish": "pnpm run build && pnpm exec yalc publish --push --no-script"
+    "test": "mocha --forbid-only 'test/**/*.test.ts' --timeout 60000",
+    "yalc:publish": "pnpm run build && pnpm dlx yalc publish --push --no-script"
   },
   "types": "./lib/index.d.ts",
   "gitHead": "f9d5b8f084e75a4aa8a29f9930f8da36a6ad258f"

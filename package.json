@@ -1,34 +1,29 @@
 {
   "devDependencies": {
-    "@octokit/core": "^3.6.0",
     "@types/node": "^20.19.19",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.1",
-    "eslint-config-oclif": "^5.2.2",
-    "eslint-config-oclif-typescript": "^3.1.14",
-    "eslint-config-prettier": "^9.1.2",
-    "eslint-config-standard": "12.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.12.1",
+    "@typescript-eslint/parser": "^8.12.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.35.0",
+    "eslint-config-oclif": "^6.0.108",
+    "eslint-config-prettier": "^10.1.1",
     "eslint-import-resolver-typescript": "^3.10.1",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-node": "^8.0.1",
-    "eslint-plugin-promise": "^4.3.1",
-    "eslint-plugin-standard": "^4.1.0",
+    "eslint-plugin-n": "^17.11.1",
+    "eslint-plugin-promise": "^6.5.2",
+    "fs.realpath": "^1.0.0",
+    "glob": "^11.0.3",
+    "inherits": "^2.0.4",
     "lerna": "^9.0.0",
     "mem-fs": "^2.3.0",
     "mem-fs-editor": "^9.7.0",
+    "minimatch": "^9.0.5",
     "oclif": "^4.22.29",
-    "promise-request-retry": "^1.0.2",
-    "standard": "12.0.1",
+    "once": "^1.4.0",
+    "path-is-absolute": "^1.0.1",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
-    "yalc": "1.0.0-pre.53"
-  },
-  "standard": {
-    "env": "mocha",
-    "ignore": [
-      "**/node_modules/**",
-      "packages/*/lib/**"
-    ]
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -45,7 +40,15 @@
   "packageManager": "pnpm@10.18.1+sha512.77a884a165cbba2d8d1c19e3b4880eee6d2fcabd0d879121e282196b80042351d5eb3ca0935fa599da1dc51265cc68816ad2bddd2a2de5ea9fdf92adbec7cd34",
   "pnpm": {
     "overrides": {
-      "fork-ts-checker-webpack-plugin": "9.1.0"
+      "fork-ts-checker-webpack-plugin": "9.1.0",
+      "@babel/plugin-proposal-class-properties": "npm:@babel/plugin-transform-class-properties@7.25.9",
+      "@babel/plugin-proposal-nullish-coalescing-operator": "npm:@babel/plugin-transform-nullish-coalescing-operator@7.24.7",
+      "@babel/plugin-proposal-optional-chaining": "npm:@babel/plugin-transform-optional-chaining@7.24.8",
+      "@babel/plugin-proposal-private-methods": "npm:@babel/plugin-transform-private-methods@7.24.1",
+      "@babel/plugin-proposal-private-property-in-object": "npm:@babel/plugin-transform-private-property-in-object@7.24.7",
+      "@babel/plugin-proposal-numeric-separator": "npm:@babel/plugin-transform-numeric-separator@7.24.7",
+      "rimraf": "5.0.10",
+      "magic-string": "0.30.11"
     },
     "onlyBuiltDependencies": [
       "@parcel/watcher",

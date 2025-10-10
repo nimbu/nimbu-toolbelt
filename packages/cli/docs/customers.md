@@ -1,11 +1,10 @@
-`nimbu customers`
-=================
+# `nimbu customers`
 
 working with customers
 
-* [`nimbu customers:config:copy`](#nimbu-customersconfigcopy)
-* [`nimbu customers:config:diff`](#nimbu-customersconfigdiff)
-* [`nimbu customers:copy`](#nimbu-customerscopy)
+- [`nimbu customers:config:copy`](#nimbu-customersconfigcopy)
+- [`nimbu customers:config:diff`](#nimbu-customersconfigdiff)
+- [`nimbu customers:copy`](#nimbu-customerscopy)
 
 ## `nimbu customers:config:copy`
 

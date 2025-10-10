@@ -7,7 +7,6 @@ import { addFieldNames, cleanUpIds, convertChangesToTree } from '../../utils/dif
 
 export default class DiffChannels extends Command {
   static description = 'check differences between channel settings from one to another'
-
   static flags = {
     from: Flags.string({
       char: 'f', // shorter flag version
@@ -141,7 +140,7 @@ export default class DiffChannels extends Command {
 
         if (diff.updated != null && Object.keys(diff.updated).length > 0) {
           anyDifferences = true
-          ux.log(`Following fields or field attributes have differences:`)
+          ux.log('Following fields or field attributes have differences:')
           convertChangesToTree(diff.updated).display()
         }
 
@@ -160,12 +159,12 @@ export default class DiffChannels extends Command {
 
         if (otherDiff.updated != null && Object.keys(otherDiff.updated).length > 0) {
           anyDifferences = true
-          ux.log(`Following channel attributes have differences:`)
+          ux.log('Following channel attributes have differences:')
           convertChangesToTree(otherDiff.updated).display()
         }
 
         if (!anyDifferences) {
-          ux.log(`There are no differences.`)
+          ux.log('There are no differences.')
         }
       }
 

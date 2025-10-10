@@ -14,43 +14,6 @@ const toPascalCase = (s: string) =>
 
 const toInterfaceType = (field: CustomField) => {
   switch (field.type) {
-    case 'string':
-    case 'text':
-    case 'email':
-    case 'calculated': {
-      return 'string'
-    }
-
-    case 'integer':
-    case 'float': {
-      return 'number'
-    }
-
-    case 'boolean': {
-      return 'boolean'
-    }
-
-    case 'file': {
-      return 'Nimbu.File'
-    }
-
-    case 'date': {
-      return 'Nimbu.Date'
-    }
-
-    case 'time':
-    case 'date_time': {
-      return 'Nimbu.DateTime'
-    }
-
-    case 'select': {
-      return `Nimbu.Select<'${field.select_options.map((o) => o.name).join("' | '")}'>`
-    }
-
-    case 'multi_select': {
-      return `Nimbu.MultiSelect<'${field.select_options.map((o) => o.name).join("' | '")}'>`
-    }
-
     case 'belongs_to':
     case 'customer': {
       return 'Nimbu.ReferenceTo'
@@ -60,8 +23,45 @@ const toInterfaceType = (field: CustomField) => {
       return 'Nimbu.ReferenceMany'
     }
 
+    case 'boolean': {
+      return 'boolean'
+    }
+
+    case 'calculated':
+    case 'email':
+    case 'string':
+    case 'text': {
+      return 'string'
+    }
+
+    case 'date': {
+      return 'Nimbu.Date'
+    }
+
+    case 'date_time':
+    case 'time': {
+      return 'Nimbu.DateTime'
+    }
+
+    case 'file': {
+      return 'Nimbu.File'
+    }
+
+    case 'float':
+    case 'integer': {
+      return 'number'
+    }
+
     case 'gallery': {
       return 'Nimbu.Gallery'
+    }
+
+    case 'multi_select': {
+      return `Nimbu.MultiSelect<'${field.select_options.map((o) => o.name).join("' | '")}'>`
+    }
+
+    case 'select': {
+      return `Nimbu.Select<'${field.select_options.map((o) => o.name).join("' | '")}'>`
     }
 
     default: {
@@ -78,9 +78,7 @@ export default class ChannelsInfo extends Command {
       required: true,
     }),
   }
-
   static description = 'list info about this channel'
-
   static flags: Record<string, any> = {
     ...ux.table.flags(),
     output: Flags.string({
@@ -153,7 +151,7 @@ export default class ChannelsInfo extends Command {
       {
         calculated_expression: {
           extended: true,
-          get: (row) => (isCalculatedField(row) ? row.calculated_expression ?? '' : ''),
+          get: (row) => (isCalculatedField(row) ? (row.calculated_expression ?? '') : ''),
         },
         hint: {
           extended: true,
@@ -174,7 +172,7 @@ export default class ChannelsInfo extends Command {
           },
         },
         reference: {
-          get: (row) => (isRelationalField(row) ? row.reference ?? '' : ''),
+          get: (row) => (isRelationalField(row) ? (row.reference ?? '') : ''),
         },
         required: {
           get: (row) => (tty ? (row.required ? '✓' : '') : Boolean(row.required)),

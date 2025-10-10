@@ -1,9 +1,8 @@
-`nimbu init`
-============
+# `nimbu init`
 
 working directory initialization
 
-* [`nimbu init`](#nimbu-init)
+- [`nimbu init`](#nimbu-init)
 
 ## `nimbu init`
 

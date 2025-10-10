@@ -1,10 +1,9 @@
-`nimbu browse`
-==============
+# `nimbu browse`
 
 open the current site in your browser (simulator, admin)
 
-* [`nimbu browse:admin`](#nimbu-browseadmin)
-* [`nimbu browse:simulator`](#nimbu-browsesimulator)
+- [`nimbu browse:admin`](#nimbu-browseadmin)
+- [`nimbu browse:simulator`](#nimbu-browsesimulator)
 
 ## `nimbu browse:admin`
 

@@ -15,7 +15,7 @@ const Colors: {
   supports: supportsColor,
 }
 
-export const color: typeof Colors & typeof chalk = new Proxy(chalk, {
+export const color: typeof chalk & typeof Colors = new Proxy(chalk, {
   get(chalk, name) {
     if ((Colors as any)[name]) return (Colors as any)[name]
     return (chalk as any)[name]
@@ -34,6 +34,6 @@ export const color: typeof Colors & typeof chalk = new Proxy(chalk, {
 
     return true
   },
-}) as typeof Colors & typeof chalk
+}) as typeof chalk & typeof Colors
 
 export default color

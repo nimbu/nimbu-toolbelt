@@ -1,11 +1,10 @@
-import { Command, APITypes as Nimbu, color } from '@nimbu-cli/command'
+import { color, Command, APITypes as Nimbu } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import { formatRelative } from 'date-fns'
 
 export default class Token extends Command {
   static description = `outputs current CLI authentication token.
 By default, the CLI auth token is only valid for 1 year. To generate a long-lived token, use nimbu authorizations:create`
-
   static flags = {
     help: Flags.help({ char: 'h' }),
   }
@@ -28,9 +27,7 @@ By default, the CLI auth token is only valid for 1 year. To generate a long-live
         const d = new Date()
         d.setSeconds(d.getSeconds() + token.expires_in)
         this.warn(
-          `token will expire ${formatRelative(d, new Date())}\nUse ${color.cmd(
-            'nimbu authorizations:create',
-          )} to generate a long-term token`,
+          `token will expire ${formatRelative(d, new Date())}\nUse ${color.cmd('nimbu authorizations:create')} to generate a long-term token`,
         )
       }
     } catch (error) {

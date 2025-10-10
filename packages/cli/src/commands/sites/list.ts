@@ -1,4 +1,4 @@
-import { Command, APITypes as Nimbu, type TableColumns, color, ux } from '@nimbu-cli/command'
+import { color, Command, APITypes as Nimbu, type TableColumns, ux } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import { orderBy } from 'lodash'
 
@@ -15,8 +15,8 @@ export default class SitesList extends Command {
 
   async execute() {
     const { flags } = await this.parse(SitesList)
-    const supports = require('supports-hyperlinks')
     const hyperlinker = require('hyperlinker')
+    const supports = require('supports-hyperlinks')
     const protocol = this.nimbuConfig.secureHost ? 'https://' : 'http://'
     const adminDomain = this.nimbuConfig.apiHost.replace(/^api\./, '')
 

@@ -6,7 +6,7 @@ import * as buildConfig from './config/config'
 import * as paths from './config/paths'
 import * as flags from './flags'
 import * as completions from './flags/completions'
-import APIClient, { APIError, IOptions, IValidationError, isValidationError } from './nimbu/client'
+import APIClient, { APIError, IOptions, isValidationError, IValidationError } from './nimbu/client'
 import * as APITypes from './nimbu/types'
 export type APIOptions = IOptions
 
@@ -17,13 +17,13 @@ export {
   APIClient,
   APIError,
   APITypes,
-  Command,
-  HTTPError,
-  IValidationError,
   buildConfig,
+  Command,
   completions,
   flags,
+  HTTPError,
   isValidationError,
+  IValidationError,
   paths,
 }
 export { ux } from './ux'

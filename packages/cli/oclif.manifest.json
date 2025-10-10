@@ -230,46 +230,6 @@
         "whoami.js"
       ]
     },
-    "browse:admin": {
-      "aliases": [],
-      "args": {},
-      "description": "open the admin area for your current site",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "browse:admin",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "browse",
-        "admin.js"
-      ]
-    },
-    "browse:simulator": {
-      "aliases": [],
-      "args": {},
-      "description": "open the simulator for your current site",
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "browse:simulator",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "browse",
-        "simulator.js"
-      ]
-    },
     "channels:copy": {
       "aliases": [],
       "args": {},
@@ -466,6 +426,46 @@
         "info.js"
       ]
     },
+    "browse:admin": {
+      "aliases": [],
+      "args": {},
+      "description": "open the admin area for your current site",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "browse:admin",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "browse",
+        "admin.js"
+      ]
+    },
+    "browse:simulator": {
+      "aliases": [],
+      "args": {},
+      "description": "open the simulator for your current site",
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "browse:simulator",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "browse",
+        "simulator.js"
+      ]
+    },
     "customers:copy": {
       "aliases": [],
       "args": {},
@@ -595,66 +595,6 @@
         "commands",
         "init",
         "index.js"
-      ]
-    },
-    "mails:pull": {
-      "aliases": [],
-      "args": {},
-      "description": "download all notification templates",
-      "flags": {
-        "only": {
-          "char": "o",
-          "description": "the names of the templates to pull from Nimbu",
-          "name": "only",
-          "required": false,
-          "hasDynamicHelp": false,
-          "multiple": true,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "mails:pull",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "mails",
-        "pull.js"
-      ]
-    },
-    "mails:push": {
-      "aliases": [],
-      "args": {},
-      "description": "upload all notification templates",
-      "flags": {
-        "only": {
-          "char": "o",
-          "description": "the names of the templates to push online",
-          "name": "only",
-          "required": false,
-          "hasDynamicHelp": false,
-          "multiple": true,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "mails:push",
-      "pluginAlias": "nimbu",
-      "pluginName": "nimbu",
-      "pluginType": "core",
-      "strict": true,
-      "isESM": false,
-      "relativePath": [
-        "lib",
-        "commands",
-        "mails",
-        "push.js"
       ]
     },
     "menus:copy": {
@@ -1196,6 +1136,66 @@
         "commands",
         "translations",
         "copy.js"
+      ]
+    },
+    "mails:pull": {
+      "aliases": [],
+      "args": {},
+      "description": "download all notification templates",
+      "flags": {
+        "only": {
+          "char": "o",
+          "description": "the names of the templates to pull from Nimbu",
+          "name": "only",
+          "required": false,
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "mails:pull",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "mails",
+        "pull.js"
+      ]
+    },
+    "mails:push": {
+      "aliases": [],
+      "args": {},
+      "description": "upload all notification templates",
+      "flags": {
+        "only": {
+          "char": "o",
+          "description": "the names of the templates to push online",
+          "name": "only",
+          "required": false,
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "mails:push",
+      "pluginAlias": "nimbu",
+      "pluginName": "nimbu",
+      "pluginType": "core",
+      "strict": true,
+      "isESM": false,
+      "relativePath": [
+        "lib",
+        "commands",
+        "mails",
+        "push.js"
       ]
     },
     "channels:entries:copy": {

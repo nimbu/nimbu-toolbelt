@@ -1,7 +1,8 @@
 import { expect } from 'chai'
-import * as fs from 'fs'
-import * as path from 'path'
-import * as os from 'os'
+import * as fs from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
+
 import { TemplatePacker } from '../src/template-packer'
 
 describe('TemplatePacker', () => {
@@ -16,7 +17,7 @@ describe('TemplatePacker', () => {
 
   afterEach(() => {
     // Clean up temporary directory
-    fs.rmSync(tempDir, { recursive: true, force: true })
+    fs.rmSync(tempDir, { force: true, recursive: true })
   })
 
   describe('packTemplates', () => {
@@ -48,7 +49,7 @@ describe('TemplatePacker', () => {
     it('should handle nested directories', async () => {
       const templatesDir = path.join(tempDir, 'templates')
       const nestedDir = path.join(templatesDir, 'products')
-      
+
       fs.mkdirSync(nestedDir, { recursive: true })
       fs.writeFileSync(path.join(nestedDir, 'show.liquid'), '<div>Product {{ product.name }}</div>')
 
@@ -61,7 +62,7 @@ describe('TemplatePacker', () => {
     it('should handle .liquid.haml files', async () => {
       const templatesDir = path.join(tempDir, 'templates')
       fs.mkdirSync(templatesDir, { recursive: true })
-      
+
       fs.writeFileSync(path.join(templatesDir, 'page.liquid.haml'), '%h1= page.title')
 
       const templates = await packer.packTemplates()
@@ -92,7 +93,7 @@ describe('TemplatePacker', () => {
 
       expect(compressed).to.be.a('string')
       expect(compressed.length).to.be.greaterThan(0)
-      
+
       // Should be valid base64
       expect(() => Buffer.from(compressed, 'base64')).to.not.throw()
     })

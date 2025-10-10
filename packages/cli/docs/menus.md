@@ -1,9 +1,8 @@
-`nimbu menus`
-=============
+# `nimbu menus`
 
 copy menus from one site to another
 
-* [`nimbu menus:copy [SLUG]`](#nimbu-menuscopy-slug)
+- [`nimbu menus:copy [SLUG]`](#nimbu-menuscopy-slug)
 
 ## `nimbu menus:copy [SLUG]`
 

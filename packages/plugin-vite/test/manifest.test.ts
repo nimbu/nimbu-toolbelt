@@ -9,7 +9,8 @@ import type { EntryPoint } from '../src/utils/types'
 
 import { buildSnippetDataFromManifest, resolveManifestPath } from '../src/utils/manifest'
 
-describe('buildSnippetDataFromManifest', () => {
+describe('manifest utils', () => {
+  describe('buildSnippetDataFromManifest', () => {
   it('returns chunk mappings based on manifest entries', async () => {
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'plugin-vite-manifest-'))
     const manifestPath = path.join(tmpDir, 'manifest.json')
@@ -79,9 +80,9 @@ describe('buildSnippetDataFromManifest', () => {
       'images/logo.png',
     ])
   })
-})
+  })
 
-describe('resolveManifestPath', () => {
+  describe('resolveManifestPath', () => {
   it('prefers manifest files inside the .vite directory when present', async () => {
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'plugin-vite-manifest-'))
     const outDir = path.join(tmpDir, '.nimbu-vite')
@@ -118,5 +119,6 @@ describe('resolveManifestPath', () => {
     const resolved = await resolveManifestPath(outDir, config)
 
     expect(resolved).to.equal(manifestPath)
+  })
   })
 })

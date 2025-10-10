@@ -1,9 +1,6 @@
-`nimbu version`
-===============
+# `nimbu version`
 
-
-
-* [`nimbu version`](#nimbu-version)
+- [`nimbu version`](#nimbu-version)
 
 ## `nimbu version`
 

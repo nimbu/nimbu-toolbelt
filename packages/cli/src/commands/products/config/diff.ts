@@ -7,7 +7,6 @@ import { addFieldNames, cleanUpIds, convertChangesToTree } from '../../../utils/
 
 export default class ProductsConfigDiff extends Command {
   static description = 'check differences between product customizations from one to another'
-
   static flags = {
     from: Flags.string({
       char: 'f', // shorter flag version
@@ -37,7 +36,7 @@ export default class ProductsConfigDiff extends Command {
     let detailedTo = []
 
     try {
-      detailedFrom = await this.nimbu.get(`/products/customizations`, {
+      detailedFrom = await this.nimbu.get('/products/customizations', {
         fetchAll: true,
         site: fromSite,
       })
@@ -50,7 +49,7 @@ export default class ProductsConfigDiff extends Command {
     }
 
     try {
-      detailedTo = await this.nimbu.get(`/products/customizations`, {
+      detailedTo = await this.nimbu.get('/products/customizations', {
         fetchAll: true,
         site: toSite,
       })
@@ -85,12 +84,12 @@ export default class ProductsConfigDiff extends Command {
 
     if (diff.updated != null && Object.keys(diff.updated).length > 0) {
       anyDifferences = true
-      ux.log(`Following fields have differences:`)
+      ux.log('Following fields have differences:')
       convertChangesToTree(diff.updated).display()
     }
 
     if (!anyDifferences) {
-      ux.log(`There are no differences.`)
+      ux.log('There are no differences.')
     }
   }
 

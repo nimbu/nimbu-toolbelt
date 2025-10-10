@@ -4,32 +4,32 @@
 const {
   buildConfig: { get: getProjectConfig },
 } = require('@nimbu-cli/command')
-
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const fs = require('node:fs')
 const path = require('node:path')
-const webpack = require('webpack')
 const resolve = require('resolve')
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
-const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
-const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
-const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent')
+const webpack = require('webpack')
+const { hasOptional } = require('./utils')
+const WorkboxWebpackPlugin = hasOptional('workbox-webpack-plugin') ? require('workbox-webpack-plugin') : null
 const ESLintPlugin = require('eslint-webpack-plugin')
-const paths = require('./paths')
-const modules = require('./modules')
-const getClientEnvironment = require('./env')
+const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent')
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
+const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
+
+const getClientEnvironment = require('./env')
+const modules = require('./modules')
+const paths = require('./paths')
 const ForkTsCheckerWebpackPlugin =
   process.env.TSC_COMPILE_ON_ERROR === 'true'
     ? require('react-dev-utils/ForkTsCheckerWarningWebpackPlugin')
     : require('react-dev-utils/ForkTsCheckerWebpackPlugin')
 
-const createEnvironmentHash = require('./persistentCache/createEnvironmentHash')
-const { hasOptional } = require('./utils')
+const createEnvironmentHash = require('./persistentCache/create-environment-hash')
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false'
@@ -51,6 +51,17 @@ const babelRuntimeRegenerator = require.resolve('@babel/runtime/regenerator', {
 const emitErrorsAsWarnings = process.env.ESLINT_NO_DEV_ERRORS === 'true'
 const disableESLintPlugin = process.env.DISABLE_ESLINT_PLUGIN === 'true'
 
+// Detect ESLint version for backward-compatible config
+const getESLintVersion = () => {
+  try {
+    const eslintPkg = require('eslint/package.json')
+    return Number.parseInt(eslintPkg.version.split('.')[0], 10)
+  } catch {
+    return 9 // Default to latest if detection fails
+  }
+}
+const eslintMajorVersion = getESLintVersion()
+
 const imageInlineSizeLimit = Number.parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT || '10000', 10) // smaller then 10000 bytes will be inlined as data url
 
 // Check if TypeScript is setup
@@ -71,7 +82,6 @@ const useTailwind = hasTailwindCSS()
 let tailwindPostCssPackage = 'tailwindcss'
 
 if (useTailwind) {
-  // eslint-disable-next-line node/no-missing-require
   const { version } = require('tailwindcss/package.json')
   if (Number.parseInt(version.split('.')[0], 10) >= 4) {
     tailwindPostCssPackage = '@tailwindcss/postcss'
@@ -152,7 +162,7 @@ module.exports = function (webpackEnv) {
   // Support for legacy custom svg loaders
   const shouldUseCustomSVGLoader = projectConfig.SVG_LOADER_INCLUDE != null
   const publicUrlOrPath = ensureTrailingSlash(
-    isEnvProduction ? projectConfig.CDN_ROOT ?? process.env.PUBLIC_URL ?? '../' : '/',
+    isEnvProduction ? (projectConfig.CDN_ROOT ?? process.env.PUBLIC_URL ?? '../') : '/',
   )
   // We will provide `paths.publicUrlOrPath` to our app
   // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
@@ -200,14 +210,14 @@ module.exports = function (webpackEnv) {
                       content: [
                         './src/**/*.{js,jsx,ts,tsx,html,liquid}',
                         './templates/**/*.liquid',
-                        './snippets/**/*.liquid', 
+                        './snippets/**/*.liquid',
                         './layout/**/*.liquid',
                         './sections/**/*.liquid',
                         './assets/**/*.scss',
                         './src/**/*.scss',
-                        './src/**/*.css'
-                      ]
-                    }
+                        './src/**/*.css',
+                      ],
+                    },
                   ],
                   require.resolve('postcss-nesting'),
                   require.resolve('postcss-flexbugs-fixes'),
@@ -569,8 +579,8 @@ module.exports = function (webpackEnv) {
                       rootPathSuffix: 'src',
                     },
                   ],
-                  require.resolve('@babel/plugin-proposal-optional-chaining'),
-                  require.resolve('@babel/plugin-proposal-nullish-coalescing-operator'),
+                  require.resolve('@babel/plugin-transform-optional-chaining'),
+                  require.resolve('@babel/plugin-transform-nullish-coalescing-operator'),
                   isEnvDevelopment && shouldUseReactRefresh && require.resolve('react-refresh/babel'),
                 ].filter(Boolean),
                 // This is a feature of `babel-loader` for webpack (not Babel itself).
@@ -755,6 +765,7 @@ module.exports = function (webpackEnv) {
       // Generate a service worker script that will precache, and keep up to date,
       // the HTML & assets that are part of the webpack build.
       isEnvProduction &&
+        WorkboxWebpackPlugin &&
         fs.existsSync(swSrc) &&
         new WorkboxWebpackPlugin.InjectManifest({
           swSrc,
@@ -818,15 +829,20 @@ module.exports = function (webpackEnv) {
           cacheLocation: path.resolve(paths.appNodeModules, '.cache/.eslintcache'),
           // ESLint class options
           cwd: paths.appPath,
-          resolvePluginsRelativeTo: __dirname,
-          baseConfig: {
-            extends: [require.resolve('eslint-config-react-app/base')],
-            rules: {
-              ...(!hasJsxRuntime && {
-                'react/react-in-jsx-scope': 'error',
-              }),
+          // Only use baseConfig for ESLint 8 and below (deprecated in ESLint 9+)
+          // For ESLint 9+, projects should have their own eslint.config.js
+          ...(eslintMajorVersion < 9 && {
+            baseConfig: {
+              plugins: ['react', 'react-hooks'],
+              rules: {
+                ...(!hasJsxRuntime && {
+                  'react/react-in-jsx-scope': 'error',
+                }),
+                'react-hooks/rules-of-hooks': 'error',
+                'react-hooks/exhaustive-deps': 'warn',
+              },
             },
-          },
+          }),
         }),
     ].filter(Boolean),
     // Turn off performance processing because we utilize
@@ -837,8 +853,8 @@ module.exports = function (webpackEnv) {
       // some third party packages may ship miss-configured sourcemaps, that interrupts the build
       // See: https://github.com/facebook/create-react-app/discussions/11278#discussioncomment-1780169
       /**
-       * @param {import('webpack').WebpackError} warning
-       * @returns {boolean}
+       * @param {import('webpack').WebpackError} warning - webpack error or warning object
+       * @returns {boolean} - true if the warning should be ignored, false otherwise
        */
       (warning) =>
         warning.module &&

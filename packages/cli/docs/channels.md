@@ -1,12 +1,11 @@
-`nimbu channels`
-================
+# `nimbu channels`
 
 working with channels
 
-* [`nimbu channels:copy`](#nimbu-channelscopy)
-* [`nimbu channels:diff`](#nimbu-channelsdiff)
-* [`nimbu channels:entries:copy`](#nimbu-channelsentriescopy)
-* [`nimbu channels:info CHANNEL`](#nimbu-channelsinfo-channel)
+- [`nimbu channels:copy`](#nimbu-channelscopy)
+- [`nimbu channels:diff`](#nimbu-channelsdiff)
+- [`nimbu channels:entries:copy`](#nimbu-channelsentriescopy)
+- [`nimbu channels:info CHANNEL`](#nimbu-channelsinfo-channel)
 
 ## `nimbu channels:copy`
 

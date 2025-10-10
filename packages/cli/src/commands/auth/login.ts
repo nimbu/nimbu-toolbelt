@@ -1,4 +1,4 @@
-import { Command, APITypes as Nimbu, color } from '@nimbu-cli/command'
+import { color, Command, APITypes as Nimbu } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 
 export default class Login extends Command {

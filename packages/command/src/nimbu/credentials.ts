@@ -62,11 +62,14 @@ export class Credentials {
     let loggedIn = false
     try {
       // timeout after 10 minutes
-      setTimeout(() => {
-        if (!loggedIn) {
-          ux.error('timed out')
-        }
-      }, 1000 * 60 * 10).unref()
+      setTimeout(
+        () => {
+          if (!loggedIn) {
+            ux.error('timed out')
+          }
+        },
+        1000 * 60 * 10,
+      ).unref()
 
       if (process.env.NIMBU_API_KEY) {
         ux.error('Cannot log in with NIMBU_API_KEY set')

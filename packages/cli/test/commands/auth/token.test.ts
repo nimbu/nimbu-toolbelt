@@ -7,13 +7,13 @@ describe('auth:token', () => {
   test
     .env({ NIMBU_API_KEY: 'foobar' }, { clear: true })
     .stub(APIClient.prototype, 'get', () =>
-      Promise.resolve([{ token: 'waldo' }, { token: 'foobar', expires_in: 60 }, {}]),
+      Promise.resolve([{ token: 'waldo' }, { expires_in: 60, token: 'foobar' }, {}]),
     )
     .stdout()
     .stderr()
     .command(['auth:token'])
     .it('should show the currently used api token', (ctx) => {
       expect(ctx.stdout).to.equal('foobar\n')
-      expect(ctx.stderr).to.match(new RegExp('Warning: token will expire today'))
+      expect(ctx.stderr).to.match(/Warning: token will expire today/)
     })
 })

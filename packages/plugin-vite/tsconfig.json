@@ -16,7 +16,5 @@
       "path": "../proxy-server"
     }
   ],
-  "include": [
-    "./src/**/*"
-  ]
+  "include": ["./src/**/*"]
 }

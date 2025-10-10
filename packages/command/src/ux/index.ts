@@ -57,9 +57,7 @@ interface NormalizedColumn<T extends Record<string, unknown>> {
 }
 
 const capitalizeWords = (value: string): string =>
-  value
-    .replaceAll(/[_-]+/g, ' ')
-    .replaceAll(/\w\S*/g, (match) => match.charAt(0).toUpperCase() + match.slice(1))
+  value.replaceAll(/[_-]+/g, ' ').replaceAll(/\w\S*/g, (match) => match.charAt(0).toUpperCase() + match.slice(1))
 
 const toPrintable = (value: unknown): string => {
   if (value == null) return ''
@@ -124,10 +122,7 @@ async function confirm(message: string): Promise<boolean> {
   })
 }
 
-const selectColumnByHeader = <T extends Record<string, unknown>>(
-  columns: NormalizedColumn<T>[],
-  header: string,
-) => {
+const selectColumnByHeader = <T extends Record<string, unknown>>(columns: NormalizedColumn<T>[], header: string) => {
   const matcher = header.toLowerCase()
   return (
     columns.find((column) => column.header.toLowerCase() === matcher) ??
@@ -402,7 +397,7 @@ const computeTableFlags = ((opts?: TableFlagOptions) => {
   return result as any
 }) as TableFlagOverload
 
-type TableWithFlags = { flags: TableFlagOverload } & typeof table
+type TableWithFlags = typeof table & { flags: TableFlagOverload }
 
 const tableWithFlags = table as TableWithFlags
 tableWithFlags.flags = computeTableFlags

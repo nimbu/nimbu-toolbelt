@@ -1,14 +1,15 @@
-// from https://github.com/ronp001/ts-utils/blob/master/src/path_helper.ts
-import * as path from 'path'
-import * as fs from 'fs'
+const isBinaryFile = require('isbinaryfile')
 import * as _ from 'lodash'
-let isBinaryFile = require('isbinaryfile')
+import * as fs from 'node:fs'
+// from https://github.com/ronp001/ts-utils/blob/master/src/path_helper.ts
+import * as path from 'node:path'
 
-export function notnull<T>(arg: T | null | undefined, name?: string): T {
+export function notnull<T>(arg: null | T | undefined, name?: string): T {
   if (arg == null) {
     const exp = name ? ` for ${name}` : ''
     throw new Error(`unexpected value${exp}: ${arg}`)
   }
+
   return arg
 }
 
@@ -28,19 +29,20 @@ export class AbsPath {
    *                  if relative path, uses basedir as reference point
    * @param basedir - if null: uses process.cwd() as basedir
    */
-  public static fromStringAllowingRelative(pathseg: string | null = null, basedir: string | null = null): AbsPath {
+  public static fromStringAllowingRelative(pathseg: null | string = null, basedir: null | string = null): AbsPath {
     if (basedir === null) {
       basedir = process.cwd()
     }
+
     if (pathseg) {
       if (path.isAbsolute(pathseg)) {
         return new AbsPath(pathseg)
-      } else {
-        return new AbsPath(path.join(basedir, pathseg))
       }
-    } else {
-      return new AbsPath(basedir)
+
+      return new AbsPath(path.join(basedir, pathseg))
     }
+
+    return new AbsPath(basedir)
   }
 
   /**
@@ -56,12 +58,13 @@ export class AbsPath {
   // Path Functions
   //------------------------------------------------------------
 
-  public readonly _abspath: string | null
+  public readonly _abspath: null | string
 
   public get abspath(): string {
     if (this._abspath === null) {
       throw new Error('abspath is not set')
     }
+
     return this._abspath
   }
 
@@ -69,17 +72,15 @@ export class AbsPath {
    *
    * @param from a string or AbsPath specifying an absolute path, or null
    */
-  constructor(from: string | null | undefined | AbsPath) {
-    if (from == undefined) {
+  constructor(from: AbsPath | null | string | undefined) {
+    if (from === undefined || from === null) {
       this._abspath = null
     } else if (from instanceof AbsPath) {
       this._abspath = from._abspath
+    } else if (path.isAbsolute(from)) {
+      this._abspath = path.normalize(from)
     } else {
-      if (path.isAbsolute(from)) {
-        this._abspath = path.normalize(from)
-      } else {
-        this._abspath = path.normalize(path.join(process.cwd(), from))
-      }
+      this._abspath = path.normalize(path.join(process.cwd(), from))
     }
   }
 
@@ -92,7 +93,7 @@ export class AbsPath {
   }
 
   /**
-   * @return the basename of the path
+   * @returns the basename of the path
    */
   public get basename(): string {
     if (this._abspath === null) return ''
@@ -100,24 +101,21 @@ export class AbsPath {
   }
 
   /**
-   * @param other
-   * @param must_be_contained_in_other
+   * @param other - the reference path to calculate the relative path from
+   * @param must_be_contained_in_other - if true, returns null unless this path is contained in the other path
    *
    * @returns the relative path to get to this path from other
    */
-  public relativeFrom(other: AbsPath, must_be_contained_in_other: boolean = false): string | null {
+  public relativeFrom(other: AbsPath, must_be_contained_in_other: boolean = false): null | string {
     if (this._abspath === null) return null
     if (other._abspath === null) return null
 
-    if (must_be_contained_in_other) {
-      if (!this._abspath.startsWith(other._abspath)) return null
-    }
+    if (must_be_contained_in_other && !this._abspath.startsWith(other._abspath)) return null
     let result = path.relative(other._abspath, this._abspath)
-    if (result == '') {
-      if (this.isDir) {
-        result = '.'
-      }
+    if (result === '' && this.isDir) {
+      result = '.'
     }
+
     return result
   }
 
@@ -155,7 +153,7 @@ export class AbsPath {
    */
   public get parent(): AbsPath {
     if (this._abspath === null) return this
-    let parent_dir = path.dirname(this._abspath)
+    const parent_dir = path.dirname(this._abspath)
     return new AbsPath(parent_dir)
   }
 
@@ -164,13 +162,9 @@ export class AbsPath {
    * @returns AbsPath of the directory which is <n> levels up.  (.parents(1) is the same is .parent)
    */
   public parents(n: number): AbsPath {
-    // tslint:disable-next-line: no-this-assignment
-    let p: AbsPath = this
-    while (n > 0) {
-      p = p.parent
-      n--
-    }
-    return p
+    if (n === 0) return this
+
+    return this.parent.parents(n - 1)
   }
 
   //------------------------------------------------------------
@@ -182,7 +176,7 @@ export class AbsPath {
    */
   public get isRoot(): boolean {
     if (this._abspath === null) return false
-    return this._abspath == path.parse(this._abspath).root
+    return this._abspath === path.parse(this._abspath).root
   }
 
   /**
@@ -230,7 +224,7 @@ export class AbsPath {
     if (!this.isDir) return false
     try {
       const files = fs.readdirSync(this._abspath)
-      return files.length == 0
+      return files.length === 0
     } catch {
       return false
     }
@@ -265,38 +259,43 @@ export class AbsPath {
    * @param t what to check for
    * @returns itself
    */
-  public validate(t: 'exists' | 'is_dir' | 'is_file' | 'is_symlink' | 'is_binary'): AbsPath {
+  public validate(t: 'exists' | 'is_binary' | 'is_dir' | 'is_file' | 'is_symlink'): AbsPath {
     if (!this.exists) {
-      if (t === 'is_dir') {
-        throw new Error(`${this._abspath}/ does not exist`)
-      } else {
-        throw new Error(`${this._abspath} does not exist`)
-      }
+      const error =
+        t === 'is_dir' ? new Error(`${this._abspath}/ does not exist`) : new Error(`${this._abspath} does not exist`)
+      throw error
     }
 
     switch (t) {
-      case 'exists':
+      case 'exists': {
         break
+      }
 
-      case 'is_dir':
-        if (!this.isDir) throw new Error(`${this._abspath}/ is not a directory`)
-        break
-
-      case 'is_file':
-        if (!this.isFile) throw new Error(`${this._abspath} is not a file`)
-        break
-
-      case 'is_symlink':
-        if (!this.isSymLink) throw new Error(`${this._abspath} is not a symlink`)
-        break
-
-      case 'is_binary':
+      case 'is_binary': {
         if (!this.isBinaryFile) throw new Error(`${this._abspath} is not a binary file`)
         break
+      }
 
-      default:
+      case 'is_dir': {
+        if (!this.isDir) throw new Error(`${this._abspath}/ is not a directory`)
+        break
+      }
+
+      case 'is_file': {
+        if (!this.isFile) throw new Error(`${this._abspath} is not a file`)
+        break
+      }
+
+      case 'is_symlink': {
+        if (!this.isSymLink) throw new Error(`${this._abspath} is not a symlink`)
+        break
+      }
+
+      default: {
         throw new Error(`unhandled validation: ${t}`)
+      }
     }
+
     return this
   }
 
@@ -327,13 +326,16 @@ export class AbsPath {
    * @returns true if found, false if not
    */
   public findUpwards(filename: string, can_be_dir: boolean = false): AbsPath {
-    for (let dir of this.dirHierarchy) {
+    for (const dir of this.dirHierarchy) {
       if (dir.containsFile(filename)) {
         return dir.add(filename)
-      } else if (can_be_dir && dir.containsDir(filename)) {
+      }
+
+      if (can_be_dir && dir.containsDir(filename)) {
         return dir.add(filename)
       }
     }
+
     return new AbsPath(null)
   }
 
@@ -341,17 +343,20 @@ export class AbsPath {
    * @returns an array of AbsPath objects, each one pointing to a containing directory
    */
   public get dirHierarchy(): Array<AbsPath> {
-    // tslint:disable-next-line: no-this-assignment
-    let current: AbsPath = this
-    let result: Array<AbsPath> = []
-    let allowed_depth = 30
-    do {
-      result.push(current)
-      current = current.parent
-    } while (allowed_depth-- > 0 && !current.isRoot && current._abspath != current.parent._abspath)
-    result.push(current.parent)
+    const buildHierarchy = (current: AbsPath, depth: number): Array<AbsPath> => {
+      if (depth <= 0 || current.isRoot) {
+        return [current, current.parent]
+      }
 
-    return result
+      const {parent} = current
+      if (current._abspath === parent._abspath) {
+        return [current, parent]
+      }
+
+      return [current, ...buildHierarchy(parent, depth - 1)]
+    }
+
+    return buildHierarchy(this, 30)
   }
 
   //------------------------------------------------------------
@@ -408,9 +413,9 @@ export class AbsPath {
    * @returns parsed contents of a JSON file or null if not a JSON file
    */
   // tslint:disable-next-line: ban-types
-  public get contentsFromJSON(): Object | null {
+  public get contentsFromJSON(): null | object {
     if (this._abspath === null || !this.isFile) return null
-    let buf = this.contentsBuffer
+    const buf = this.contentsBuffer
     try {
       return JSON.parse(buf.toString())
     } catch {
@@ -427,13 +432,15 @@ export class AbsPath {
     if (this._abspath === null) {
       throw new Error("can't save - abspath is null")
     }
+
     try {
       this.parent.mkdirs()
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new Error(`can't save ${this.toString()} - ${e.message}`)
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new TypeError(`can't save ${this.toString()} - ${error.message}`)
       }
     }
+
     fs.writeFileSync(this._abspath, contents)
   }
 
@@ -449,11 +456,12 @@ export class AbsPath {
     if (this._abspath === null) return null
     if (!this.isDir) return null
 
-    let result: Array<AbsPath> = []
+    const result: Array<AbsPath> = []
 
-    for (let entry of fs.readdirSync(this._abspath)) {
+    for (const entry of fs.readdirSync(this._abspath)) {
       result.push(this.add(entry))
     }
+
     return result
   }
 
@@ -468,10 +476,10 @@ export class AbsPath {
    * @param fn callback to activate
    */
   public foreachEntryInDir(fn: (entry: AbsPath, traversal_direction: 'down' | 'up' | null) => boolean | void): boolean {
-    let entries = this.dirContents
+    const entries = this.dirContents
     if (entries === null) return true
 
-    for (let entry of entries) {
+    for (const entry of entries) {
       if (entry.isDir) {
         let abort
         abort = fn(entry, 'down')
@@ -481,10 +489,11 @@ export class AbsPath {
         abort = fn(entry, 'up')
         if (abort) return true
       } else {
-        let abort = fn(entry, null)
+        const abort = fn(entry, null)
         if (abort) return true
       }
     }
+
     return false
   }
 
@@ -505,11 +514,13 @@ export class AbsPath {
 
   public rmFile() {
     if (this._abspath === null) {
-      throw new Error(`rmFile - path is not set`)
+      throw new Error('rmFile - path is not set')
     }
+
     if (!this.isFile) {
       throw new Error(`rmFile - ${this} is not a file`)
     }
+
     fs.unlinkSync(this._abspath)
   }
 
@@ -522,7 +533,7 @@ export class AbsPath {
     if (this.exists) return
     if (this.isRoot) return
 
-    let parent = this.parent
+    const { parent } = this
     if (parent.exists && !parent.isDir && !parent.isSymLink) {
       throw new Error(`${parent.toString()} exists and is not a directory or symlink`)
     } else {
@@ -535,14 +546,16 @@ export class AbsPath {
   public rmrfdir(must_match: RegExp, remove_self = false) {
     if (this._abspath === null) return
     if (!this.isDir) return
-    if (remove_self && !this._abspath.match(must_match)) {
+    if (remove_self && !must_match.test(this._abspath)) {
       throw new Error(`${this._abspath} does not match ${must_match} - aborting delete operation`)
     }
+
     this.foreachEntryInDir((p: AbsPath, direction: 'down' | 'up' | null) => {
       if (p._abspath === null) return
-      if (!p._abspath.match(must_match)) {
+      if (!must_match.test(p._abspath)) {
         throw new Error(`${p._abspath} does not match ${must_match} - aborting delete operation`)
       }
+
       if (direction === 'up' || direction === null) {
         if (p.isDir) {
           fs.rmdirSync(p._abspath)
@@ -565,11 +578,11 @@ export class AbsPath {
   // Useful for keeping a backup of a file before modifying it.
   //------------------------------------------------------------
 
-  public get maxVer(): number | null {
-    let existing_versions = this.existingVersions
+  public get maxVer(): null | number {
+    const existing_versions = this.existingVersions
     if (existing_versions === null) return null
 
-    let max: number | undefined = _.max(existing_versions)
+    const max: number | undefined = _.max(existing_versions)
 
     if (max === undefined) return null
     return max
@@ -586,33 +599,27 @@ export class AbsPath {
    *   etc.
    */
   public renameToNextVer(): AbsPath {
-    let current_max_ver: number | null = this.maxVer
+    const current_max_ver: null | number = this.maxVer
 
-    let newname: string
-    if (current_max_ver === null) {
-      newname = this._abspath + '.1'
-    } else {
-      newname = this._abspath + `.${current_max_ver + 1}`
-    }
+    const newname: string =
+      current_max_ver === null ? this._abspath + '.1' : this._abspath + `.${current_max_ver + 1}`
     this.renameTo(newname)
     return new AbsPath(newname)
   }
 
-  public get existingVersions(): number[] | null {
+  public get existingVersions(): null | number[] {
     if (this._abspath === null) return null
     if (!this.exists) return null
 
-    let regex = new RegExp(`${this._abspath}\.([0-9]+)`)
-    let existing = this.parent.dirContents
-    let matching: Array<number | null> = _.map(existing, (el: AbsPath) => {
-      let matches = el.toString().match(regex)
+    const regex = new RegExp(`${this._abspath}\\.([0-9]+)`)
+    const existing = this.parent.dirContents
+    const matching: Array<null | number> = _.map(existing, (el: AbsPath) => {
+      const matches = el.toString().match(regex)
       if (matches === null) return null
-      return parseInt(matches[1], 10)
+      return Number.parseInt(matches[1], 10)
     })
 
-    let nums: number[] = _.filter(matching, (e) => {
-      return e !== null
-    }) as number[]
+    const nums: number[] = _.filter(matching, (e) => e !== null) as number[]
 
     return _.sortBy(nums)
   }

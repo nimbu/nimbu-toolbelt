@@ -17,9 +17,9 @@ type CopyAll = {
   toSite: string
 }
 
-type CopyAllChannelsKnown = {
+type CopyAllChannelsKnown = CopyAll & {
   channels: Channel[]
-} & CopyAll
+}
 
 type CopySingle = {
   channel?: Channel
@@ -30,14 +30,13 @@ type CopySingle = {
   toSite: string
 }
 
-type CopySingleChannelKnown = {
+type CopySingleChannelKnown = CopySingle & {
   channel: Channel
   copyAll?: boolean
-} & CopySingle
+}
 
 export default class CopyChannels extends Command {
   static description = 'copy channel configuration from one to another'
-
   static flags = {
     all: Flags.boolean({
       char: 'a',
@@ -79,7 +78,13 @@ export default class CopyChannels extends Command {
     }
 
     await (fromChannel != null && toChannel != null
-      ? this.executeCopySingle({ fromChannel, fromSite, overwrite: Boolean(flags.force), toChannel, toSite })
+      ? this.executeCopySingle({
+          fromChannel,
+          fromSite,
+          overwrite: Boolean(flags.force),
+          toChannel,
+          toSite,
+        })
       : this.executeCopyAll({ fromSite, overwrite: Boolean(flags.force), toSite }))
   }
 
@@ -176,7 +181,7 @@ export default class CopyChannels extends Command {
       ? `${chalk.bold(ctx.channel.name)} (${ctx.channel.slug}): created`
       : `Creating channel ${chalk.bold(ctx.toChannel)} in site ${chalk.bold(ctx.toSite)}`
 
-    await this.nimbu.post<Channel>(`/channels`, options)
+    await this.nimbu.post<Channel>('/channels', options)
   }
 
   private async ensureCircularDependencies(ctx: CopyAll) {
@@ -202,7 +207,7 @@ export default class CopyChannels extends Command {
 
         if (targetChannel == null) {
           // ensure a channel with this slug exists, any field will do
-          await this.nimbu.post<Channel>(`/channels`, {
+          await this.nimbu.post<Channel>('/channels', {
             body: {
               customizations: [
                 {
@@ -233,61 +238,63 @@ export default class CopyChannels extends Command {
     const fetchTitle = `Fetching all channels from ${chalk.bold(fromSite)}`
     const upsertTitle = `Copying all channels to ${chalk.bold(toSite)}`
 
-    const tasks = new Listr([
-      {
-        task: (ctx: CopyAll) => this.fetchAll(ctx),
-        title: fetchTitle,
-      },
-      {
-        enabled: (ctx: CopyAll) => ctx.channels != null && ctx.channels.length > 0,
-        task: (ctx, _task) => {
-          const knownCtx = ctx as CopyAllChannelsKnown
-
-          return new Listr(
-            [
-              {
-                enabled: (ctx: CopyAll) => ctx.circularDependencies != null && ctx.circularDependencies.length > 0,
-                rendererOptions: {
-                  persistentOutput: true,
-                },
-                task: (ctx: CopyAll) => this.ensureCircularDependencies(ctx),
-                title: 'Ensure circular dependencies are created first',
-              },
-              ...knownCtx.channels.map((channel) => ({
-                rendererOptions: {
-                  persistentOutput: true,
-                },
-                task: (_ctx, task) =>
-                  this.copy(
-                    {
-                      channel,
-                      copyAll: true,
-                      fromChannel: channel.slug,
-                      fromSite,
-                      overwrite,
-                      toChannel: channel.slug,
-                      toSite,
-                    },
-                    task,
-                  ),
-                title: `${chalk.bold(channel.name)} (${channel.slug})`,
-              })),
-            ],
-            {
-              rendererOptions: {
-                collapseSubtasks: false,
-              },
-            },
-          )
+    const tasks = new Listr(
+      [
+        {
+          task: (ctx: CopyAll) => this.fetchAll(ctx),
+          title: fetchTitle,
         },
-        title: upsertTitle,
+        {
+          enabled: (ctx: CopyAll) => ctx.channels != null && ctx.channels.length > 0,
+          task: (ctx, _task) => {
+            const knownCtx = ctx as CopyAllChannelsKnown
+
+            return new Listr(
+              [
+                {
+                  enabled: (ctx: CopyAll) => ctx.circularDependencies != null && ctx.circularDependencies.length > 0,
+                  rendererOptions: {
+                    persistentOutput: true,
+                  },
+                  task: (ctx: CopyAll) => this.ensureCircularDependencies(ctx),
+                  title: 'Ensure circular dependencies are created first',
+                },
+                ...knownCtx.channels.map((channel) => ({
+                  rendererOptions: {
+                    persistentOutput: true,
+                  },
+                  task: (_ctx, task) =>
+                    this.copy(
+                      {
+                        channel,
+                        copyAll: true,
+                        fromChannel: channel.slug,
+                        fromSite,
+                        overwrite,
+                        toChannel: channel.slug,
+                        toSite,
+                      },
+                      task,
+                    ),
+                  title: `${chalk.bold(channel.name)} (${channel.slug})`,
+                })),
+              ],
+              {
+                rendererOptions: {
+                  collapseSubtasks: false,
+                },
+              },
+            )
+          },
+          title: upsertTitle,
+        },
+      ],
+      {
+        rendererOptions: {
+          collapseSubtasks: false,
+        },
       },
-    ],
-    {
-      rendererOptions: {
-        collapseSubtasks: false,
-      },
-    })
+    )
 
     await tasks
       .run({

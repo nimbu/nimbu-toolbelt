@@ -1,23 +1,21 @@
 {
   "extends": "../../tsconfig.settings.json",
   "compilerOptions": {
-      "allowJs": true,
-      "outDir": "./lib",
-      "rootDir": "./src",
-      "paths": {
-          "nimbu": ["../cli"],
-          "@nimbu-cli/command": ["../command"]
-      },
+    "allowJs": true,
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "paths": {
+      "nimbu": ["../cli"],
+      "@nimbu-cli/command": ["../command"]
+    }
   },
   "references": [
-      {
-          "path": "../cli"
-      },
-      {
-          "path": "../command"
-      }
+    {
+      "path": "../cli"
+    },
+    {
+      "path": "../command"
+    }
   ],
-  "include": [
-    "./src/**/*"
-  ]
+  "include": ["./src/**/*"]
 }

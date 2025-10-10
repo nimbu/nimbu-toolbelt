@@ -7,14 +7,13 @@
 'use strict'
 
 const address = require('address')
-const fs = require('fs')
-const path = require('path')
-const url = require('url')
 const chalk = require('chalk')
 const detect = require('detect-port-alt')
 const isRoot = require('is-root')
+const fs = require('node:fs')
+const path = require('node:path')
+const url = require('node:url')
 const prompts = require('prompts')
-
 const formatWebpackMessages = require('react-dev-utils//formatWebpackMessages')
 const getProcessForPort = require('react-dev-utils//getProcessForPort')
 const forkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin')
@@ -26,27 +25,29 @@ function clearConsole() {
     return false
   }
 
-  process.stdout.write(process.platform === 'win32' ? '\x1B[2J\x1B[0f' : '\x1B[2J\x1B[3J\x1B[H')
+  process.stdout.write(process.platform === 'win32' ? '\u001B[2J\u001B[0f' : '\u001B[2J\u001B[3J\u001B[H')
 }
 
 function prepareUrls(protocol, host, port, pathname = '/') {
   const formatUrl = (hostname) =>
     url.format({
-      protocol,
       hostname,
-      port,
       pathname,
+      port,
+      protocol,
     })
   const prettyPrintUrl = (hostname) =>
     url.format({
-      protocol,
       hostname,
-      port: chalk.bold(port),
       pathname,
+      port: chalk.bold(port),
+      protocol,
     })
 
   const isUnspecifiedHost = host === '0.0.0.0' || host === '::'
-  let prettyHost, lanUrlForConfig, lanUrlForTerminal
+  let lanUrlForConfig
+  let lanUrlForTerminal
+  let prettyHost
   if (isUnspecifiedHost) {
     prettyHost = 'localhost'
     try {
@@ -63,19 +64,20 @@ function prepareUrls(protocol, host, port, pathname = '/') {
           lanUrlForConfig = undefined
         }
       }
-    } catch (_e) {
+    } catch {
       // ignored
     }
   } else {
     prettyHost = host
   }
+
   const localUrlForTerminal = prettyPrintUrl(prettyHost)
   const localUrlForBrowser = formatUrl(prettyHost)
   return {
     lanUrlForConfig,
     lanUrlForTerminal,
-    localUrlForTerminal,
     localUrlForBrowser,
+    localUrlForTerminal,
   }
 }
 
@@ -93,21 +95,22 @@ function printInstructions(appName, urls, packageManager) {
 
   console.log()
   console.log('Note that the development build is not optimized.')
-  const buildCommand = packageManager === 'pnpm' ? 'pnpm run build' : packageManager === 'yarn' ? 'yarn build' : 'npm run build'
-  console.log(`To create a production build, use ` + `${chalk.cyan(buildCommand)}.`)
+  const buildCommand =
+    packageManager === 'pnpm' ? 'pnpm run build' : packageManager === 'yarn' ? 'yarn build' : 'npm run build'
+  console.log(`To create a production build, use ${chalk.cyan(buildCommand)}.`)
   console.log()
 }
 
-function createCompiler({ appName, config, urls, packageManager, useTypeScript, webpack }) {
+function createCompiler({ appName, config, packageManager, urls, useTypeScript, webpack }) {
   // "Compiler" is a low-level interface to webpack.
   // It lets us listen to some events and provide our own custom messages.
   let compiler
   try {
     compiler = webpack(config)
-  } catch (err) {
+  } catch (error) {
     console.log(chalk.red('Failed to compile.'))
     console.log()
-    console.log(err.message || err)
+    console.log(error.message || error)
     console.log()
     process.exit(1)
   }
@@ -120,11 +123,11 @@ function createCompiler({ appName, config, urls, packageManager, useTypeScript, 
     if (isInteractive) {
       clearConsole()
     }
+
     console.log('Compiling...')
   })
 
   let isFirstCompile = true
-  let tsMessagesPromise
 
   if (useTypeScript) {
     forkTsCheckerWebpackPlugin.getCompilerHooks(compiler).waiting.tap('awaitingTypeScriptCheck', () => {
@@ -146,34 +149,37 @@ function createCompiler({ appName, config, urls, packageManager, useTypeScript, 
     // https://github.com/facebook/create-react-app/issues/4492#issuecomment-421959548
     const statsData = stats.toJson({
       all: false,
-      warnings: true,
       errors: true,
+      warnings: true,
     })
 
     const messages = formatWebpackMessages(statsData)
-    const isSuccessful = !messages.errors.length && !messages.warnings.length
+    const isSuccessful = messages.errors.length === 0 && messages.warnings.length === 0
     if (isSuccessful) {
       console.log(chalk.green('Compiled successfully!'))
     }
+
     if (isSuccessful && (isInteractive || isFirstCompile)) {
       printInstructions(appName, urls, packageManager)
     }
+
     isFirstCompile = false
 
     // If errors exist, only show errors.
-    if (messages.errors.length) {
+    if (messages.errors.length > 0) {
       // Only keep the first error. Others are often indicative
       // of the same problem, but confuse the reader with noise.
       if (messages.errors.length > 1) {
         messages.errors.length = 1
       }
+
       console.log(chalk.red('Failed to compile.\n'))
       console.log(messages.errors.join('\n\n'))
       return
     }
 
     // Show warnings if no errors were found.
-    if (messages.warnings.length) {
+    if (messages.warnings.length > 0) {
       console.log(chalk.yellow('Compiled with warnings.\n'))
       console.log(messages.warnings.join('\n\n'))
 
@@ -187,14 +193,12 @@ function createCompiler({ appName, config, urls, packageManager, useTypeScript, 
 
   // You can safely remove this after ejecting.
   // We only use this block for testing of Create React App itself:
-  const isSmokeTest = process.argv.some((arg) => arg.indexOf('--smoke-test') > -1)
+  const isSmokeTest = process.argv.some((arg) => arg.includes('--smoke-test'))
   if (isSmokeTest) {
-    compiler.hooks.failed.tap('smokeTest', async () => {
-      await tsMessagesPromise
+    compiler.hooks.failed.tap('smokeTest', () => {
       process.exit(1)
     })
-    compiler.hooks.done.tap('smokeTest', async (stats) => {
-      await tsMessagesPromise
+    compiler.hooks.done.tap('smokeTest', (stats) => {
       if (stats.hasErrors() || stats.hasWarnings()) {
         process.exit(1)
       } else {
@@ -207,7 +211,7 @@ function createCompiler({ appName, config, urls, packageManager, useTypeScript, 
 }
 
 function resolveLoopback(proxy) {
-  const o = url.parse(proxy)
+  const o = new URL(proxy)
   o.host = undefined
   if (o.hostname !== 'localhost') {
     return proxy
@@ -216,11 +220,11 @@ function resolveLoopback(proxy) {
   // This means even though localhost resolves to ::1, the application
   // must fall back to IPv4 (on 127.0.0.1).
   // We can re-enable this in a few years.
-  /*try {
+  /* try {
     o.hostname = address.ipv6() ? '::1' : '127.0.0.1';
   } catch (_ignored) {
     o.hostname = '127.0.0.1';
-  }*/
+  } */
 
   try {
     // Check if we're on a network; if we are, chances are we can resolve
@@ -229,10 +233,11 @@ function resolveLoopback(proxy) {
     if (!address.ip()) {
       o.hostname = '127.0.0.1'
     }
-  } catch (_ignored) {
+  } catch {
     o.hostname = '127.0.0.1'
   }
-  return url.format(o)
+
+  return o.href
 }
 
 // We need to provide a custom onError function for httpProxyMiddleware.
@@ -262,6 +267,7 @@ function onProxyError(proxy) {
     if (res.writeHead && !res.headersSent) {
       res.writeHead(500)
     }
+
     res.end(
       'Proxy error: Could not proxy request ' + req.url + ' from ' + host + ' to ' + proxy + ' (' + err.code + ').',
     )
@@ -271,8 +277,9 @@ function onProxyError(proxy) {
 function prepareProxy(proxy, appPublicFolder, servedPathname) {
   // `proxy` lets you specify alternate servers for specific requests.
   if (!proxy) {
-    return undefined
+    return
   }
+
   if (typeof proxy !== 'string') {
     console.log(chalk.red('When specified, "proxy" in package.json must be a string.'))
     console.log(chalk.red('Instead, the type of "proxy" was "' + typeof proxy + '".'))
@@ -298,16 +305,10 @@ function prepareProxy(proxy, appPublicFolder, servedPathname) {
     process.exit(1)
   }
 
-  let target
-  if (process.platform === 'win32') {
-    target = resolveLoopback(proxy)
-  } else {
-    target = proxy
-  }
+  const target = process.platform === 'win32' ? resolveLoopback(proxy) : proxy
   return [
     {
-      target,
-      logLevel: 'silent',
+      changeOrigin: true,
       // For single page apps, we generally want to fallback to /index.html.
       // However we also want to respect `proxy` for API calls.
       // So if `proxy` is specified as a string, we need to decide which fallback to use.
@@ -318,13 +319,15 @@ function prepareProxy(proxy, appPublicFolder, servedPathname) {
       // Modern browsers include text/html into `accept` header when navigating.
       // However API calls like `fetch()` won’t generally accept text/html.
       // If this heuristic doesn’t work well for you, use `src/setupProxy.js`.
-      context: function (pathname, req) {
+      context(pathname, req) {
         return (
           req.method !== 'GET' ||
-          (mayProxy(pathname) && req.headers.accept && req.headers.accept.indexOf('text/html') === -1)
+          (mayProxy(pathname) && req.headers.accept && !req.headers.accept.includes('text/html'))
         )
       },
-      onProxyReq: (proxyReq) => {
+      logLevel: 'silent',
+      onError: onProxyError(target),
+      onProxyReq(proxyReq) {
         // Browsers may send Origin headers even with same-origin
         // requests. To prevent CORS issues, we have to change
         // the Origin to match the target URL.
@@ -332,9 +335,8 @@ function prepareProxy(proxy, appPublicFolder, servedPathname) {
           proxyReq.setHeader('origin', target)
         }
       },
-      onError: onProxyError(target),
       secure: false,
-      changeOrigin: true,
+      target,
       ws: true,
       xfwd: true,
     },
@@ -346,22 +348,24 @@ function choosePort(host, defaultPort) {
     (port) =>
       new Promise((resolve) => {
         if (port === defaultPort) {
-          return resolve(port)
+          resolve(port)
+          return
         }
+
         const message =
           process.platform !== 'win32' && defaultPort < 1024 && !isRoot()
-            ? `Admin permissions are required to run a server on a port below 1024.`
+            ? 'Admin permissions are required to run a server on a port below 1024.'
             : `Something is already running on port ${defaultPort}.`
         if (isInteractive) {
           clearConsole()
           const existingProcess = getProcessForPort(defaultPort)
           const question = {
-            type: 'confirm',
-            name: 'shouldChangePort',
+            initial: true,
             message:
               chalk.yellow(message + `${existingProcess ? ` Probably:\n  ${existingProcess}` : ''}`) +
               '\n\nWould you like to run the app on another port instead?',
-            initial: true,
+            name: 'shouldChangePort',
+            type: 'confirm',
           }
           prompts(question).then((answer) => {
             if (answer.shouldChangePort) {
@@ -375,11 +379,11 @@ function choosePort(host, defaultPort) {
           resolve(null)
         }
       }),
-    (err) => {
+    (error) => {
       throw new Error(
         chalk.red(`Could not find an open port at ${chalk.bold(host)}.`) +
           '\n' +
-          ('Network error message: ' + err.message || err) +
+          ('Network error message: ' + error.message || error) +
           '\n',
       )
     },

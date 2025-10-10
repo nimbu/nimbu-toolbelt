@@ -1,9 +1,8 @@
-`nimbu help`
-============
+# `nimbu help`
 
 Display help for nimbu.
 
-* [`nimbu help [COMMAND]`](#nimbu-help-command)
+- [`nimbu help [COMMAND]`](#nimbu-help-command)
 
 ## `nimbu help [COMMAND]`
 

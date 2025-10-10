@@ -6,10 +6,7 @@ declare module 'object-treeify' {
     valueLength?: number
   }
 
-  function treeify(
-    object: Record<string, unknown>,
-    options?: TreeifyOptions,
-  ): string
+  function treeify(object: Record<string, unknown>, options?: TreeifyOptions): string
 
   export default treeify
 }

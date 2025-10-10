@@ -1,12 +1,11 @@
-`nimbu apps`
-============
+# `nimbu apps`
 
 manage (cloud code) applications
 
-* [`nimbu apps:config`](#nimbu-appsconfig)
-* [`nimbu apps:list`](#nimbu-appslist)
-* [`nimbu apps:push`](#nimbu-appspush)
-* [`nimbu apps:transpile`](#nimbu-appstranspile)
+- [`nimbu apps:config`](#nimbu-appsconfig)
+- [`nimbu apps:list`](#nimbu-appslist)
+- [`nimbu apps:push`](#nimbu-appspush)
+- [`nimbu apps:transpile`](#nimbu-appstranspile)
 
 ## `nimbu apps:config`
 

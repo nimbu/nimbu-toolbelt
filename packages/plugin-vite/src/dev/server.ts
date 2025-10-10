@@ -3,7 +3,7 @@ import type { InlineConfig, ViteDevServer } from 'vite'
 import { ProxyServer } from '@nimbu-cli/proxy-server'
 import chalk from 'chalk'
 import debugFactory from 'debug'
-import { Server as HttpServer, createServer as createHttpServer } from 'node:http'
+import { createServer as createHttpServer, Server as HttpServer } from 'node:http'
 
 import { ensureViteNodeCompatibility } from '../utils/node-version'
 import { createSnippetData, writeSnippets } from '../utils/snippet'
@@ -28,7 +28,6 @@ export class ViteDevelopmentServer {
   private proxy?: ProxyServer
   private vite?: ViteDevServer
   private httpServer?: HttpServer
-
   private readonly options: ViteDevOptions
 
   constructor(options: ViteDevOptions) {
@@ -63,8 +62,7 @@ export class ViteDevelopmentServer {
     const httpServer = createHttpServer(this.proxy.expressApp)
     this.httpServer = httpServer
 
-    const existingHmrConfig =
-      typeof viteConfig.server?.hmr === 'object' ? viteConfig.server.hmr : undefined
+    const existingHmrConfig = typeof viteConfig.server?.hmr === 'object' ? viteConfig.server.hmr : undefined
 
     const hmrConfig = {
       ...(existingHmrConfig ? { ...existingHmrConfig } : {}),
@@ -91,9 +89,9 @@ export class ViteDevelopmentServer {
       })
 
       httpServer.listen(port, host, () => {
-        const proxy = this.proxy as {
+        const proxy = this.proxy as ProxyServer & {
           registerExternalServer(server: HttpServer, serverHost: string, serverPort: number): void
-        } & ProxyServer
+        }
 
         proxy.registerExternalServer(httpServer, host, port)
         resolve()
@@ -122,8 +120,10 @@ export class ViteDevelopmentServer {
 
     await writeSnippets(devSnippet)
 
-    console.log(chalk.green(`
-Nimbu proxy server ready at http://${host}:${port}`))
+    console.log(
+      chalk.green(`
+Nimbu proxy server ready at http://${host}:${port}`),
+    )
     console.log(chalk.cyan('Vite dev middleware attached (HMR on the same port)'))
 
     if (openBrowser) {

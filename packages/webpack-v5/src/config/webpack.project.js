@@ -1,6 +1,7 @@
+const fs = require('node:fs')
+const path = require('node:path')
+
 const paths = require('./paths')
-const path = require('path')
-const fs = require('fs')
 
 let projectWebpackPath
 const defaultWebpack = {
@@ -10,15 +11,14 @@ const defaultWebpack = {
 try {
   const projectPackageJson = require(path.resolve(paths.PROJECT_DIRECTORY, 'package.json'))
 
-  if (projectPackageJson.nimbu && projectPackageJson.nimbu.webpack) {
-    projectWebpackPath = path.resolve(paths.PROJECT_DIRECTORY, projectPackageJson.nimbu.webpack)
-  } else {
-    projectWebpackPath = path.resolve(paths.PROJECT_DIRECTORY, 'webpack.js')
-  }
-} catch (_) {
+  projectWebpackPath =
+    projectPackageJson.nimbu && projectPackageJson.nimbu.webpack
+      ? path.resolve(paths.PROJECT_DIRECTORY, projectPackageJson.nimbu.webpack)
+      : path.resolve(paths.PROJECT_DIRECTORY, 'webpack.js')
+} catch {
   // do nothing, we are probably running the nimbu command in global context, i.e. to initialize a project
 }
 
 const projectWebpack = fs.existsSync(projectWebpackPath) ? require(projectWebpackPath) : {}
 
-module.exports = Object.assign({}, defaultWebpack, projectWebpack)
+module.exports = { ...defaultWebpack, ...projectWebpack }

@@ -12,7 +12,6 @@ import { resolveViteConfig } from '../utils/vite-config'
 
 export default class Build extends Command {
   static description = 'build assets using Vite'
-
   static flags = {
     mode: Flags.string({
       description: 'Vite mode to use for the build',

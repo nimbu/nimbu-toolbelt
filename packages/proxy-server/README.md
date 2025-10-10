@@ -25,7 +25,7 @@ const server = new ProxyServer({
   port: 3000,
   host: 'localhost',
   apiUrl: 'https://api.nimbu.io',
-  templatePath: './templates'
+  templatePath: './templates',
 })
 
 await server.start()

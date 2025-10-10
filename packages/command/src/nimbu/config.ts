@@ -1,6 +1,6 @@
 import { pathExistsSync } from 'fs-extra'
-import { resolve as resolvePath } from 'node:path'
 import { readSync, write } from 'node-yaml'
+import { resolve as resolvePath } from 'node:path'
 
 import paths = require('../config/paths')
 
@@ -20,7 +20,6 @@ interface ConfigFile {
 
 export class Config {
   static defaultHost = 'nimbu.io'
-
   private _config?: ConfigFile
   private readonly _projectConfig: any
 

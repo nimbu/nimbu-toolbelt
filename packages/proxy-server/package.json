@@ -8,9 +8,9 @@
     "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
     "clean": "rimraf lib",
     "prepack": "pnpm run build",
-    "test": "mocha --require ts-node/register 'test/**/*.test.ts'",
-    "lint": "eslint src --ext .ts",
-    "yalc:publish": "pnpm run build && pnpm exec yalc publish --push --no-script"
+    "test": "mocha --forbid-only 'test/**/*.test.ts' --timeout 60000",
+    "lint": "eslint src",
+    "yalc:publish": "pnpm run build && pnpm dlx yalc publish --push --no-script"
   },
   "dependencies": {
     "@nimbu-cli/command": "workspace:^6.0.0",
@@ -32,9 +32,9 @@
     "@types/multer": "^1.4.13",
     "@types/node": "^24.7.0",
     "chai": "^4.5.0",
-    "mocha": "^10.8.2",
+    "mocha": "^11.7.4",
     "nock": "^14.0.10",
-    "rimraf": "^3.0.2",
+    "rimraf": "^5.0.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
@@ -46,7 +46,7 @@
     "README.md"
   ],
   "engines": {
-    "node": ">=14.18.0"
+    "node": ">=18.0.0"
   },
   "license": "MIT"
 }

@@ -2,19 +2,20 @@ import { APIClient, APIError, HTTPError } from '@nimbu-cli/command'
 import { expect } from 'chai'
 
 import test from '../../helpers/setup'
-import { destinations, countries, journeys } from './fixtures'
+import { countries, destinations, journeys } from './fixtures'
 
 const notFoundError = () => {
   const httpError = Object.assign(new HTTPError(), {
-    statusCode: 404,
     body: { code: 101, message: 'Not found' },
+    statusCode: 404,
   })
 
   return new APIError(httpError as HTTPError)
 }
 
-describe('channels:copy --from foo --to bar --all', () => {
-  const createdChannels = new Map<string, { payload: any; type: 'placeholder' | 'channel' }>()
+describe('channels:copy', () => {
+  describe('--from foo --to bar --all', () => {
+  const createdChannels = new Map<string, { payload: any; type: 'channel' | 'placeholder' }>()
 
   const getStub = async (path: string, options: any = {}) => {
     const site = options?.site
@@ -72,9 +73,9 @@ describe('channels:copy --from foo --to bar --all', () => {
         journeys.slug,
       ])
     })
-})
+  })
 
-describe('channels:copy --from site1/foo --to site2/bar', () => {
+  describe('--from site1/foo --to site2/bar', () => {
   const createdChannels: string[] = []
 
   const getStub = async (path: string, options: any = {}) => {
@@ -115,4 +116,5 @@ describe('channels:copy --from site1/foo --to site2/bar', () => {
     .it('should copy the channel foo from one site1 to site2', () => {
       expect(createdChannels).to.deep.equal(['bar'])
     })
+  })
 })

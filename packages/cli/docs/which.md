@@ -1,9 +1,8 @@
-`nimbu which`
-=============
+# `nimbu which`
 
 Show which plugin a command is in.
 
-* [`nimbu which`](#nimbu-which)
+- [`nimbu which`](#nimbu-which)
 
 ## `nimbu which`
 

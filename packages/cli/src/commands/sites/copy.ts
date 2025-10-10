@@ -15,7 +15,6 @@ import CopyTranslations from '../translations/copy'
 
 export default class CopySite extends Command {
   static description = 'copy a complete site from one to another'
-
   static flags = {
     'allow-errors': Flags.boolean({
       description: 'do not stop when an item fails and continue with the other',
@@ -72,7 +71,7 @@ export default class CopySite extends Command {
 
     this.log(`Copying everything from ${chalk.bold(fromSite)} to ${chalk.bold(toSite)}:`)
 
-    this.log(`\n1. Copying channels...\n`)
+    this.log('\n1. Copying channels...\n')
     await CopyChannels.run(['--from', fromSite, '--to', toSite, '--all', ...(flags.force ? ['--force'] : [])])
 
     if (channelsWithEntriesToCopy.length > 0) {
@@ -103,22 +102,22 @@ export default class CopySite extends Command {
       }
     }
 
-    this.log(`\n2. Customer data model...\n`)
+    this.log('\n2. Customer data model...\n')
     await CopyCustomerConfig.run(['--from', fromSite, '--to', toSite])
 
-    this.log(`\n3. Product data model...\n`)
+    this.log('\n3. Product data model...\n')
     await CopyProductsConfig.run(['--from', fromSite, '--to', toSite])
 
-    this.log(`\n4. Active themes...\n`)
+    this.log('\n4. Active themes...\n')
     await CopyThemes.run(['--from', fromSite, '--to', toSite])
 
-    this.log(`\n5. Pages...\n`)
+    this.log('\n5. Pages...\n')
     await CopyPages.run(['--from', fromSite, '--to', toSite])
 
-    this.log(`\n6. Menus...\n`)
+    this.log('\n6. Menus...\n')
     await CopyMenus.run(['--from', fromSite, '--to', toSite])
 
-    this.log(`\n7. Translations...\n`)
+    this.log('\n7. Translations...\n')
     await CopyTranslations.run(['--from', fromSite, '--to', toSite])
 
     this.log('\n✨  Done! ✨')

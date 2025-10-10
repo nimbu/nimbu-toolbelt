@@ -1,9 +1,8 @@
-`nimbu update`
-==============
+# `nimbu update`
 
 update the nimbu CLI
 
-* [`nimbu update [CHANNEL]`](#nimbu-update-channel)
+- [`nimbu update [CHANNEL]`](#nimbu-update-channel)
 
 ## `nimbu update [CHANNEL]`
 

@@ -11,7 +11,7 @@ export const fetchAllChannels = async (command: Command, site: string, options: 
   const apiOptions: APIOptions = { fetchAll: true, site }
 
   try {
-    const channels: Channel[] = await command.nimbu.get<Channel[]>(`/channels`, apiOptions)
+    const channels: Channel[] = await command.nimbu.get<Channel[]>('/channels', apiOptions)
 
     // determine dependencies between channels using a dependency graphprefer-module
     const DependencyGraph = require('dependency-graph').DepGraph

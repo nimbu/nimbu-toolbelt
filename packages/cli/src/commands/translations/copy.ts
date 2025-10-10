@@ -22,9 +22,7 @@ export default class CopyTranslations extends Command {
       required: false,
     }),
   }
-
   static description = 'copy translations from one site to another'
-
   static flags = {
     'dry-run': Flags.boolean({
       description: 'log which translations would be copied without actually copying them',
@@ -97,9 +95,7 @@ export default class CopyTranslations extends Command {
               let crntIndex = 1
               for (const translation of ctx.translations) {
                 dryRunLogs.push(
-                  `[${crntIndex}/${nbtranslations}] Dry-run: would copy translation ${chalk.bold(
-                    translation.key,
-                  )} to ${chalk.bold(ctx.toSite)}`,
+                  `[${crntIndex}/${nbtranslations}] Dry-run: would copy translation ${chalk.bold(translation.key)} to ${chalk.bold(ctx.toSite)}`,
                 )
                 crntIndex++
               }
@@ -142,7 +138,7 @@ export default class CopyTranslations extends Command {
       for (const translation of ctx.translations) {
         try {
           observer.next(`[${crntIndex}/${nbtranslations}] Copying translation ${translation.key} to site ${ctx.toSite}`)
-          await this.nimbu.post(`/translations`, {
+          await this.nimbu.post('/translations', {
             body: translation,
             host: ctx.toHost,
             site: ctx.toSite,

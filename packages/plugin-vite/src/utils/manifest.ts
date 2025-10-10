@@ -63,7 +63,8 @@ export async function buildSnippetDataFromManifest(
     if (!value.isEntry) continue
 
     const normalizedKey = normalizeManifestKey(value.src ?? key)
-    const chunkName = entryAliasBySrc.get(normalizedKey) ?? value.name ?? path.basename(value.file, path.extname(value.file))
+    const chunkName =
+      entryAliasBySrc.get(normalizedKey) ?? value.name ?? path.basename(value.file, path.extname(value.file))
 
     chunks.add(chunkName)
     js[chunkName] = normalizedFile
@@ -89,9 +90,7 @@ export async function resolveManifestPath(outDir: string, config: InlineConfig):
 
   if (typeof config.build?.manifest === 'string') {
     const manifestOption = config.build.manifest
-    const candidate = path.isAbsolute(manifestOption)
-      ? manifestOption
-      : path.join(outDir, manifestOption)
+    const candidate = path.isAbsolute(manifestOption) ? manifestOption : path.join(outDir, manifestOption)
     candidates.add(candidate)
   }
 

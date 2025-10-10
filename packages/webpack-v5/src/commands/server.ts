@@ -9,9 +9,7 @@ import WebpackDevServer from '../webpack/server'
 export default class Server extends Command {
   static aliases = ['server:v5']
   static description = 'run the development server (webpack 5)'
-
   private static _processListenersRegistered = false
-
   static flags = {
     debug: Flags.boolean({
       default: false,
@@ -32,14 +30,14 @@ export default class Server extends Command {
     }),
     noopen: Flags.boolean({
       default: false,
-      description: `Don't open/reload browser`,
+      description: "Don't open/reload browser",
     }),
     nowebpack: Flags.boolean({
       description: 'Do not use webpack.',
     }),
     poll: Flags.boolean({
       default: false,
-      description: `Tell webpack dev server to use polling`,
+      description: 'Tell webpack dev server to use polling',
     }),
     port: Flags.integer({
       default: 4567,
@@ -47,7 +45,6 @@ export default class Server extends Command {
       env: 'DEFAULT_PORT',
     }),
   }
-
   private _nimbuServer?: WebpackIntegration
   private _shutdownPromise?: Promise<void>
   private _shutdownHandlers: Array<() => void> = []

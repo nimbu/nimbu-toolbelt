@@ -9,9 +9,7 @@ export default class ThemesList extends Command {
       name: 'theme',
     }),
   }
-
   static description = 'list all layouts, templates, snippets and assets'
-
   static flags = {
     site: Flags.string({
       char: 's',
@@ -21,7 +19,7 @@ export default class ThemesList extends Command {
 
   async execute() {
     const { args, flags } = await this.parse(ThemesList)
-    
+
     const theme = args.theme || this.nimbuConfig.theme || 'default-theme'
     const site = flags.site || this.nimbuConfig.site
 
@@ -32,10 +30,10 @@ export default class ThemesList extends Command {
     this.log(`\nShowing layouts, templates, snippets and assets for ${chalk.red.bold(theme)}:`)
 
     try {
-      const contents = await this.nimbu.get(`/themes/${theme}`, {
+      const contents = (await this.nimbu.get(`/themes/${theme}`, {
         fetchAll: true,
         site,
-      }) as any
+      })) as any
 
       if (contents.layouts && contents.layouts.length > 0) {
         this.log(chalk.bold('\nLayouts:'))

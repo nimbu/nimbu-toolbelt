@@ -1,6 +1,4 @@
-/* eslint-disable unicorn/no-process-exit, n/no-process-exit */
-
-import { Command, buildConfig } from '@nimbu-cli/command'
+import { buildConfig, Command } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import ora from 'ora'
 const { get: getProjectConfig } = buildConfig
@@ -12,7 +10,6 @@ const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024
 export default class Build extends Command {
   static aliases = ['build:v5']
   static description = 'build a production bundle of your JS and CSS (using webpack 5)'
-
   static flags = {
     stats: Flags.boolean({
       description: 'Write bundle-stats.json file with detailed build info',
@@ -40,13 +37,14 @@ export default class Build extends Command {
     const projectWebpack = require('../config/webpack.project')
     const webpackConfig = projectWebpack.customize(configFactory('production'), getProjectConfig())
 
-    const chalk = require('react-dev-utils/chalk')
     const bfj = require('bfj')
-    const webpack = require('webpack')
-    const paths = require('../config/paths')
-    const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages')
+    const chalk = require('react-dev-utils/chalk')
     const FileSizeReporter = require('react-dev-utils/FileSizeReporter')
+    const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages')
     const printBuildError = require('react-dev-utils/printBuildError')
+    const webpack = require('webpack')
+
+    const paths = require('../config/paths')
     const { printFileSizesAfterBuild } = FileSizeReporter
 
     const isInteractive = process.stdout.isTTY

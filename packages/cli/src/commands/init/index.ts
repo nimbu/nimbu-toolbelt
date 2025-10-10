@@ -1,4 +1,4 @@
-import { Command, APITypes as Nimbu, color, ux } from '@nimbu-cli/command'
+import { color, Command, APITypes as Nimbu, ux } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import * as fs from 'fs-extra'
 import inquirer from 'inquirer'
@@ -7,7 +7,6 @@ import logSymbols from 'log-symbols'
 
 export default class Init extends Command {
   static description = 'initialize your working directory to code a selected theme'
-
   static flags = {
     cloudcode: Flags.boolean({
       char: 'c',

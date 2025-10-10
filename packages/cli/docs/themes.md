@@ -1,13 +1,12 @@
-`nimbu themes`
-==============
+# `nimbu themes`
 
 working with themes (upload / download)
 
-* [`nimbu themes:copy`](#nimbu-themescopy)
-* [`nimbu themes:diff [THEME]`](#nimbu-themesdiff-theme)
-* [`nimbu themes:list [THEME]`](#nimbu-themeslist-theme)
-* [`nimbu themes:pull`](#nimbu-themespull)
-* [`nimbu themes:push`](#nimbu-themespush)
+- [`nimbu themes:copy`](#nimbu-themescopy)
+- [`nimbu themes:diff [THEME]`](#nimbu-themesdiff-theme)
+- [`nimbu themes:list [THEME]`](#nimbu-themeslist-theme)
+- [`nimbu themes:pull`](#nimbu-themespull)
+- [`nimbu themes:push`](#nimbu-themespush)
 
 ## `nimbu themes:copy`
 

@@ -14,7 +14,7 @@ export class TemplatePacker implements TemplateAdapter {
   async getCompressedTemplates(templatePath?: string): Promise<string> {
     const templates = await this.packTemplates(templatePath)
     const jsonString = JSON.stringify(templates)
-    
+
     return new Promise((resolve, reject) => {
       zlib.deflate(jsonString, { level: zlib.constants.Z_DEFAULT_COMPRESSION }, (err, compressed) => {
         if (err) {
@@ -41,15 +41,15 @@ export class TemplatePacker implements TemplateAdapter {
   async packTemplates(templatePath?: string): Promise<TemplateData> {
     const templates: TemplateData = {}
     const rootPath = templatePath || this.projectRoot
-    
+
     // Load templates from each directory type
     const templateTypes = ['layouts', 'templates', 'snippets']
-    
+
     for (const type of templateTypes) {
       templates[type] = {}
       await this.loadFiles(rootPath, type, templates)
     }
-    
+
     return templates
   }
 
@@ -58,23 +58,23 @@ export class TemplatePacker implements TemplateAdapter {
    */
   private findFiles(dir: string, extensions: string[]): string[] {
     const files: string[] = []
-    
+
     if (!fs.existsSync(dir)) {
       return files
     }
-    
+
     const entries = fs.readdirSync(dir, { withFileTypes: true })
-    
+
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name)
-      
+
       if (entry.isDirectory()) {
         files.push(...this.findFiles(fullPath, extensions))
-      } else if (entry.isFile() && extensions.some(extension => entry.name.endsWith(extension))) {
+      } else if (entry.isFile() && extensions.some((extension) => entry.name.endsWith(extension))) {
         files.push(fullPath)
       }
     }
-    
+
     return files
   }
 
@@ -95,26 +95,26 @@ export class TemplatePacker implements TemplateAdapter {
    */
   private async loadFiles(rootPath: string, type: string, templates: TemplateData): Promise<void> {
     const typeDir = path.join(rootPath, type)
-    
+
     if (!fs.existsSync(typeDir)) {
       return
     }
-    
+
     if (!templates[type]) {
       templates[type] = {}
     }
-    
+
     // Find all .liquid and .liquid.haml files recursively
     const liquidFiles = this.findFiles(typeDir, ['.liquid', '.liquid.haml'])
-    
+
     for (const filePath of liquidFiles) {
       try {
         // Get relative path from type directory
         const relativePath = path.relative(typeDir, filePath)
-        
+
         // Read file content and force UTF-8 encoding
         const content = fs.readFileSync(filePath, 'utf8')
-        
+
         templates[type][relativePath] = content
       } catch (error) {
         console.error(`Error reading template file ${filePath}:`, error)

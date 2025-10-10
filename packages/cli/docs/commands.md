@@ -1,9 +1,8 @@
-`nimbu commands`
-================
+# `nimbu commands`
 
 List all nimbu commands.
 
-* [`nimbu commands`](#nimbu-commands)
+- [`nimbu commands`](#nimbu-commands)
 
 ## `nimbu commands`
 

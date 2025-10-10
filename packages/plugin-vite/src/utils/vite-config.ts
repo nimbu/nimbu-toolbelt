@@ -48,9 +48,7 @@ function withStableFilenames(config: UserConfig): UserConfig {
 function getResolver(root: string) {
   try {
     return createRequire(path.join(root, 'package.json'))
-  } catch {
-    
-  }
+  } catch {}
 }
 
 function loadOptional(root: string, id: string) {
@@ -60,9 +58,7 @@ function loadOptional(root: string, id: string) {
   try {
     const mod = resolver(id)
     return mod?.default ?? mod
-  } catch {
-    
-  }
+  } catch {}
 }
 
 function resolveTailwindMajorVersion(root: string) {
@@ -71,7 +67,7 @@ function resolveTailwindMajorVersion(root: string) {
 
   try {
     const pkgPath = resolver.resolve('tailwindcss/package.json')
-     
+
     const pkg = resolver(pkgPath) as { version?: string }
     const major = Number.parseInt((pkg?.version ?? '0').split('.')[0] ?? '0', 10)
     return Number.isNaN(major) ? 0 : major
@@ -160,17 +156,14 @@ export async function resolveViteConfig(
   const userConfigResult = await loadConfigFromFile({ command, mode }, undefined, root)
   const defaultConfig = createDefaultConfig(root)
 
-  const merged = mergeConfig(
-    mergeConfig(defaultConfig, userConfigResult?.config ?? {}),
-    {
-      ...overrides,
-      build: {
-        manifest: true,
-        ...overrides.build,
-      },
-      root,
+  const merged = mergeConfig(mergeConfig(defaultConfig, userConfigResult?.config ?? {}), {
+    ...overrides,
+    build: {
+      manifest: true,
+      ...overrides.build,
     },
-  )
+    root,
+  })
 
   // Ensure stable filenames remain in place after merging overrides
   const finalConfig = withStableFilenames(merged)

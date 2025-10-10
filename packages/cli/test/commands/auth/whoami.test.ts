@@ -12,15 +12,15 @@ describe('auth:whoami', () => {
     .command(['auth:whoami'])
     .it('should show the current user when logged in', (ctx) => {
       expect(ctx.stdout).to.equal('Logged in as jeff@example.com (Jeff)\n')
-      expect(ctx.stderr).to.match(new RegExp('Warning: NIMBU_API_KEY is set'))
+      expect(ctx.stderr).to.match(/Warning: NIMBU_API_KEY is set/)
     })
 
   test
     .env({ NIMBU_API_KEY: 'foobar' }, { clear: true })
     .stub(APIClient.prototype, 'get', () => {
       const httpError = Object.assign(new HTTPError(), {
-        statusCode: 401,
         body: { message: 'Unauthorized' },
+        statusCode: 401,
       })
 
       return Promise.reject(new APIError(httpError as HTTPError))

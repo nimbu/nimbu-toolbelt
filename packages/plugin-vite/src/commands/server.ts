@@ -18,7 +18,6 @@ interface ServerFlags {
 
 export default class Server extends Command {
   static description = 'run the development server (vite)'
-
   static flags = {
     debug: Flags.boolean({
       default: false,
@@ -30,7 +29,7 @@ export default class Server extends Command {
     }),
     noopen: Flags.boolean({
       default: false,
-      description: `Do not automatically open the browser`,
+      description: 'Do not automatically open the browser',
     }),
     port: Flags.integer({
       default: 4567,
@@ -38,7 +37,6 @@ export default class Server extends Command {
       env: 'DEFAULT_PORT',
     }),
   }
-
   private devServer?: ViteDevelopmentServer
 
   async execute() {
