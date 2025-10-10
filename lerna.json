@@ -1,12 +1,10 @@
 {
-  "packages": [
-    "packages/*"
-  ],
+  "packages": ["packages/*"],
   "version": "6.0.0",
   "npmClient": "pnpm",
   "command": {
     "publish": {
-      "allowBranch": "master",
+      "allowBranch": "main",
       "conventionalCommits": true
     }
   }

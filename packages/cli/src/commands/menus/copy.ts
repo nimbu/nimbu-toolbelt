@@ -1,11 +1,11 @@
 import { APIError, Command, ux } from '@nimbu-cli/command'
 import { Args, Flags } from '@oclif/core'
 import chalk from 'chalk'
+const inquirer = require('inquirer')
 import { Listr } from 'listr2'
 import { cloneDeep } from 'lodash'
 import { Observable } from 'rxjs'
 const through = require('through')
-const inquirer = require('inquirer')
 
 export default class CopyMenus extends Command {
   static args = {
@@ -15,9 +15,7 @@ export default class CopyMenus extends Command {
       required: false,
     }),
   }
-
   static description = 'copy menus from one site to another'
-
   static flags = {
     from: Flags.string({
       char: 'f', // shorter flag version
@@ -142,7 +140,7 @@ export default class CopyMenus extends Command {
 
     observer.next(`Creating menu ${chalk.bold(menu.slug)} in site ${chalk.bold(ctx.toSite)}`)
 
-    return this.nimbu.post(`/menus`, options)
+    return this.nimbu.post('/menus', options)
   }
 
   private async fetchMenus(ctx: any) {

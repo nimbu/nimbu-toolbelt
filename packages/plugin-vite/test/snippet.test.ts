@@ -7,8 +7,8 @@ import path from 'node:path'
 import { createSnippetData, writeSnippets } from '../src/utils/snippet'
 
 function setThemeRoot(themeRoot: string) {
-  process.env.NIMBU_DIRECTORY = themeRoot
-  ;(paths as unknown as { NIMBU_DIRECTORY: string }).NIMBU_DIRECTORY = themeRoot
+  process.env.NIMBU_DIRECTORY = themeRoot;
+(paths as unknown as { NIMBU_DIRECTORY: string }).NIMBU_DIRECTORY = themeRoot
 }
 
 describe('snippet writer', () => {

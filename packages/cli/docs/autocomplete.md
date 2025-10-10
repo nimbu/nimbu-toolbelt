@@ -1,9 +1,8 @@
-`nimbu autocomplete`
-====================
+# `nimbu autocomplete`
 
 Display autocomplete installation instructions.
 
-* [`nimbu autocomplete [SHELL]`](#nimbu-autocomplete-shell)
+- [`nimbu autocomplete [SHELL]`](#nimbu-autocomplete-shell)
 
 ## `nimbu autocomplete [SHELL]`
 

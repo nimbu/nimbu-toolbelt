@@ -1,9 +1,8 @@
-`nimbu pages`
-=============
+# `nimbu pages`
 
 copy page from one site to another
 
-* [`nimbu pages:copy [FULLPATH]`](#nimbu-pagescopy-fullpath)
+- [`nimbu pages:copy [FULLPATH]`](#nimbu-pagescopy-fullpath)
 
 ## `nimbu pages:copy [FULLPATH]`
 

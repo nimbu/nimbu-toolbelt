@@ -6,10 +6,7 @@
     "incremental": false,
     "noEmit": true,
     "rootDir": "../.",
-    "sourceMap": true,
+    "sourceMap": true
   },
-  "include": [
-    "./**/*",
-    "../src/**/*"
-  ]
+  "include": ["./**/*", "../src/**/*"]
 }

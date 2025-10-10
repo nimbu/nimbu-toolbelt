@@ -1,4 +1,4 @@
-import { APIError, APIOptions, Command, APITypes as Nimbu, type TableColumns, color, ux } from '@nimbu-cli/command'
+import { APIError, APIOptions, color, Command, APITypes as Nimbu, type TableColumns, ux } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
 import * as fs from 'fs-extra'
@@ -10,16 +10,16 @@ import {
   ChannelEntryFile,
   ChannelEntryReferenceMany,
   ChannelEntryReferenceSingle,
-  CustomField,
   Customer,
+  CustomField,
   FieldType,
   FileField,
-  RegularField,
-  RelationalField,
-  SelectField,
   isFieldOf,
   isFileField,
   isRelationalField,
+  RegularField,
+  RelationalField,
+  SelectField,
 } from '../../nimbu/types'
 import { download, generateRandom } from '../../utils/files'
 
@@ -58,7 +58,6 @@ function generatePassword(length = 8) {
 
 export default class CopyCustomers extends Command {
   static description = 'copy customers from one to another'
-
   static flags = {
     'allow-errors': Flags.boolean({
       description: 'do not stop when an item fails and continue with the other',
@@ -96,9 +95,7 @@ export default class CopyCustomers extends Command {
       description: 'query expression to filter the the source customer api call',
     }),
   }
-
   private abortOnError = true
-
   private createdCustomers: Customer[] = []
   // mapping of ids in source site to newly created items in target site
   private idMapping: {
@@ -106,7 +103,6 @@ export default class CopyCustomers extends Command {
       [id: string]: null | string
     }
   } = {}
-
   private warnings: string[] = []
 
   get needsConfig(): boolean {
@@ -142,7 +138,7 @@ export default class CopyCustomers extends Command {
           persistentOutput: true,
         },
         task: (ctx: CopySingle, task) => this.queryCustomers(ctx, task),
-        title: `Querying customers`,
+        title: 'Querying customers',
       },
       {
         enabled: (ctx: CopySingle) =>
@@ -151,7 +147,7 @@ export default class CopyCustomers extends Command {
           persistentOutput: true,
         },
         task: (ctx: CopySingle) => this.downloadAttachments(ctx),
-        title: `Downloading attachments`,
+        title: 'Downloading attachments',
       },
       {
         rendererOptions: {
@@ -337,7 +333,7 @@ export default class CopyCustomers extends Command {
             if (existingId == null) {
               observer.next(`[${i}/${nbEntries}] creating entry "${chalk.bold(entry.email)}"`)
 
-              createdOrUpdated = await this.nimbu.post<Customer>(`/customers`, options)
+              createdOrUpdated = await this.nimbu.post<Customer>('/customers', options)
 
               // remember the newly created customer with password to print later
               createdOrUpdated.password = entry.password
@@ -426,9 +422,9 @@ export default class CopyCustomers extends Command {
     cacheKey: string,
     fieldName: string,
   ) {
-    const tmp = require('tmp-promise')
-    const prettyBytes = require('pretty-bytes')
     const pathFinder = require('node:path')
+    const prettyBytes = require('pretty-bytes')
+    const tmp = require('tmp-promise')
 
     if (fileObject != null && fileObject !== null && fileObject.url != null) {
       const url =
@@ -443,9 +439,7 @@ export default class CopyCustomers extends Command {
           path,
           (bytes, percentage) => {
             observer.next(
-              `[${i}/${ctx.nbEntries}] Downloading ${fieldName} => "${filename}" (${percentage}% of ${prettyBytes(
-                bytes,
-              )})`,
+              `[${i}/${ctx.nbEntries}] Downloading ${fieldName} => "${filename}" (${percentage}% of ${prettyBytes(bytes)})`,
             )
           },
           this.debug,
@@ -462,7 +456,7 @@ export default class CopyCustomers extends Command {
     const options: APIOptions = { site: ctx.fromSite }
 
     try {
-      const customizations = await this.nimbu.get<CustomField[]>(`/customers/customizations`, options)
+      const customizations = await this.nimbu.get<CustomField[]>('/customers/customizations', options)
 
       ctx.fileFields = customizations.filter(isFileField)
       ctx.galleryFields = customizations.filter(isFieldOf(FieldType.GALLERY))
@@ -517,8 +511,8 @@ export default class CopyCustomers extends Command {
 
   private printCreatedCustomers(toSite: string) {
     if (this.createdCustomers.length > 0) {
-      const supports = require('supports-hyperlinks')
       const hyperlinker = require('hyperlinker')
+      const supports = require('supports-hyperlinks')
 
       const columns: TableColumns<Customer> = {
         email: {
@@ -563,7 +557,7 @@ export default class CopyCustomers extends Command {
   private async queryCustomers(ctx: CopySingle, task: any) {
     const apiOptions: APIOptions = { fetchAll: true, site: ctx.fromSite }
 
-    const baseUrl = `/customers`
+    const baseUrl = '/customers'
     const containedInParts: {
       [k: string]: string[]
     } = {}
@@ -707,9 +701,7 @@ export default class CopyCustomers extends Command {
               if (error instanceof APIError) {
                 observer.error(
                   new Error(
-                    `[${i}/${nbEntries}] updating entry #${entry.id} failed: ${error.body.message} => ${JSON.stringify(
-                      error.body.errors,
-                    )}`,
+                    `[${i}/${nbEntries}] updating entry #${entry.id} failed: ${error.body.message} => ${JSON.stringify(error.body.errors)}`,
                   ),
                 )
               } else {

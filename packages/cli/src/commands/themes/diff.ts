@@ -12,16 +12,13 @@ export default class ThemesDiff extends Command {
       name: 'theme',
     }),
   }
-
   static description = 'show differences between local and server theme files'
-
   static flags = {
     site: Flags.string({
       char: 's',
       description: 'the site of the theme',
     }),
   }
-
   private diff: Record<string, boolean> = {}
 
   async execute() {
@@ -35,9 +32,7 @@ export default class ThemesDiff extends Command {
     }
 
     this.log(
-      `\nShowing differences between local and server\nlayouts, templates, snippets and assets for ${chalk.green.bold(
-        theme,
-      )}:`,
+      `\nShowing differences between local and server\nlayouts, templates, snippets and assets for ${chalk.green.bold(theme)}:`,
     )
 
     try {

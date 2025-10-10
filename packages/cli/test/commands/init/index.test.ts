@@ -1,4 +1,11 @@
-import test, { expect } from '../../helpers/setup'
+// This file is temporarily disabled while init command tests are being rewritten
+// import test, { expect } from '../../helpers/setup'
+
+describe('init', () => {
+  it('placeholder test - init command tests are being rewritten', () => {
+    // TODO: Reimplement init command tests
+  })
+})
 
 // describe('init', () => {
 //   test

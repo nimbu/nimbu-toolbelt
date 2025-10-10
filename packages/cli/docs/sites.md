@@ -1,11 +1,10 @@
-`nimbu sites`
-=============
+# `nimbu sites`
 
 interacting with your sites (list, create)
 
-* [`nimbu sites`](#nimbu-sites)
-* [`nimbu sites:copy`](#nimbu-sitescopy)
-* [`nimbu sites:list`](#nimbu-siteslist)
+- [`nimbu sites`](#nimbu-sites)
+- [`nimbu sites:copy`](#nimbu-sitescopy)
+- [`nimbu sites:list`](#nimbu-siteslist)
 
 ## `nimbu sites`
 

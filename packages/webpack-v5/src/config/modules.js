@@ -2,14 +2,15 @@
 
 const fs = require('node:fs')
 const path = require('node:path')
-const paths = require('./paths')
 const chalk = require('react-dev-utils/chalk')
 const resolve = require('resolve')
+
+const paths = require('./paths')
 
 /**
  * Get additional module paths based on the baseUrl of a compilerOptions object.
  *
- * @param {Object} options
+ * @param {object} options - compiler options object containing baseUrl and other settings
  */
 function getAdditionalModulePaths(options = {}) {
   const { baseUrl } = options
@@ -52,7 +53,7 @@ function getAdditionalModulePaths(options = {}) {
 /**
  * Get webpack aliases based on the baseUrl of a compilerOptions object.
  *
- * @param {*} options
+ * @param {object} options - compiler options object containing baseUrl and other settings
  */
 function getWebpackAliases(options = {}) {
   const { baseUrl } = options
@@ -73,7 +74,7 @@ function getWebpackAliases(options = {}) {
 /**
  * Get jest aliases based on the baseUrl of a compilerOptions object.
  *
- * @param {*} options
+ * @param {object} options - compiler options object containing baseUrl and other settings
  */
 function getJestAliases(options = {}) {
   const { baseUrl } = options
@@ -108,9 +109,11 @@ function getModules() {
   // TypeScript project and set up the config
   // based on tsconfig.json
   if (hasTsConfig) {
-    const ts = require(resolve.sync('typescript', {
-      basedir: paths.appNodeModules,
-    }))
+    const ts = require(
+      resolve.sync('typescript', {
+        basedir: paths.appNodeModules,
+      }),
+    )
     config = ts.readConfigFile(paths.appTsConfig, ts.sys.readFile).config
     // Otherwise we'll check if there is jsconfig.json
     // for non TS projects.

@@ -1,14 +1,13 @@
 import { APIError, Command, ux } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
+const inquirer = require('inquirer')
 import { Listr } from 'listr2'
 import { Observable } from 'rxjs'
 const through = require('through')
-const inquirer = require('inquirer')
 
 export default class CopyCustomerConfig extends Command {
   static description = 'copy customer customizations from one to another'
-
   static flags = {
     from: Flags.string({
       char: 'f', // shorter flag version
@@ -84,7 +83,7 @@ export default class CopyCustomerConfig extends Command {
 
       prompt({
         default: false,
-        message: `Are you sure you want to overwrite the existing customizations?`,
+        message: 'Are you sure you want to overwrite the existing customizations?',
         name: 'overwrite',
         type: 'confirm',
       })
@@ -115,7 +114,7 @@ export default class CopyCustomerConfig extends Command {
 
     // check if any target customizations exists
     try {
-      targetCustomizations = await this.nimbu.get(`/customers/customizations`, options)
+      targetCustomizations = await this.nimbu.get('/customers/customizations', options)
     } catch (error) {
       const error_ = error instanceof APIError ? new Error(error.message) : error
       throw error_
@@ -136,7 +135,7 @@ export default class CopyCustomerConfig extends Command {
 
     task.title = `Copying customizations to site ${chalk.bold(ctx.toSite)}`
 
-    return this.nimbu.post(`/customers/customizations`, options)
+    return this.nimbu.post('/customers/customizations', options)
   }
 
   private async fetch(ctx: any) {
@@ -144,7 +143,7 @@ export default class CopyCustomerConfig extends Command {
       site: ctx.fromSite,
     }
     try {
-      ctx.customizations = await this.nimbu.get(`/customers/customizations`, options)
+      ctx.customizations = await this.nimbu.get('/customers/customizations', options)
     } catch (error) {
       const error_ = error instanceof APIError ? new Error(error.message) : error
       throw error_
@@ -159,6 +158,6 @@ export default class CopyCustomerConfig extends Command {
 
     task.title = `Updating customizations in site ${chalk.bold(ctx.toSite)}`
 
-    return this.nimbu.post(`/customers/customizations?replace=1`, options)
+    return this.nimbu.post('/customers/customizations?replace=1', options)
   }
 }

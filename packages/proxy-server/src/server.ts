@@ -16,7 +16,7 @@ export class ProxyServer implements ServerAdapter {
   private customMiddlewares: RequestHandler[] = []
   private isRunning = false
   private nimbuClient: any
-  private server: Server | null = null
+  private server: null | Server = null
   private simulatorFormatter: SimulatorFormatter
   private templatePacker: TemplatePacker
 
@@ -85,7 +85,6 @@ export class ProxyServer implements ServerAdapter {
   async stop(): Promise<void> {
     if (this.server && this.isRunning) {
       return new Promise((resolve) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.server!.close(() => {
           console.log('Proxy server stopped')
           this.isRunning = false
@@ -108,7 +107,7 @@ export class ProxyServer implements ServerAdapter {
     console.log(chalk.cyan('\n=== DEBUG: API Request Data ==='))
 
     // Create a copy of the payload without the template code
-    const debugPayload = JSON.parse(JSON.stringify(payload))
+    const debugPayload = structuredClone(payload)
 
     // Remove or truncate the template code for readability
     if (debugPayload.simulator?.code) {

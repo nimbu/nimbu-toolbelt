@@ -3,18 +3,21 @@
 // const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware')
 // const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware')
 const ignoredFiles = require('react-dev-utils/ignoredFiles')
+
+const getHttpsConfig = require('./get-https-config.js')
 // const redirectServedPath = require('react-dev-utils/redirectServedPathMiddleware')
 const paths = require('./paths')
-const getHttpsConfig = require('./get-https-config.js')
 
 // Import proxy server components for integrated mode
-let ProxyServer, TemplatePacker, SimulatorFormatter
+let ProxyServer
+let TemplatePacker
+let SimulatorFormatter
 try {
   const proxyModule = require('@nimbu-cli/proxy-server')
   ProxyServer = proxyModule.ProxyServer
   TemplatePacker = proxyModule.TemplatePacker
   SimulatorFormatter = proxyModule.SimulatorFormatter
-} catch (error) {
+} catch {
   // Proxy server not available, will fall back to separate server mode
 }
 
@@ -34,9 +37,9 @@ module.exports = function (proxy, allowedHosts, options = {}) {
         throw new Error('webpack-dev-server is not defined')
       }
 
-      const express = require('express')
-      const cors = require('cors')
       const compression = require('compression')
+      const cors = require('cors')
+      const express = require('express')
       const helmet = require('helmet')
 
       // Initialize proxy server components
@@ -63,8 +66,8 @@ module.exports = function (proxy, allowedHosts, options = {}) {
       devServer.app.use(compression())
 
       // Add middleware to serve images and fonts from template root directory
-      devServer.app.use('/images', express.static(require('path').join(process.cwd(), 'images')))
-      devServer.app.use('/fonts', express.static(require('path').join(process.cwd(), 'fonts')))
+      devServer.app.use('/images', express.static(require('node:path').join(process.cwd(), 'images')))
+      devServer.app.use('/fonts', express.static(require('node:path').join(process.cwd(), 'fonts')))
 
       // Add unified body parsing middleware for v3 simulator
       devServer.app.use((req, res, next) => {
@@ -143,6 +146,7 @@ module.exports = function (proxy, allowedHosts, options = {}) {
             if (!authContext.token) {
               throw new Error('Authentication required')
             }
+
             if (!authContext.site) {
               throw new Error('Site configuration missing')
             }
@@ -169,8 +173,8 @@ module.exports = function (proxy, allowedHosts, options = {}) {
               statusCode >= 200 && statusCode < 300
                 ? chalk.green(`(${statusCode})`)
                 : statusCode >= 400
-                ? chalk.red(`(${statusCode})`)
-                : chalk.yellow(`(${statusCode})`)
+                  ? chalk.red(`(${statusCode})`)
+                  : chalk.yellow(`(${statusCode})`)
             console.log(`${timestamp} ${req.method} ${req.path} ${coloredStatus}`)
           } catch (error) {
             const chalk = require('chalk')
@@ -180,10 +184,10 @@ module.exports = function (proxy, allowedHosts, options = {}) {
             const { ResponseProcessor } = require('@nimbu-cli/proxy-server')
             ResponseProcessor.handleError(error, res)
           }
-        })().catch((err) => {
-          console.error('Unhandled error in integrated proxy middleware:', err)
+        })().catch((error) => {
+          console.error('Unhandled error in integrated proxy middleware:', error)
           const { ResponseProcessor } = require('@nimbu-cli/proxy-server')
-          ResponseProcessor.handleError(err, res)
+          ResponseProcessor.handleError(error, res)
         })
       })
 

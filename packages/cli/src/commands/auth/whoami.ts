@@ -1,4 +1,4 @@
-import { APIError, Command, HTTPError, APITypes as Nimbu, color } from '@nimbu-cli/command'
+import { APIError, color, Command, HTTPError, APITypes as Nimbu } from '@nimbu-cli/command'
 
 export default class Whoami extends Command {
   static aliases = ['whoami']

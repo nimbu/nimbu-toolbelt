@@ -1,5 +1,3 @@
-/* eslint-disable import/no-named-as-default */
-
 import { Errors, Interfaces } from '@oclif/core'
 import Netrc from 'netrc-parser'
 import Nimbu, { HTTPError } from 'nimbu-client'
@@ -110,7 +108,10 @@ export default class Client {
   private client: Nimbu
   private readonly credentials: Credentials
 
-  constructor(protected oclifConfig: Interfaces.Config, config: Config) {
+  constructor(
+    protected oclifConfig: Interfaces.Config,
+    config: Config,
+  ) {
     this.oclifConfig = oclifConfig
     this.config = config
     this.credentials = new Credentials(oclifConfig, this)
@@ -203,7 +204,7 @@ export default class Client {
 
   async simulatorRender(payload: ISimulatorPayload): Promise<ISimulatorResponse> {
     return this.request<ISimulatorResponse>('POST', '/simulator/render', {
-      body: payload
+      body: payload,
     })
   }
 

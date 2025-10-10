@@ -1,10 +1,13 @@
 import { Config } from '@oclif/core'
-import base, { expect } from 'fancy-test'
+import { expect } from 'chai'
+import { resolve as resolvePath } from 'node:path'
 
 import Command from '../src/command'
 import * as flags from '../src/flags'
 
-const test = base.add('config', () => Config.load())
+const cliRoot = resolvePath(__dirname, '../..', 'cli')
+
+const loadCommandConfig = () => Config.load({ root: cliRoot })
 
 class MyCommand extends Command {
   async execute() {
@@ -13,7 +16,7 @@ class MyCommand extends Command {
 }
 
 describe('cli base command', () => {
-  it('has a flag to set the site', async () =>
+  it('has a flag to set the site', async () => {
     class SiteCommand extends Command {
       static flags = {
         site: flags.site(),
@@ -23,11 +26,15 @@ describe('cli base command', () => {
         const { flags } = await this.parse(SiteCommand)
         expect(flags.site).to.equal('mysite')
       }
-    }.run(['--site=mysite']))
+    }
 
-  test.it('has a nimbu API client', async (ctx) => {
-    const cmd = new MyCommand([], ctx.config)
+    await SiteCommand.run(['--site=mysite'])
+  })
+
+  it('has a nimbu API client', async () => {
+    const config = await loadCommandConfig()
+    const cmd = new MyCommand([], config)
     await cmd.initialize()
-    expect(cmd.nimbu).to.be.ok
+    expect(cmd.nimbu).to.exist
   })
 })

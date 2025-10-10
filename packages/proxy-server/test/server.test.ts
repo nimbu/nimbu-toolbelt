@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import { ProxyServer } from '../src/server'
 
 // Mock nimbuClient for testing
@@ -7,13 +8,13 @@ const createMockNimbuClient = () => ({
     apiHost: 'api.nimbu.io',
     apiUrl: 'https://api.nimbu.io',
     site: 'test-site',
-    token: 'test-token'
+    token: 'test-token',
   }),
-  simulatorRender: async (payload: any) => ({
-    status: 200,
+  simulatorRender: async (_payload: any) => ({
     body: Buffer.from('<html><body>Test Response</body></html>', 'utf8').toString('base64'),
-    headers: { 'content-type': 'text/html' }
-  })
+    headers: { 'content-type': 'text/html' },
+    status: 200,
+  }),
 })
 
 describe('ProxyServer', () => {
@@ -22,7 +23,7 @@ describe('ProxyServer', () => {
 
   beforeEach(() => {
     mockNimbuClient = createMockNimbuClient()
-    server = new ProxyServer({ port: 3000, nimbuClient: mockNimbuClient })
+    server = new ProxyServer({ nimbuClient: mockNimbuClient, port: 3000 })
   })
 
   afterEach(async () => {
@@ -37,10 +38,10 @@ describe('ProxyServer', () => {
 
   it('should start and stop server', async () => {
     expect(server.running).to.be.false
-    
+
     await server.start()
     expect(server.running).to.be.true
-    
+
     await server.stop()
     expect(server.running).to.be.false
   })

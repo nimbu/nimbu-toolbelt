@@ -1,8 +1,9 @@
 import { expect } from 'chai'
 import { Request } from 'express'
+import * as path from 'node:path'
+
 import { SimulatorFormatter } from '../src/simulator-formatter'
 import { TemplatePacker } from '../src/template-packer'
-import * as path from 'path'
 
 describe('SimulatorFormatter', () => {
   let formatter: SimulatorFormatter
@@ -17,15 +18,15 @@ describe('SimulatorFormatter', () => {
   describe('buildSimulatorPayload', () => {
     it('should build basic simulator payload', async () => {
       const mockReq = {
+        body: {},
+        headers: {
+          accept: 'text/html',
+          'user-agent': 'test-browser',
+        },
+        is: () => false,
         method: 'GET',
         path: '/test-page',
-        headers: {
-          'user-agent': 'test-browser',
-          'accept': 'text/html'
-        },
         query: { param: 'value' },
-        body: {},
-        is: () => false
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -52,14 +53,14 @@ describe('SimulatorFormatter', () => {
 
     it('should handle POST requests with body', async () => {
       const mockReq = {
+        body: { email: 'john@example.com', name: 'John' },
+        headers: {
+          'content-type': 'application/json',
+        },
+        is: () => false,
         method: 'POST',
         path: '/submit',
-        headers: {
-          'content-type': 'application/json'
-        },
         query: {},
-        body: { name: 'John', email: 'john@example.com' },
-        is: () => false
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -78,25 +79,26 @@ describe('SimulatorFormatter', () => {
     })
 
     it('should handle multipart requests with files', async () => {
-      const rawFormData = '--boundary123\r\nContent-Disposition: form-data; name="name"\r\n\r\nJohn\r\n--boundary123\r\nContent-Disposition: form-data; name="avatar"; filename="avatar.jpg"\r\nContent-Type: image/jpeg\r\n\r\nimage data\r\n--boundary123--\r\n'
-      
+      const rawFormData =
+        '--boundary123\r\nContent-Disposition: form-data; name="name"\r\n\r\nJohn\r\n--boundary123\r\nContent-Disposition: form-data; name="avatar"; filename="avatar.jpg"\r\nContent-Type: image/jpeg\r\n\r\nimage data\r\n--boundary123--\r\n'
+
       const mockReq = {
-        method: 'POST',
-        path: '/upload',
-        headers: {
-          'content-type': 'multipart/form-data; boundary=boundary123'
-        },
-        query: {},
         body: {
-          name: 'John',
           avatar: {
             __type: 'file',
+            data: Buffer.from('image data').toString('base64'),
             filename: 'avatar.jpg',
-            data: Buffer.from('image data').toString('base64')
-          }
+          },
+          name: 'John',
         },
+        headers: {
+          'content-type': 'multipart/form-data; boundary=boundary123',
+        },
+        is: (type: string) => type === 'multipart/form-data',
+        method: 'POST',
+        path: '/upload',
+        query: {},
         rawBody: Buffer.from(rawFormData),
-        is: (type: string) => type === 'multipart/form-data'
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -104,7 +106,7 @@ describe('SimulatorFormatter', () => {
       // For v3, we should have rawBody instead of processed files
       expect(payload.simulator.request.rawBody).to.be.a('string')
       expect(payload.simulator.version).to.equal('v3')
-      
+
       // Verify the rawBody is base64 encoded form data
       const decodedBody = Buffer.from(payload.simulator.request.rawBody!, 'base64').toString()
       expect(decodedBody).to.include('John')
@@ -112,33 +114,34 @@ describe('SimulatorFormatter', () => {
     })
 
     it('should handle complex nested file structures', async () => {
-      const rawFormData = '--boundary456\r\nContent-Disposition: form-data; name="user[documents][0]"; filename="doc1.pdf"\r\nContent-Type: application/pdf\r\n\r\npdf content 1\r\n--boundary456\r\nContent-Disposition: form-data; name="user[documents][1]"; filename="doc2.pdf"\r\nContent-Type: application/pdf\r\n\r\npdf content 2\r\n--boundary456--\r\n'
-      
+      const rawFormData =
+        '--boundary456\r\nContent-Disposition: form-data; name="user[documents][0]"; filename="doc1.pdf"\r\nContent-Type: application/pdf\r\n\r\npdf content 1\r\n--boundary456\r\nContent-Disposition: form-data; name="user[documents][1]"; filename="doc2.pdf"\r\nContent-Type: application/pdf\r\n\r\npdf content 2\r\n--boundary456--\r\n'
+
       const mockReq = {
-        method: 'POST',
-        path: '/complex-upload',
-        headers: {
-          'content-type': 'multipart/form-data; boundary=boundary456'
-        },
-        query: {},
         body: {
           user: {
             documents: [
               {
                 __type: 'file',
+                data: Buffer.from('pdf content 1').toString('base64'),
                 filename: 'doc1.pdf',
-                data: Buffer.from('pdf content 1').toString('base64')
               },
               {
                 __type: 'file',
+                data: Buffer.from('pdf content 2').toString('base64'),
                 filename: 'doc2.pdf',
-                data: Buffer.from('pdf content 2').toString('base64')
-              }
-            ]
-          }
+              },
+            ],
+          },
         },
+        headers: {
+          'content-type': 'multipart/form-data; boundary=boundary456',
+        },
+        is: (type: string) => type === 'multipart/form-data',
+        method: 'POST',
+        path: '/complex-upload',
+        query: {},
         rawBody: Buffer.from(rawFormData),
-        is: (type: string) => type === 'multipart/form-data'
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -146,7 +149,7 @@ describe('SimulatorFormatter', () => {
       // For v3, we should have rawBody instead of processed files
       expect(payload.simulator.request.rawBody).to.be.a('string')
       expect(payload.simulator.version).to.equal('v3')
-      
+
       // Verify the rawBody contains the file data
       const decodedBody = Buffer.from(payload.simulator.request.rawBody!, 'base64').toString()
       expect(decodedBody).to.include('doc1.pdf')
@@ -157,12 +160,12 @@ describe('SimulatorFormatter', () => {
 
     it('should not include rawBody when no request body present', async () => {
       const mockReq = {
+        body: {},
+        headers: {},
+        is: () => false,
         method: 'GET',
         path: '/no-files',
-        headers: {},
         query: {},
-        body: {},
-        is: () => false
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -175,14 +178,14 @@ describe('SimulatorFormatter', () => {
 
     it('should merge query parameters with POST body parameters', async () => {
       const mockReq = {
+        body: { message: 'Hello world', name: 'Alice' },
+        headers: {
+          'content-type': 'application/json',
+        },
+        is: () => false,
         method: 'POST',
         path: '/contact',
-        headers: {
-          'content-type': 'application/json'
-        },
-        query: { source: 'newsletter', ref: 'homepage' },
-        body: { name: 'Alice', message: 'Hello world' },
-        is: () => false
+        query: { ref: 'homepage', source: 'newsletter' },
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -197,14 +200,14 @@ describe('SimulatorFormatter', () => {
 
     it('should handle PUT requests with parameters', async () => {
       const mockReq = {
+        body: { email: 'updated@example.com', name: 'Updated Name' },
+        headers: {
+          'content-type': 'application/json',
+        },
+        is: () => false,
         method: 'PUT',
         path: '/users/123',
-        headers: {
-          'content-type': 'application/json'
-        },
         query: { validate: 'true' },
-        body: { name: 'Updated Name', email: 'updated@example.com' },
-        is: () => false
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -218,14 +221,14 @@ describe('SimulatorFormatter', () => {
 
     it('should handle PATCH requests with parameters', async () => {
       const mockReq = {
+        body: { title: 'Updated Title' },
+        headers: {
+          'content-type': 'application/json',
+        },
+        is: () => false,
         method: 'PATCH',
         path: '/articles/456',
-        headers: {
-          'content-type': 'application/json'
-        },
         query: { draft: 'false' },
-        body: { title: 'Updated Title' },
-        is: () => false
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -238,12 +241,12 @@ describe('SimulatorFormatter', () => {
 
     it('should handle GET requests with only query parameters', async () => {
       const mockReq = {
+        body: {},
+        headers: {},
+        is: () => false,
         method: 'GET',
         path: '/search',
-        headers: {},
-        query: { q: 'nodejs', filter: 'recent' },
-        body: {},
-        is: () => false
+        query: { filter: 'recent', q: 'nodejs' },
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -258,14 +261,14 @@ describe('SimulatorFormatter', () => {
 
     it('should handle body parameter precedence over query parameters', async () => {
       const mockReq = {
+        body: { email: 'test@example.com', name: 'BodyName' },
+        headers: {
+          'content-type': 'application/json',
+        },
+        is: () => false,
         method: 'POST',
         path: '/api/test',
-        headers: {
-          'content-type': 'application/json'
-        },
-        query: { name: 'QueryName', id: '999' },
-        body: { name: 'BodyName', email: 'test@example.com' },
-        is: () => false
+        query: { id: '999', name: 'QueryName' },
       } as unknown as Request
 
       const payload = await formatter.buildSimulatorPayload(mockReq)
@@ -281,9 +284,9 @@ describe('SimulatorFormatter', () => {
   describe('shouldHandleRequest', () => {
     it('should handle regular page requests', () => {
       const mockReq = {
+        headers: {},
         path: '/about',
         query: {},
-        headers: {}
       } as unknown as Request
 
       expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.true
@@ -292,7 +295,7 @@ describe('SimulatorFormatter', () => {
     it('should skip webpack resources', () => {
       const mockReq = {
         path: '/javascripts/app.js',
-        query: {}
+        query: {},
       } as unknown as Request
 
       const webpackResources = ['app.js', 'vendor.js']
@@ -305,20 +308,20 @@ describe('SimulatorFormatter', () => {
         '/app.d98feefa3ad3f14c2168.hot-update.js',
         '/__webpack_hmr',
         '/sockjs-node/info',
-        '/webpack.stats.json'
+        '/webpack.stats.json',
       ]
 
-      hmrRequests.forEach(path => {
+      for (const path of hmrRequests) {
         const mockReq = { path, query: {} } as unknown as Request
         expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.false
-      })
+      }
     })
 
     it('should handle favicon requests', () => {
       const mockReq = {
+        headers: {},
         path: '/favicon.ico',
         query: {},
-        headers: {}
       } as unknown as Request
 
       expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.true
@@ -326,9 +329,9 @@ describe('SimulatorFormatter', () => {
 
     it('should handle private file requests', () => {
       const mockReq = {
+        headers: {},
         path: '/downloads/document.pdf',
         query: { key: 'secret123' },
-        headers: {}
       } as unknown as Request
 
       expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.true
@@ -336,9 +339,9 @@ describe('SimulatorFormatter', () => {
 
     it('should not handle private files without key', () => {
       const mockReq = {
+        headers: {},
         path: '/downloads/document.pdf',
         query: {},
-        headers: {}
       } as unknown as Request
 
       expect(SimulatorFormatter.shouldHandleRequest(mockReq, [])).to.be.true
@@ -348,45 +351,44 @@ describe('SimulatorFormatter', () => {
   describe('cookie handling', () => {
     it('should map cookies to HTTP_COOKIE header', async () => {
       const mockReq = {
-        method: 'GET',
-        path: '/test',
-        url: '/test',
-        query: {},
         body: {},
         headers: {
+          cookie: '_nimbu_session=abc123; csrf_token=xyz789',
           host: 'localhost:3000',
-          cookie: '_nimbu_session=abc123; csrf_token=xyz789'
         },
+        is: () => false,
+        method: 'GET',
+        path: '/test',
+        query: {},
         secure: false,
-        is: () => false
+        url: '/test',
       } as unknown as Request
 
       const result = await formatter.buildSimulatorPayload(mockReq)
       const headers = JSON.parse(result.simulator.request.headers)
-      
+
       expect(headers).to.have.property('HTTP_COOKIE', '_nimbu_session=abc123; csrf_token=xyz789')
       expect(headers).to.have.property('cookie', '_nimbu_session=abc123; csrf_token=xyz789')
     })
 
     it('should handle requests without cookies', async () => {
       const mockReq = {
-        method: 'GET',
-        path: '/test',
-        url: '/test',
-        query: {},
         body: {},
         headers: {
-          host: 'localhost:3000'
+          host: 'localhost:3000',
         },
+        is: () => false,
+        method: 'GET',
+        path: '/test',
+        query: {},
         secure: false,
-        is: () => false
+        url: '/test',
       } as unknown as Request
 
       const result = await formatter.buildSimulatorPayload(mockReq)
       const headers = JSON.parse(result.simulator.request.headers)
-      
+
       expect(headers).to.not.have.property('HTTP_COOKIE')
     })
   })
-
 })

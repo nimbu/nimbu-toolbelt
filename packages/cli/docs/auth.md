@@ -1,12 +1,11 @@
-`nimbu auth`
-============
+# `nimbu auth`
 
 authenticate, display token and current user
 
-* [`nimbu auth:login`](#nimbu-authlogin)
-* [`nimbu auth:logout`](#nimbu-authlogout)
-* [`nimbu auth:token`](#nimbu-authtoken)
-* [`nimbu auth:whoami`](#nimbu-authwhoami)
+- [`nimbu auth:login`](#nimbu-authlogin)
+- [`nimbu auth:logout`](#nimbu-authlogout)
+- [`nimbu auth:token`](#nimbu-authtoken)
+- [`nimbu auth:whoami`](#nimbu-authwhoami)
 
 ## `nimbu auth:login`
 

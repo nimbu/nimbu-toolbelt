@@ -12,16 +12,16 @@ import {
   ChannelEntryFile,
   ChannelEntryReferenceMany,
   ChannelEntryReferenceSingle,
-  CustomField,
   Customer,
+  CustomField,
   FieldType,
   FileField,
-  RegularField,
-  RelationalField,
-  SelectField,
   isFieldOf,
   isFileField,
   isRelationalField,
+  RegularField,
+  RelationalField,
+  SelectField,
 } from '../../../nimbu/types'
 import { fetchAllChannels } from '../../../utils/channels'
 import { download, generateRandom } from '../../../utils/files'
@@ -68,7 +68,6 @@ type CopySingleRecursive = {
 
 export default class CopyChannelEntries extends Command {
   static description = 'copy channel entries from one to another'
-
   static flags = {
     'allow-errors': Flags.boolean({
       description: 'do not stop when an item fails and continue with the other',
@@ -113,16 +112,13 @@ export default class CopyChannelEntries extends Command {
       description: 'query expression to filter the source channel',
     }),
   }
-
   private abortOnError = true
-
   // mapping of ids in source site to newly created items in target site
   private idMapping: {
     [channelSlug: string]: {
       [id: string]: null | string
     }
   } = {}
-
   private warnings: string[] = []
 
   get needsConfig(): boolean {
@@ -183,13 +179,13 @@ export default class CopyChannelEntries extends Command {
                           persistentOutput: true,
                         },
                         task: (ctx: CopySingle, task) => this.queryChannel(ctx, task),
-                        title: `Querying channel entries`,
+                        title: 'Querying channel entries',
                       },
                       {
                         enabled: () => flags['copy-customers'],
                         skip: (ctx) => ctx.entries == null || ctx.entries.length === 0,
                         task: (ctx: CopySingle, task) => this.queryRelatedCustomers(ctx, task),
-                        title: `Querying related customers for fetched entries`,
+                        title: 'Querying related customers for fetched entries',
                       },
                       {
                         enabled: (ctx: CopySingle) =>
@@ -199,7 +195,7 @@ export default class CopyChannelEntries extends Command {
                           persistentOutput: true,
                         },
                         task: (ctx: CopySingle) => this.downloadAttachments(ctx),
-                        title: `Downloading attachments`,
+                        title: 'Downloading attachments',
                       },
                       {
                         rendererOptions: {
@@ -221,7 +217,7 @@ export default class CopyChannelEntries extends Command {
                         },
                         skip: (ctx) => ctx.dryRun,
                         task: (ctx: CopySingle) => this.updateEntries(ctx),
-                        title: `Updating self-references`,
+                        title: 'Updating self-references',
                       },
                     ],
                     {
@@ -572,9 +568,9 @@ export default class CopyChannelEntries extends Command {
     cacheKey: string,
     fieldName: string,
   ) {
-    const tmp = require('tmp-promise')
-    const prettyBytes = require('pretty-bytes')
     const pathFinder = require('node:path')
+    const prettyBytes = require('pretty-bytes')
+    const tmp = require('tmp-promise')
 
     if (fileObject != null && fileObject !== null && fileObject.url != null) {
       const url =
@@ -589,9 +585,7 @@ export default class CopyChannelEntries extends Command {
           path,
           (bytes, percentage) => {
             observer.next(
-              `[${i}/${ctx.nbEntries}] Downloading ${fieldName} => "${filename}" (${percentage}% of ${prettyBytes(
-                bytes,
-              )})`,
+              `[${i}/${ctx.nbEntries}] Downloading ${fieldName} => "${filename}" (${percentage}% of ${prettyBytes(bytes)})`,
             )
           },
           this.debug,
@@ -735,7 +729,12 @@ export default class CopyChannelEntries extends Command {
       throw new Error('You need to specify the destination site.')
     }
 
-    return { fromChannel, fromSite, toChannel, toSite }
+    return {
+      fromChannel,
+      fromSite,
+      toChannel,
+      toSite,
+    }
   }
 
   private printWarnings() {
@@ -942,9 +941,7 @@ export default class CopyChannelEntries extends Command {
           this.cacheId('customers', customer.id, newCustomer.id)
         } catch (error) {
           if (error instanceof APIError) {
-            const errorMessage = `creating customer #${customer.id} failed: ${error.body.message} => ${JSON.stringify(
-              error.body.errors,
-            )}`
+            const errorMessage = `creating customer #${customer.id} failed: ${error.body.message} => ${JSON.stringify(error.body.errors)}`
 
             if (this.abortOnError) {
               ux.error(errorMessage)
@@ -998,9 +995,7 @@ export default class CopyChannelEntries extends Command {
               if (error instanceof APIError) {
                 observer.error(
                   new Error(
-                    `[${i}/${nbEntries}] updating entry #${entry.id} failed: ${error.body.message} => ${JSON.stringify(
-                      error.body.errors,
-                    )}`,
+                    `[${i}/${nbEntries}] updating entry #${entry.id} failed: ${error.body.message} => ${JSON.stringify(error.body.errors)}`,
                   ),
                 )
               } else {

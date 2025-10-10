@@ -8,17 +8,16 @@ export interface ProcessedFile {
 }
 
 export class FileProcessor {
-  
   /**
    * Create multer configuration for handling file uploads
    */
   static createMulterConfig(): multer.Options {
     return {
       limits: {
+        files: 10, // Max 10 files
         fileSize: 10 * 1024 * 1024, // 10MB limit
-        files: 10 // Max 10 files
       },
-      storage: multer.memoryStorage()
+      storage: multer.memoryStorage(),
     }
   }
 
@@ -70,7 +69,7 @@ export class FileProcessor {
     return {
       __type: 'file',
       data: buffer.toString('base64'),
-      filename
+      filename,
     }
   }
 
@@ -80,15 +79,15 @@ export class FileProcessor {
    */
   private static convertValue(value: any): any {
     if (Array.isArray(value)) {
-      return value.map(item => this.convertValue(item))
+      return value.map((item) => this.convertValue(item))
     }
-    
+
     if (value && typeof value === 'object') {
       // Check if it's a file object (from multer or similar)
       if (this.isFileObject(value)) {
         return this.convertFileToBase64(value)
       }
-      
+
       // Process object properties recursively
       const result: any = {}
       for (const [key, val] of Object.entries(value)) {
@@ -97,7 +96,7 @@ export class FileProcessor {
 
       return result
     }
-    
+
     return value
   }
 
@@ -105,13 +104,14 @@ export class FileProcessor {
    * Check if object is a file upload
    */
   private static isFileObject(obj: any): boolean {
-    return obj && (
+    return (
+      obj &&
       // Multer file object
-      (obj.fieldname && obj.originalname && obj.buffer) ||
-      // Express-fileupload object
-      (obj.name && obj.data) ||
-      // Raw file buffer with metadata
-      (obj.filename && (obj.buffer || obj.data))
+      ((obj.fieldname && obj.originalname && obj.buffer) ||
+        // Express-fileupload object
+        (obj.name && obj.data) ||
+        // Raw file buffer with metadata
+        (obj.filename && (obj.buffer || obj.data)))
     )
   }
 }

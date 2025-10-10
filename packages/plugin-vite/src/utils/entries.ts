@@ -68,7 +68,10 @@ export function resolveEntryPoints(
     {
       absolutePath: fallbackEntries.app ?? defaultEntryPath,
       name: 'app',
-      relativePath: path.relative(normalizedRoot, fallbackEntries.app ?? defaultEntryPath).split(path.sep).join('/'),
+      relativePath: path
+        .relative(normalizedRoot, fallbackEntries.app ?? defaultEntryPath)
+        .split(path.sep)
+        .join('/'),
     },
   ]
 }

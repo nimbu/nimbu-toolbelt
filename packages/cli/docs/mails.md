@@ -1,10 +1,9 @@
-`nimbu mails`
-=============
+# `nimbu mails`
 
 manage your notification templates
 
-* [`nimbu mails:pull`](#nimbu-mailspull)
-* [`nimbu mails:push`](#nimbu-mailspush)
+- [`nimbu mails:pull`](#nimbu-mailspull)
+- [`nimbu mails:push`](#nimbu-mailspush)
 
 ## `nimbu mails:pull`
 

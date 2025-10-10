@@ -1,9 +1,8 @@
-`nimbu translations`
-====================
+# `nimbu translations`
 
 working with translations
 
-* [`nimbu translations:copy [QUERY]`](#nimbu-translationscopy-query)
+- [`nimbu translations:copy [QUERY]`](#nimbu-translationscopy-query)
 
 ## `nimbu translations:copy [QUERY]`
 

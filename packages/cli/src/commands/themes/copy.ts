@@ -11,7 +11,6 @@ import { download } from '../../utils/files'
 
 export default class CopyThemes extends Command {
   static description = 'copy themes from one site to another'
-
   static flags = {
     from: Flags.string({
       char: 'f',
@@ -128,10 +127,10 @@ export default class CopyThemes extends Command {
   }
 
   private async downloadFile(observer, prefix, item) {
-    const tmp = require('tmp-promise')
     const prettyBytes = require('pretty-bytes')
+    const tmp = require('tmp-promise')
 
-    const { cleanup, path } = await tmp.file({ prefix: `nimbu-asset-` })
+    const { cleanup, path } = await tmp.file({ prefix: 'nimbu-asset-' })
     try {
       await download(item.file, path, (bytes, percentage) => {
         observer.next(`${prefix} Downloading ${item.name} (${percentage}% of ${prettyBytes(bytes)})`)

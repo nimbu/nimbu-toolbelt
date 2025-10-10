@@ -2,9 +2,9 @@ import {
   APIError,
   AppConfig,
   Command,
+  isValidationError,
   IValidationError,
   APITypes as Nimbu,
-  isValidationError,
   ux,
 } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
@@ -17,16 +17,13 @@ import { findMatchingFiles } from '../../utils/files'
 
 export default class AppsPush extends Command {
   static description = 'Push your cloud code files to nimbu'
-
   static flags = {
     app: Flags.string({
       char: 'a',
       description: 'The (local) name of the application to push to (see apps:list and apps:config).',
     }),
   }
-
   static strict = false
-
   private _app?: AppConfig
   private _code?: Nimbu.AppFile[]
   private _files?: string[]

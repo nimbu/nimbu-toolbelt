@@ -10,7 +10,6 @@ import { findMatchingFiles } from '../../utils/files'
 
 export default class PushMails extends Command {
   static description = 'upload all notification templates'
-
   static flags = {
     only: Flags.string({
       char: 'o',

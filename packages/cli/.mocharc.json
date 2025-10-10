@@ -1,0 +1,8 @@
+{
+  "extension": ["ts"],
+  "require": ["test/helpers/init.js", "ts-node/register/transpile-only"],
+  "watchExtensions": ["ts"],
+  "reporter": "spec",
+  "timeout": 60000,
+  "ui": "bdd"
+}

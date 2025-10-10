@@ -1,14 +1,13 @@
 import { Command, ux } from '@nimbu-cli/command'
 import { Flags } from '@oclif/core'
 import chalk from 'chalk'
+const inquirer = require('inquirer')
 import { Listr } from 'listr2'
 import { Observable } from 'rxjs'
 const through = require('through')
-const inquirer = require('inquirer')
 
 export default class CopyProductsConfig extends Command {
   static description = 'copy product customizations from one to another'
-
   static flags = {
     from: Flags.string({
       char: 'f', // shorter flag version
@@ -85,7 +84,7 @@ export default class CopyProductsConfig extends Command {
 
       prompt({
         default: false,
-        message: `Are you sure you want to overwrite the existing customizations?`,
+        message: 'Are you sure you want to overwrite the existing customizations?',
         name: 'overwrite',
         type: 'confirm',
       })
@@ -116,7 +115,7 @@ export default class CopyProductsConfig extends Command {
 
     // check if any target customizations exists
     try {
-      targetCustomizations = await this.nimbu.get(`/products/customizations`, options)
+      targetCustomizations = await this.nimbu.get('/products/customizations', options)
     } catch (error) {
       if (error instanceof Error) {
         throw new TypeError(error.message)
@@ -138,7 +137,7 @@ export default class CopyProductsConfig extends Command {
 
     task.title = `Copying customizations to site ${chalk.bold(ctx.toSite)}`
 
-    return this.nimbu.post(`/products/customizations`, options)
+    return this.nimbu.post('/products/customizations', options)
   }
 
   private async fetch(ctx: any) {
@@ -146,7 +145,7 @@ export default class CopyProductsConfig extends Command {
       site: ctx.fromSite,
     }
     try {
-      ctx.customizations = await this.nimbu.get(`/products/customizations`, options)
+      ctx.customizations = await this.nimbu.get('/products/customizations', options)
     } catch (error) {
       if (error instanceof Error) {
         throw new TypeError(error.message)
@@ -162,6 +161,6 @@ export default class CopyProductsConfig extends Command {
 
     task.title = `Updating customizations in site ${chalk.bold(ctx.toSite)}`
 
-    return this.nimbu.post(`/products/customizations?replace=1`, options)
+    return this.nimbu.post('/products/customizations?replace=1', options)
   }
 }

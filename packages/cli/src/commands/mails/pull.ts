@@ -6,7 +6,6 @@ import { Listr } from 'listr2'
 
 export default class PullMails extends Command {
   static description = 'download all notification templates'
-
   static flags = {
     only: Flags.string({
       char: 'o',
@@ -17,7 +16,6 @@ export default class PullMails extends Command {
   }
 
   async execute() {
-
     const { flags } = await this.parse(PullMails)
 
     const tasks = new Listr([

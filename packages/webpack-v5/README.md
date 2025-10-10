@@ -1,5 +1,4 @@
-@nimbu/webpack
-==============
+# @nimbu/webpack
 
 Webpack Plugin for the Nimbu toolbelt
 
@@ -9,11 +8,15 @@ Webpack Plugin for the Nimbu toolbelt
 [![License](https://img.shields.io/npm/l/@nimbu/webpack.svg)](https://github.com/dedene/webpack/blob/master/package.json)
 
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
+
 # Usage
+
 <!-- usage -->
+
 ```sh-session
 $ npm install -g @nimbu-cli/plugin-webpack-v5
 $ @nimbu-cli/plugin-webpack-v5 COMMAND
@@ -25,15 +28,19 @@ USAGE
   $ @nimbu-cli/plugin-webpack-v5 COMMAND
 ...
 ```
+
 <!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
-* [`@nimbu-cli/plugin-webpack-v5 apps:transpile SOURCE TARGET`](#nimbu-cliplugin-webpack-v5-appstranspile-source-target)
-* [`@nimbu-cli/plugin-webpack-v5 build`](#nimbu-cliplugin-webpack-v5-build)
-* [`@nimbu-cli/plugin-webpack-v5 server`](#nimbu-cliplugin-webpack-v5-server)
-* [`@nimbu-cli/plugin-webpack-v5 themes:diff [THEME]`](#nimbu-cliplugin-webpack-v5-themesdiff-theme)
-* [`@nimbu-cli/plugin-webpack-v5 themes:list [THEME]`](#nimbu-cliplugin-webpack-v5-themeslist-theme)
-* [`@nimbu-cli/plugin-webpack-v5 themes:push [FILES]`](#nimbu-cliplugin-webpack-v5-themespush-files)
+
+- [`@nimbu-cli/plugin-webpack-v5 apps:transpile SOURCE TARGET`](#nimbu-cliplugin-webpack-v5-appstranspile-source-target)
+- [`@nimbu-cli/plugin-webpack-v5 build`](#nimbu-cliplugin-webpack-v5-build)
+- [`@nimbu-cli/plugin-webpack-v5 server`](#nimbu-cliplugin-webpack-v5-server)
+- [`@nimbu-cli/plugin-webpack-v5 themes:diff [THEME]`](#nimbu-cliplugin-webpack-v5-themesdiff-theme)
+- [`@nimbu-cli/plugin-webpack-v5 themes:list [THEME]`](#nimbu-cliplugin-webpack-v5-themeslist-theme)
+- [`@nimbu-cli/plugin-webpack-v5 themes:push [FILES]`](#nimbu-cliplugin-webpack-v5-themespush-files)
 
 ## `@nimbu-cli/plugin-webpack-v5 apps:transpile SOURCE TARGET`
 
@@ -128,4 +135,5 @@ OPTIONS
 ```
 
 _See code: [src/commands/themes/push.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v5.0.0-alpha.7/src/commands/themes/push.ts)_
+
 <!-- commandsstop -->

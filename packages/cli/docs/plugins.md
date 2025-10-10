@@ -1,18 +1,17 @@
-`nimbu plugins`
-===============
+# `nimbu plugins`
 
 List installed plugins.
 
-* [`nimbu plugins`](#nimbu-plugins)
-* [`nimbu plugins:add PLUGIN`](#nimbu-pluginsadd-plugin)
-* [`nimbu plugins:inspect PLUGIN...`](#nimbu-pluginsinspect-plugin)
-* [`nimbu plugins:install PLUGIN`](#nimbu-pluginsinstall-plugin)
-* [`nimbu plugins:link PATH`](#nimbu-pluginslink-path)
-* [`nimbu plugins:remove [PLUGIN]`](#nimbu-pluginsremove-plugin)
-* [`nimbu plugins:reset`](#nimbu-pluginsreset)
-* [`nimbu plugins:uninstall [PLUGIN]`](#nimbu-pluginsuninstall-plugin)
-* [`nimbu plugins:unlink [PLUGIN]`](#nimbu-pluginsunlink-plugin)
-* [`nimbu plugins:update`](#nimbu-pluginsupdate)
+- [`nimbu plugins`](#nimbu-plugins)
+- [`nimbu plugins:add PLUGIN`](#nimbu-pluginsadd-plugin)
+- [`nimbu plugins:inspect PLUGIN...`](#nimbu-pluginsinspect-plugin)
+- [`nimbu plugins:install PLUGIN`](#nimbu-pluginsinstall-plugin)
+- [`nimbu plugins:link PATH`](#nimbu-pluginslink-path)
+- [`nimbu plugins:remove [PLUGIN]`](#nimbu-pluginsremove-plugin)
+- [`nimbu plugins:reset`](#nimbu-pluginsreset)
+- [`nimbu plugins:uninstall [PLUGIN]`](#nimbu-pluginsuninstall-plugin)
+- [`nimbu plugins:unlink [PLUGIN]`](#nimbu-pluginsunlink-plugin)
+- [`nimbu plugins:update`](#nimbu-pluginsupdate)
 
 ## `nimbu plugins`
 

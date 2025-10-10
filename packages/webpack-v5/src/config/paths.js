@@ -73,9 +73,11 @@ export const packageManager = (() => {
   if (fs.existsSync(pnpmLockFile)) {
     return 'pnpm'
   }
+
   if (fs.existsSync(yarnLockFile)) {
     return 'yarn'
   }
+
   return 'npm'
 })()
 export const testsSetup = resolveModule(resolveApp, 'src/setupTests')

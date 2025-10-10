@@ -17,9 +17,7 @@ export default class CopyPages extends Command {
       required: false,
     }),
   }
-
   static description = 'copy page from one site to another'
-
   static flags = {
     from: Flags.string({
       char: 'f', // shorter flag version
@@ -54,7 +52,7 @@ export default class CopyPages extends Command {
     }
 
     const fetchTitle = `Querying pages from site ${chalk.bold(fromSite)}`
-    const downloadTitle = `Downloading attachments`
+    const downloadTitle = 'Downloading attachments'
     const createTitle = `Creating pages in site ${chalk.bold(toSite)}`
 
     const tasks = new Listr([
@@ -127,7 +125,7 @@ export default class CopyPages extends Command {
           try {
             if (targetPage == null) {
               observer.next(`[${crntIndex}/${nbPages}] Creating page ${page.fullpath} in site ${ctx.toSite}`)
-              await this.nimbu.post(`/pages`, {
+              await this.nimbu.post('/pages', {
                 body: data,
                 host: ctx.toHost,
                 site: ctx.toSite,
@@ -193,9 +191,9 @@ export default class CopyPages extends Command {
 
   // eslint-disable-next-line max-params
   private async downloadFile(observer, i, ctx, fileObject, fieldName) {
-    const tmp = require('tmp-promise')
-    const prettyBytes = require('pretty-bytes')
     const pathFinder = require('node:path')
+    const prettyBytes = require('pretty-bytes')
+    const tmp = require('tmp-promise')
 
     if (fileObject != null && fileObject !== null && fileObject.url != null) {
       const url = `${fileObject.url}${fileObject.url.includes('?') ? '&v=' : '?'}${generateRandom(6)}`
@@ -205,9 +203,7 @@ export default class CopyPages extends Command {
       try {
         await download(url, path, (bytes, percentage) => {
           observer.next(
-            `[${i}/${ctx.pages.length}] Downloading ${fieldName} => "${filename}" (${percentage}% of ${prettyBytes(
-              bytes,
-            )})`,
+            `[${i}/${ctx.pages.length}] Downloading ${fieldName} => "${filename}" (${percentage}% of ${prettyBytes(bytes)})`,
           )
         })
       } catch (error) {

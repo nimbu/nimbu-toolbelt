@@ -1,20 +1,20 @@
 import { expect } from 'chai'
 import { Request } from 'express'
+
 import { RequestExtractor } from '../src/request-extractor'
 
 describe('RequestExtractor', () => {
-  
   describe('extractMetadata', () => {
     it('should extract basic request metadata', () => {
       const mockReq = {
+        body: {},
+        headers: {
+          'content-type': 'application/json',
+          'user-agent': 'test-browser',
+        },
         method: 'GET',
         path: '/test',
-        headers: {
-          'user-agent': 'test-browser',
-          'content-type': 'application/json'
-        },
         query: { param1: 'value1' },
-        body: {}
       } as unknown as Request
 
       const metadata = RequestExtractor.extractMetadata(mockReq)
@@ -28,11 +28,11 @@ describe('RequestExtractor', () => {
 
     it('should handle root path correctly', () => {
       const mockReq = {
+        body: {},
+        headers: {},
         method: 'GET',
         path: '/',
-        headers: {},
         query: {},
-        body: {}
       } as unknown as Request
 
       const metadata = RequestExtractor.extractMetadata(mockReq)
@@ -41,11 +41,11 @@ describe('RequestExtractor', () => {
 
     it('should remove trailing slash from non-root paths', () => {
       const mockReq = {
+        body: { data: 'test' },
+        headers: {},
         method: 'POST',
         path: '/some/path/',
-        headers: {},
         query: {},
-        body: { data: 'test' }
       } as unknown as Request
 
       const metadata = RequestExtractor.extractMetadata(mockReq)
@@ -56,18 +56,18 @@ describe('RequestExtractor', () => {
 
     it('should set Rack-specific headers for Ruby server compatibility', () => {
       const mockReq = {
+        body: { email: 'test@example.com' },
+        headers: {
+          'content-type': 'application/json',
+        },
         method: 'POST',
         path: '/api/users',
-        url: '/api/users?id=123&name=test',
-        headers: {
-          'content-type': 'application/json'
-        },
         query: { id: '123', name: 'test' },
-        body: { email: 'test@example.com' }
+        url: '/api/users?id=123&name=test',
       } as unknown as Request
 
       const metadata = RequestExtractor.extractMetadata(mockReq)
-      const headers = JSON.parse(JSON.stringify(metadata.headers))
+      const headers = structuredClone(metadata.headers)
 
       expect(headers.REQUEST_METHOD).to.equal('POST')
       expect(headers.REQUEST_PATH).to.equal('/api/users')
@@ -79,14 +79,14 @@ describe('RequestExtractor', () => {
 
     it('should handle different HTTP methods', () => {
       const methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
-      
+
       for (const method of methods) {
         const mockReq = {
+          body: {},
+          headers: {},
           method,
           path: '/test',
-          headers: {},
           query: {},
-          body: {}
         } as unknown as Request
 
         const metadata = RequestExtractor.extractMetadata(mockReq)
@@ -98,7 +98,7 @@ describe('RequestExtractor', () => {
   describe('isWebpackResource', () => {
     it('should identify webpack resources correctly', () => {
       const webpackResources = ['app.js', 'vendor.js']
-      
+
       expect(RequestExtractor.isWebpackResource('/javascripts/app.js', webpackResources)).to.be.true
       expect(RequestExtractor.isWebpackResource('/javascripts/vendor.js', webpackResources)).to.be.true
       expect(RequestExtractor.isWebpackResource('/javascripts/other.js', webpackResources)).to.be.false
@@ -107,7 +107,7 @@ describe('RequestExtractor', () => {
 
     it('should return false when no webpack resources configured', () => {
       expect(RequestExtractor.isWebpackResource('/javascripts/app.js', [])).to.be.false
-      expect(RequestExtractor.isWebpackResource('/javascripts/app.js', undefined)).to.be.false
+      expect(RequestExtractor.isWebpackResource('/javascripts/app.js')).to.be.false
     })
 
     it('should identify HMR (Hot Module Replacement) requests', () => {
@@ -142,17 +142,17 @@ describe('RequestExtractor', () => {
     it('should identify private files correctly', () => {
       const mockReq1 = {
         path: '/downloads/file.pdf',
-        query: { key: 'secret123' }
+        query: { key: 'secret123' },
       } as unknown as Request
 
       const mockReq2 = {
         path: '/downloads/file.pdf',
-        query: {}
+        query: {},
       } as unknown as Request
 
       const mockReq3 = {
         path: '/public/file.pdf',
-        query: { key: 'secret123' }
+        query: { key: 'secret123' },
       } as unknown as Request
 
       expect(RequestExtractor.isPrivateFile(mockReq1)).to.be.true

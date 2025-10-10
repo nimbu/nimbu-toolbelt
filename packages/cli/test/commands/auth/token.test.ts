@@ -1,30 +1,19 @@
+import { APIClient } from '@nimbu-cli/command'
 import { expect } from 'chai'
-import test, { nockActivate, nockCleanup } from '../../helpers/setup'
 
-beforeEach(function (done) {
-  nockActivate()
-  done()
-})
-
-afterEach(function (done) {
-  nockCleanup()
-  done()
-})
+import test from '../../helpers/setup'
 
 describe('auth:token', () => {
   test
     .env({ NIMBU_API_KEY: 'foobar' }, { clear: true })
-    .nock('https://api.nimbu.io', (api) =>
-      api
-        .get('/tokens')
-        // return some tokens
-        .reply(200, [{ token: 'waldo' }, { token: 'foobar', expires_in: 60 }, {}]),
+    .stub(APIClient.prototype, 'get', () =>
+      Promise.resolve([{ token: 'waldo' }, { expires_in: 60, token: 'foobar' }, {}]),
     )
     .stdout()
     .stderr()
     .command(['auth:token'])
     .it('should show the currently used api token', (ctx) => {
       expect(ctx.stdout).to.equal('foobar\n')
-      expect(ctx.stderr).to.match(new RegExp('Warning: token will expire today'))
+      expect(ctx.stderr).to.match(/Warning: token will expire today/)
     })
 })

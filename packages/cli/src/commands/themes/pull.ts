@@ -10,7 +10,6 @@ import { download } from '../../utils/files'
 
 export default class PullThemes extends Command {
   static description = 'download all code and assets for a theme'
-
   static flags = {
     'liquid-only': Flags.boolean({
       description: 'only download template files',
@@ -71,10 +70,10 @@ export default class PullThemes extends Command {
   }
 
   private async downloadFile(observer, prefix, item) {
-    const tmp = require('tmp-promise')
     const prettyBytes = require('pretty-bytes')
+    const tmp = require('tmp-promise')
 
-    const { cleanup, path } = await tmp.file({ prefix: `nimbu-asset-` })
+    const { cleanup, path } = await tmp.file({ prefix: 'nimbu-asset-' })
     try {
       await download(item.public_url, path, (bytes, percentage) => {
         observer.next(`${prefix} Downloading ${item.name} (${percentage}% of ${prettyBytes(bytes)})`)

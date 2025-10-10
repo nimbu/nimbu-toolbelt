@@ -1,0 +1,67 @@
+import oclifConfig from 'eslint-config-oclif'
+
+export default [
+  ...oclifConfig,
+  {
+    ignores: ['**/lib/**', '**/node_modules/**', '**/vendor/**'],
+  },
+  {
+    rules: {
+      // Disable all @stylistic rules - let Prettier handle all formatting
+      '@stylistic/arrow-parens': 'off',
+      '@stylistic/comma-dangle': 'off',
+      '@stylistic/function-paren-newline': 'off',
+      '@stylistic/indent': 'off',
+      '@stylistic/indent-binary-ops': 'off',
+      '@stylistic/max-len': 'off',
+      '@stylistic/max-statements-per-line': 'off',
+      '@stylistic/member-delimiter-style': 'off',
+      '@stylistic/no-extra-semi': 'off',
+      '@stylistic/no-mixed-operators': 'off',
+      '@stylistic/no-mixed-spaces-and-tabs': 'off',
+      '@stylistic/object-curly-newline': 'off',
+      '@stylistic/object-curly-spacing': 'off',
+      '@stylistic/operator-linebreak': 'off',
+      '@stylistic/quotes': 'off',
+      '@stylistic/semi': 'off',
+      '@stylistic/space-before-function-paren': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
+      'block-scoped-var': 'off',
+      camelcase: 'off',
+      complexity: 'off',
+      // Custom rules from legacy .eslintrc
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
+      'import/no-named-as-default': 'off',
+      'max-depth': 'off',
+      'mocha/no-exports': 'off',
+      'n/no-extraneous-require': [
+        'error',
+        {
+          allowModules: ['@nimbu-cli/command'],
+        },
+      ],
+      'n/no-missing-import': 'off',
+      'n/no-missing-require': 'off',
+      'n/no-process-exit': 'off',
+      'no-await-in-loop': 'off',
+      'no-eq-null': 'off',
+      'no-warning-comments': 'off',
+      'node/no-missing-require': 'off',
+      'perfectionist/sort-classes': 'off',
+
+      'unicorn/consistent-function-scoping': 'off',
+      'unicorn/expiring-todo-comments': 'off',
+      'unicorn/import-style': 'off',
+      'unicorn/no-anonymous-default-export': 'off',
+      'unicorn/no-array-callback-reference': 'off',
+      'unicorn/no-nested-ternary': 'off',
+      'unicorn/no-process-exit': 'off',
+      'unicorn/prefer-module': 'off',
+      'unicorn/prefer-spread': 'off',
+      'valid-jsdoc': 'off',
+    },
+  },
+]

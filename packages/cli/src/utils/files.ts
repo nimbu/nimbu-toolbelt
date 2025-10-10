@@ -1,16 +1,21 @@
 import debugGlobal from 'debug'
+import fg, { type Options as FastGlobOptions } from 'fast-glob'
 import { http, https } from 'follow-redirects'
 import * as fs from 'fs-extra'
-import { glob } from 'glob-gitignore'
 import ignore from 'ignore'
 import { basename } from 'node:path'
 const debug = debugGlobal('nimbu')
 
 const TIMEOUT = 10_000
 
-const promiseGlob = function (pattern: string, options: any = {}): Promise<string[]> {
-  return glob(pattern, options)
-}
+const promiseGlob = (pattern: string, options: FastGlobOptions = {}): Promise<string[]> =>
+  fg(pattern, {
+    dot: true,
+    followSymbolicLinks: false,
+    onlyFiles: true,
+    unique: true,
+    ...options,
+  })
 
 export async function findMatchingFiles(dir: string, pattern: string): Promise<string[]> {
   debug('Looking for files in %s matching %s', dir, pattern)

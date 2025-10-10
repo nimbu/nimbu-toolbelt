@@ -14,9 +14,7 @@ interface PushOptions {
 
 export default class ThemesPush extends Command {
   static args = {}
-
   static description = 'push the theme code online'
-
   static flags = {
     // --css, --css-only   # only push css
     css: Flags.boolean({ hidden: true }),
@@ -52,7 +50,6 @@ export default class ThemesPush extends Command {
       description: 'the site of the theme',
     }),
   }
-
   static strict = false
 
   async execute() {
@@ -180,9 +177,7 @@ export default class ThemesPush extends Command {
       try {
         const pattern = path.join(this.nimbuConfig.projectPath, type, '**/*')
         const allFiles = await fg(pattern, { dot: true, onlyFiles: true })
-        files = allFiles.map((file) =>
-          path.relative(path.join(this.nimbuConfig.projectPath, type), file),
-        )
+        files = allFiles.map((file) => path.relative(path.join(this.nimbuConfig.projectPath, type), file))
       } catch {
         files = []
       }
@@ -205,9 +200,7 @@ export default class ThemesPush extends Command {
     } else {
       const pattern = path.join(this.nimbuConfig.projectPath, type, '**/*.liquid')
       const allFiles = await fg(pattern, { onlyFiles: true })
-      files = allFiles.map((file) =>
-        path.relative(path.join(this.nimbuConfig.projectPath, type), file),
-      )
+      files = allFiles.map((file) => path.relative(path.join(this.nimbuConfig.projectPath, type), file))
     }
 
     for (const file of files) {
@@ -296,17 +289,17 @@ export default class ThemesPush extends Command {
     const match = error.body?.message?.match(/Conflict \((.*)\)/)
     if (match) {
       this.log(chalk.red(` => WARNING!! ${match[1]}`))
-      const shouldOverwrite = await ux.confirm(`    Do you want to overwrite these changes? (y/n)`)
+      const shouldOverwrite = await ux.confirm('    Do you want to overwrite these changes? (y/n)')
 
       if (shouldOverwrite) {
         process.stdout.write(chalk.green(`     -> Forcing upload of ${filename}`))
-        
+
         const filePath = path.join(this.nimbuConfig.projectPath, type, filename)
-        
+
         if (['fonts', 'images', 'javascripts', 'stylesheets'].includes(type)) {
           const fileBuffer = await fs.readFile(filePath)
           const base64Content = fileBuffer.toString('base64')
-          
+
           await this.nimbu.post(`/themes/${options.theme}/assets?force=true`, {
             body: {
               name: `${type}/${filename}`,
@@ -320,7 +313,7 @@ export default class ThemesPush extends Command {
           })
         } else {
           const content = await fs.readFile(filePath, 'utf8')
-          
+
           await this.nimbu.post(`/themes/${options.theme}/${type}?force=true`, {
             body: {
               content,
@@ -329,7 +322,7 @@ export default class ThemesPush extends Command {
             site: options.site,
           })
         }
-        
+
         this.log(': (ok)')
       } else {
         this.log(chalk.yellow(`     -> Ok, skipping upload of ${filename}`))

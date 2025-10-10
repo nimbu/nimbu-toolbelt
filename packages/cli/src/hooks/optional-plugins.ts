@@ -50,9 +50,10 @@ const hook: Hook<'init'> = async function (options) {
     await instance.load()
 
     const pluginsCollection: any = options.config.plugins
-    const hasPlugin = typeof pluginsCollection?.has === 'function'
-      ? pluginsCollection.has(instance.name)
-      : Boolean(pluginsCollection?.[instance.name])
+    const hasPlugin =
+      typeof pluginsCollection?.has === 'function'
+        ? pluginsCollection.has(instance.name)
+        : Boolean(pluginsCollection?.[instance.name])
 
     if (hasPlugin) continue
 

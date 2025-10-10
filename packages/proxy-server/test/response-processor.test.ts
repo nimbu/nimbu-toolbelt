@@ -1,6 +1,7 @@
+import { ISimulatorResponse } from '@nimbu-cli/command/lib/nimbu/client'
 import { expect } from 'chai'
 import { Response } from 'express'
-import { ISimulatorResponse } from '@nimbu-cli/command/lib/nimbu/client'
+
 import { ResponseProcessor } from '../src/response-processor'
 
 describe('ResponseProcessor', () => {
@@ -8,27 +9,27 @@ describe('ResponseProcessor', () => {
 
   beforeEach(() => {
     mockRes = {
-      status: function(code: number) {
-        this.statusCode = code
+      body: null,
+      headers: {},
+      json(data: any) {
+        this.jsonData = data
         return this
       },
-      set: function(name: string, value: string) {
+      jsonData: null,
+      send(body: any) {
+        this.body = body
+        return this
+      },
+      set(name: string, value: string) {
         if (!this.headers) this.headers = {}
         this.headers[name] = value
         return this
       },
-      send: function(body: any) {
-        this.body = body
-        return this
-      },
-      json: function(data: any) {
-        this.jsonData = data
+      status(code: number) {
+        this.statusCode = code
         return this
       },
       statusCode: 200,
-      headers: {},
-      body: null,
-      jsonData: null
     }
   })
 
@@ -36,14 +37,14 @@ describe('ResponseProcessor', () => {
     it('should process HTML response correctly', () => {
       const htmlContent = '<html><body>Hello World</body></html>'
       const base64Content = Buffer.from(htmlContent, 'utf8').toString('base64')
-      
+
       const simulatorResponse: ISimulatorResponse = {
-        status: 200,
+        body: base64Content,
         headers: {
+          'cache-control': 'public, max-age=3600',
           'content-type': 'text/html; charset=utf-8',
-          'cache-control': 'public, max-age=3600'
         },
-        body: base64Content
+        status: 200,
       }
 
       ResponseProcessor.processResponse(simulatorResponse, mockRes as Response)
@@ -56,15 +57,15 @@ describe('ResponseProcessor', () => {
 
     it('should process binary response with base64 encoding', () => {
       const imageData = Buffer.from('fake image data', 'utf8').toString('base64')
-      
+
       const simulatorResponse: ISimulatorResponse = {
-        status: 200,
-        headers: {
-          'content-type': 'image/jpeg',
-          'content-length': '12345'
-        },
         body: imageData,
-        encoding: 'base64'
+        encoding: 'base64',
+        headers: {
+          'content-length': '12345',
+          'content-type': 'image/jpeg',
+        },
+        status: 200,
       }
 
       ResponseProcessor.processResponse(simulatorResponse, mockRes as Response)
@@ -72,7 +73,7 @@ describe('ResponseProcessor', () => {
       expect(mockRes.statusCode).to.equal(200)
       expect(mockRes.headers['content-type']).to.equal('image/jpeg')
       expect(mockRes.body).to.be.instanceOf(Buffer)
-      
+
       // Verify the buffer contains the correct decoded data
       const decodedData = (mockRes.body as Buffer).toString('utf8')
       expect(decodedData).to.equal('fake image data')
@@ -81,13 +82,13 @@ describe('ResponseProcessor', () => {
     it('should handle error status codes', () => {
       const errorContent = '<html><body>Page not found</body></html>'
       const base64ErrorContent = Buffer.from(errorContent, 'utf8').toString('base64')
-      
+
       const simulatorResponse: ISimulatorResponse = {
-        status: 404,
+        body: base64ErrorContent,
         headers: {
-          'content-type': 'text/html'
+          'content-type': 'text/html',
         },
-        body: base64ErrorContent
+        status: 404,
       }
 
       ResponseProcessor.processResponse(simulatorResponse, mockRes as Response)
@@ -98,21 +99,21 @@ describe('ResponseProcessor', () => {
 
     it('should filter out connection headers', () => {
       const simulatorResponse: ISimulatorResponse = {
-        status: 200,
+        body: 'Hello World',
         headers: {
+          connection: 'keep-alive',
           'content-type': 'text/html',
-          'connection': 'keep-alive',
+          'custom-header': 'should-be-included',
           'transfer-encoding': 'chunked',
-          'custom-header': 'should-be-included'
         },
-        body: 'Hello World'
+        status: 200,
       }
 
       ResponseProcessor.processResponse(simulatorResponse, mockRes as Response)
 
       expect(mockRes.headers['content-type']).to.equal('text/html')
       expect(mockRes.headers['custom-header']).to.equal('should-be-included')
-      expect(mockRes.headers['connection']).to.be.undefined
+      expect(mockRes.headers.connection).to.be.undefined
       expect(mockRes.headers['transfer-encoding']).to.be.undefined
     })
   })
@@ -120,49 +121,49 @@ describe('ResponseProcessor', () => {
   describe('handleError', () => {
     it('should handle simulator API errors', () => {
       const error = new Error('Simulator API error 500: Internal Server Error')
-      
+
       ResponseProcessor.handleError(error, mockRes as Response)
 
       expect(mockRes.statusCode).to.equal(500)
       expect(mockRes.jsonData).to.deep.equal({
         error: 'Simulator API Error',
-        message: 'Simulator API error 500: Internal Server Error'
+        message: 'Simulator API error 500: Internal Server Error',
       })
     })
 
     it('should handle connection errors', () => {
       const error = new Error('Failed to connect to Nimbu simulator API')
-      
+
       ResponseProcessor.handleError(error, mockRes as Response)
 
       expect(mockRes.statusCode).to.equal(502)
       expect(mockRes.jsonData).to.deep.equal({
         error: 'Gateway Error',
-        message: 'Failed to connect to Nimbu simulator API'
+        message: 'Failed to connect to Nimbu simulator API',
       })
     })
 
     it('should handle base64 validation errors', () => {
       const error = new Error('Invalid base64 content received from simulator')
-      
+
       ResponseProcessor.handleError(error, mockRes as Response)
 
       expect(mockRes.statusCode).to.equal(502)
       expect(mockRes.jsonData).to.deep.equal({
         error: 'Response Processing Error',
-        message: 'Invalid response format from simulator'
+        message: 'Invalid response format from simulator',
       })
     })
 
     it('should handle unknown errors', () => {
       const error = new Error('Unknown error occurred')
-      
+
       ResponseProcessor.handleError(error, mockRes as Response)
 
       expect(mockRes.statusCode).to.equal(500)
       expect(mockRes.jsonData).to.deep.equal({
         error: 'Internal Server Error',
-        message: 'An unexpected error occurred'
+        message: 'An unexpected error occurred',
       })
     })
   })
@@ -189,12 +190,12 @@ describe('ResponseProcessor', () => {
     })
 
     it('should allow caching when expires header is present', () => {
-      const headers = { 'expires': 'Wed, 21 Oct 2025 07:28:00 GMT' }
+      const headers = { expires: 'Wed, 21 Oct 2025 07:28:00 GMT' }
       expect(ResponseProcessor.shouldCache(headers)).to.be.true
     })
 
     it('should allow caching when etag is present', () => {
-      const headers = { 'etag': '"abc123"' }
+      const headers = { etag: '"abc123"' }
       expect(ResponseProcessor.shouldCache(headers)).to.be.true
     })
 

@@ -1,9 +1,10 @@
 'use strict'
 
+const crypto = require('node:crypto')
 const fs = require('node:fs')
 const path = require('node:path')
-const crypto = require('node:crypto')
 const chalk = require('react-dev-utils/chalk')
+
 const paths = require('./paths')
 
 // Ensure the certificate and key provided are valid and if not

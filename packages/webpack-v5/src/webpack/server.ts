@@ -1,6 +1,5 @@
 import { buildConfig } from '@nimbu-cli/command'
 import globalDebug from 'debug'
-
 import path = require('path')
 import webpack = require('webpack')
 import DevServer = require('webpack-dev-server')
@@ -40,15 +39,13 @@ export default class WebpackDevServer {
 
     // load all dependencies at runtime
     const fs = require('node:fs')
-
-    const { choosePort, createCompiler, prepareUrls } = require('../config/webpack-dev-server-utils')
     const openBrowser = require('react-dev-utils/openBrowser')
 
     const paths = require('../config/paths')
+    const { choosePort, createCompiler, prepareUrls } = require('../config/webpack-dev-server-utils')
+    const createDevServerConfig = require('../config/webpack-dev-server.config.js')
     const configFactory = require('../config/webpack.config')
     const projectWebpack = require('../config/webpack.project')
-
-    const createDevServerConfig = require('../config/webpack-dev-server.config.js')
     // const getClientEnvironment = require('../config/env')
 
     const isInteractive = process.stdout.isTTY
@@ -56,7 +53,7 @@ export default class WebpackDevServer {
     // We require that you explicitly set browsers and do not fall back to
     // browserslist defaults.
     const { checkBrowsers } = require('react-dev-utils/browsersHelper')
-    const { PROJECT_DIRECTORY, appPath, appTsConfig, packageManager, publicUrlOrPath } = paths
+    const { appPath, appTsConfig, packageManager, PROJECT_DIRECTORY, publicUrlOrPath } = paths
 
     await checkBrowsers(appPath, isInteractive)
 
@@ -126,7 +123,7 @@ export default class WebpackDevServer {
       this.server = new DevServer(serverConfig, compiler)
       debug('DevServer instance created successfully')
 
-      await this.listen(host, port)
+      await this.listen()
       debug('DevServer listening successfully')
 
       if (open) {
@@ -147,7 +144,7 @@ export default class WebpackDevServer {
     }
   }
 
-  private async listen(_host: string, _port: number): Promise<void> {
+  private async listen(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.server) {
         this.serverRunning = true

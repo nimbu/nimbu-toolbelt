@@ -1,18 +1,16 @@
 {
   "extends": "../../tsconfig.settings.json",
   "compilerOptions": {
-      "outDir": "./lib",
-      "rootDir": "./src",
-      "paths": {
-          "@nimbu-cli/command": ["../command"]
-      },
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "paths": {
+      "@nimbu-cli/command": ["../command"]
+    }
   },
   "references": [
-      {
-          "path": "../command"
-      }
+    {
+      "path": "../command"
+    }
   ],
-  "include": [
-    "./src/**/*"
-  ]
+  "include": ["./src/**/*"]
 }

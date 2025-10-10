@@ -1,59 +1,120 @@
-import test from '../../helpers/setup'
-import { matches } from 'lodash'
-import { destinations, countries, journeys } from './fixtures'
+import { APIClient, APIError, HTTPError } from '@nimbu-cli/command'
+import { expect } from 'chai'
 
-describe('channels:copy --from foo --to bar --all', () => {
+import test from '../../helpers/setup'
+import { countries, destinations, journeys } from './fixtures'
+
+const notFoundError = () => {
+  const httpError = Object.assign(new HTTPError(), {
+    body: { code: 101, message: 'Not found' },
+    statusCode: 404,
+  })
+
+  return new APIError(httpError as HTTPError)
+}
+
+describe('channels:copy', () => {
+  describe('--from foo --to bar --all', () => {
+  const createdChannels = new Map<string, { payload: any; type: 'channel' | 'placeholder' }>()
+
+  const getStub = async (path: string, options: any = {}) => {
+    const site = options?.site
+    if (path === '/channels' && site === 'foo') {
+      return [destinations, journeys, countries]
+    }
+
+    if (site === 'bar' && path.startsWith('/channels/')) {
+      const slug = path.split('/').pop()!
+      const existing = createdChannels.get(slug)
+      if (existing?.type === 'channel') {
+        return existing.payload
+      }
+
+      throw notFoundError()
+    }
+
+    throw new Error(`Unexpected GET ${path} for site ${site}`)
+  }
+
+  const postStub = async (_path: string, options: any = {}) => {
+    const slug = options?.body?.slug
+    if (!slug) throw new Error('Missing slug in post payload')
+
+    const isPlaceholder = options?.body?.customizations?.[0]?.label === 'Dummy Field for Circular Dependencies'
+    const entry = {
+      payload: options.body,
+      type: isPlaceholder ? ('placeholder' as const) : ('channel' as const),
+    }
+
+    createdChannels.set(slug, entry)
+    return options.body
+  }
+
+  const patchStub = async (_path: string) => {
+    throw new Error('Unexpected PATCH call')
+  }
+
   test
     .env({ NIMBU_API_KEY: 'foobar' }, { clear: true })
-    .nock('https://api.nimbu.io', (api) => {
-      api.get('/channels').reply(200, [destinations, journeys, countries])
-
-      const channels = [destinations, journeys, countries]
-      channels.forEach((channel) => {
-        api
-          .get(`/channels/${channel.slug}`)
-          .reply(404, { message: 'Not found', code: 101 })
-          .post('/channels', matches({ slug: channel.slug }))
-          .reply(201, channel)
-      })
+    .do(() => {
+      createdChannels.clear()
     })
+    .stub(APIClient.prototype, 'get', getStub)
+    .stub(APIClient.prototype, 'post', postStub)
+    .stub(APIClient.prototype, 'patch', patchStub)
     .stdout()
     .stderr()
     .command(['channels:copy', '--from', 'foo', '--to', 'bar', '--all'])
-    .it('should copy all channels from one site to another')
-})
+    .it('should copy all channels from one site to another', () => {
+      const copied = [...createdChannels.values()].filter((entry) => entry.type === 'channel')
+      expect(copied.map((entry) => entry.payload.slug).sort()).to.deep.equal([
+        countries.slug,
+        destinations.slug,
+        journeys.slug,
+      ])
+    })
+  })
 
-describe('channels:copy --from site1/foo --to site2/bar', () => {
+  describe('--from site1/foo --to site2/bar', () => {
+  const createdChannels: string[] = []
+
+  const getStub = async (path: string, options: any = {}) => {
+    const site = options?.site
+
+    if (path === '/channels/foo' && site === 'site1') {
+      return destinations
+    }
+
+    if (path === '/channels/bar' && site === 'site2') {
+      throw notFoundError()
+    }
+
+    throw new Error(`Unexpected GET ${path} for site ${site}`)
+  }
+
+  const postStub = async (_path: string, options: any = {}) => {
+    const slug = options?.body?.slug
+    if (slug) createdChannels.push(slug)
+    return options.body
+  }
+
+  const patchStub = async (_path: string) => {
+    throw new Error('Unexpected PATCH call')
+  }
+
   test
     .env({ NIMBU_API_KEY: 'foobar' }, { clear: true })
-    .nock(
-      'https://api.nimbu.io',
-      {
-        reqheaders: {
-          'X-Nimbu-Site': 'site1',
-        },
-      },
-      (api) => {
-        api.get('/channels/foo').reply(200, destinations)
-      },
-    )
-    .nock(
-      'https://api.nimbu.io',
-      {
-        reqheaders: {
-          'X-Nimbu-Site': 'site2',
-        },
-      },
-      (api) => {
-        api
-          .get(`/channels/bar`)
-          .reply(404, { message: 'Not found', code: 101 })
-          .post('/channels', matches({ slug: 'bar' }))
-          .reply(201, destinations)
-      },
-    )
+    .do(() => {
+      createdChannels.length = 0
+    })
+    .stub(APIClient.prototype, 'get', getStub)
+    .stub(APIClient.prototype, 'post', postStub)
+    .stub(APIClient.prototype, 'patch', patchStub)
     .stdout()
     .stderr()
     .command(['channels:copy', '--from', 'site1/foo', '--to', 'site2/bar'])
-    .it('should copy the channel foo from one site1 to site2')
+    .it('should copy the channel foo from one site1 to site2', () => {
+      expect(createdChannels).to.deep.equal(['bar'])
+    })
+  })
 })

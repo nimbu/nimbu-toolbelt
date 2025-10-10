@@ -1,10 +1,9 @@
-`nimbu products`
-================
+# `nimbu products`
 
 working with products
 
-* [`nimbu products:config:copy`](#nimbu-productsconfigcopy)
-* [`nimbu products:config:diff`](#nimbu-productsconfigdiff)
+- [`nimbu products:config:copy`](#nimbu-productsconfigcopy)
+- [`nimbu products:config:diff`](#nimbu-productsconfigdiff)
 
 ## `nimbu products:config:copy`
 
