@@ -1,8 +1,9 @@
-# `nimbu commands`
+`nimbu commands`
+================
 
 List all nimbu commands.
 
-- [`nimbu commands`](#nimbu-commands)
+* [`nimbu commands`](#nimbu-commands)
 
 ## `nimbu commands`
 
@@ -10,7 +11,7 @@ List all nimbu commands.
 
 ```
 USAGE
-  $ nimbu commands [--json] [-c id|plugin|summary|type | --tree] [--deprecated] [-x | ] [--hidden]
+  $ nimbu commands [--json] [-c id|plugin|summary|type... | --tree] [--deprecated] [-x | ] [--hidden]
     [--no-truncate | ] [--sort id|plugin|summary|type | ]
 
 FLAGS
@@ -31,4 +32,4 @@ DESCRIPTION
   List all nimbu commands.
 ```
 
-_See code: [@oclif/plugin-commands](https://github.com/oclif/plugin-commands/blob/v4.1.33/src/commands/commands.ts)_
+_See code: [@oclif/plugin-commands](https://github.com/oclif/plugin-commands/blob/v4.1.34/src/commands/commands.ts)_

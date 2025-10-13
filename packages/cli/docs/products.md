@@ -1,9 +1,10 @@
-# `nimbu products`
+`nimbu products`
+================
 
 working with products
 
-- [`nimbu products:config:copy`](#nimbu-productsconfigcopy)
-- [`nimbu products:config:diff`](#nimbu-productsconfigdiff)
+* [`nimbu products:config:copy`](#nimbu-productsconfigcopy)
+* [`nimbu products:config:diff`](#nimbu-productsconfigdiff)
 
 ## `nimbu products:config:copy`
 
@@ -21,7 +22,7 @@ DESCRIPTION
   copy product customizations from one to another
 ```
 
-_See code: [lib/commands/products/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/products/config/copy.js)_
+_See code: [lib/commands/products/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/products/config/copy.js)_
 
 ## `nimbu products:config:diff`
 
@@ -39,4 +40,4 @@ DESCRIPTION
   check differences between product customizations from one to another
 ```
 
-_See code: [lib/commands/products/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/products/config/diff.js)_
+_See code: [lib/commands/products/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/products/config/diff.js)_

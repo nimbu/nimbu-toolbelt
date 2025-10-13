@@ -1,8 +1,9 @@
-# `nimbu update`
+`nimbu update`
+==============
 
 update the nimbu CLI
 
-- [`nimbu update [CHANNEL]`](#nimbu-update-channel)
+* [`nimbu update [CHANNEL]`](#nimbu-update-channel)
 
 ## `nimbu update [CHANNEL]`
 
@@ -40,4 +41,4 @@ EXAMPLES
     $ nimbu update --available
 ```
 
-_See code: [@oclif/plugin-update](https://github.com/oclif/plugin-update/blob/v4.7.5/src/commands/update.ts)_
+_See code: [@oclif/plugin-update](https://github.com/oclif/plugin-update/blob/v4.7.8/src/commands/update.ts)_

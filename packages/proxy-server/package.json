@@ -1,6 +1,6 @@
 {
   "name": "@nimbu-cli/proxy-server",
-  "version": "6.0.0",
+  "version": "6.0.0-alpha.0",
   "description": "HTTP proxy server for Nimbu CLI development",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -13,7 +13,7 @@
     "yalc:publish": "pnpm run build && pnpm dlx yalc publish --push --no-script"
   },
   "dependencies": {
-    "@nimbu-cli/command": "workspace:^6.0.0",
+    "@nimbu-cli/command": "workspace:^6.0.0-alpha.0",
     "axios": "^1.12.2",
     "chalk": "^4.1.2",
     "compression": "^1.8.1",

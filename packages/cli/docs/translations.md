@@ -1,8 +1,9 @@
-# `nimbu translations`
+`nimbu translations`
+====================
 
 working with translations
 
-- [`nimbu translations:copy [QUERY]`](#nimbu-translationscopy-query)
+* [`nimbu translations:copy [QUERY]`](#nimbu-translationscopy-query)
 
 ## `nimbu translations:copy [QUERY]`
 
@@ -29,4 +30,4 @@ DESCRIPTION
   copy translations from one site to another
 ```
 
-_See code: [lib/commands/translations/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/translations/copy.js)_
+_See code: [lib/commands/translations/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/translations/copy.js)_

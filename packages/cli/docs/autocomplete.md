@@ -1,8 +1,9 @@
-# `nimbu autocomplete`
+`nimbu autocomplete`
+====================
 
 Display autocomplete installation instructions.
 
-- [`nimbu autocomplete [SHELL]`](#nimbu-autocomplete-shell)
+* [`nimbu autocomplete [SHELL]`](#nimbu-autocomplete-shell)
 
 ## `nimbu autocomplete [SHELL]`
 
@@ -33,4 +34,4 @@ EXAMPLES
   $ nimbu autocomplete --refresh-cache
 ```
 
-_See code: [@oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete/blob/v3.2.34/src/commands/autocomplete/index.ts)_
+_See code: [@oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete/blob/v3.2.35/src/commands/autocomplete/index.ts)_

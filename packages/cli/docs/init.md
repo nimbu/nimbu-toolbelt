@@ -1,8 +1,9 @@
-# `nimbu init`
+`nimbu init`
+============
 
 working directory initialization
 
-- [`nimbu init`](#nimbu-init)
+* [`nimbu init`](#nimbu-init)
 
 ## `nimbu init`
 
@@ -21,4 +22,4 @@ DESCRIPTION
   initialize your working directory to code a selected theme
 ```
 
-_See code: [lib/commands/init/index.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/init/index.js)_
+_See code: [lib/commands/init/index.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/init/index.js)_

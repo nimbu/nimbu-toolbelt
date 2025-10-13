@@ -21,7 +21,7 @@ $ npm install -g @nimbu-cli/plugin-webpack-v5
 $ @nimbu-cli/plugin-webpack-v5 COMMAND
 running command...
 $ @nimbu-cli/plugin-webpack-v5 (--version)
-@nimbu-cli/plugin-webpack-v5/6.0.0 darwin-arm64 node-v24.10.0
+@nimbu-cli/plugin-webpack-v5/6.0.0-alpha.0 darwin-arm64 node-v24.10.0
 $ @nimbu-cli/plugin-webpack-v5 --help [COMMAND]
 USAGE
   $ @nimbu-cli/plugin-webpack-v5 COMMAND
@@ -55,7 +55,7 @@ ALIASES
   $ @nimbu-cli/plugin-webpack-v5 build:v5
 ```
 
-_See code: [src/commands/build.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/src/commands/build.ts)_
+_See code: [src/commands/build.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/src/commands/build.ts)_
 
 ## `@nimbu-cli/plugin-webpack-v5 build:v5`
 
@@ -101,7 +101,7 @@ ALIASES
   $ @nimbu-cli/plugin-webpack-v5 server:v5
 ```
 
-_See code: [src/commands/server.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/src/commands/server.ts)_
+_See code: [src/commands/server.ts](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/src/commands/server.ts)_
 
 ## `@nimbu-cli/plugin-webpack-v5 server:v5`
 

@@ -1,11 +1,12 @@
-# `nimbu auth`
+`nimbu auth`
+============
 
 authenticate, display token and current user
 
-- [`nimbu auth:login`](#nimbu-authlogin)
-- [`nimbu auth:logout`](#nimbu-authlogout)
-- [`nimbu auth:token`](#nimbu-authtoken)
-- [`nimbu auth:whoami`](#nimbu-authwhoami)
+* [`nimbu auth:login`](#nimbu-authlogin)
+* [`nimbu auth:logout`](#nimbu-authlogout)
+* [`nimbu auth:token`](#nimbu-authtoken)
+* [`nimbu auth:whoami`](#nimbu-authwhoami)
 
 ## `nimbu auth:login`
 
@@ -25,7 +26,7 @@ ALIASES
   $ nimbu login
 ```
 
-_See code: [lib/commands/auth/login.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/auth/login.js)_
+_See code: [lib/commands/auth/login.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/auth/login.js)_
 
 ## `nimbu auth:logout`
 
@@ -42,7 +43,7 @@ ALIASES
   $ nimbu logout
 ```
 
-_See code: [lib/commands/auth/logout.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/auth/logout.js)_
+_See code: [lib/commands/auth/logout.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/auth/logout.js)_
 
 ## `nimbu auth:token`
 
@@ -61,7 +62,7 @@ DESCRIPTION
   authorizations:create
 ```
 
-_See code: [lib/commands/auth/token.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/auth/token.js)_
+_See code: [lib/commands/auth/token.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/auth/token.js)_
 
 ## `nimbu auth:whoami`
 
@@ -78,4 +79,4 @@ ALIASES
   $ nimbu whoami
 ```
 
-_See code: [lib/commands/auth/whoami.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/auth/whoami.js)_
+_See code: [lib/commands/auth/whoami.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/auth/whoami.js)_

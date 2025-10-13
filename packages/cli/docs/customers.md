@@ -1,10 +1,11 @@
-# `nimbu customers`
+`nimbu customers`
+=================
 
 working with customers
 
-- [`nimbu customers:config:copy`](#nimbu-customersconfigcopy)
-- [`nimbu customers:config:diff`](#nimbu-customersconfigdiff)
-- [`nimbu customers:copy`](#nimbu-customerscopy)
+* [`nimbu customers:config:copy`](#nimbu-customersconfigcopy)
+* [`nimbu customers:config:diff`](#nimbu-customersconfigdiff)
+* [`nimbu customers:copy`](#nimbu-customerscopy)
 
 ## `nimbu customers:config:copy`
 
@@ -22,7 +23,7 @@ DESCRIPTION
   copy customer customizations from one to another
 ```
 
-_See code: [lib/commands/customers/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/customers/config/copy.js)_
+_See code: [lib/commands/customers/config/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/customers/config/copy.js)_
 
 ## `nimbu customers:config:diff`
 
@@ -40,7 +41,7 @@ DESCRIPTION
   check differences between customer customizations from one to another
 ```
 
-_See code: [lib/commands/customers/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/customers/config/diff.js)_
+_See code: [lib/commands/customers/config/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/customers/config/diff.js)_
 
 ## `nimbu customers:copy`
 
@@ -65,4 +66,4 @@ DESCRIPTION
   copy customers from one to another
 ```
 
-_See code: [lib/commands/customers/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/customers/copy.js)_
+_See code: [lib/commands/customers/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/customers/copy.js)_

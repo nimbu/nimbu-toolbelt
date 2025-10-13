@@ -1,10 +1,11 @@
-# `nimbu sites`
+`nimbu sites`
+=============
 
 interacting with your sites (list, create)
 
-- [`nimbu sites`](#nimbu-sites)
-- [`nimbu sites:copy`](#nimbu-sitescopy)
-- [`nimbu sites:list`](#nimbu-siteslist)
+* [`nimbu sites`](#nimbu-sites)
+* [`nimbu sites:copy`](#nimbu-sitescopy)
+* [`nimbu sites:list`](#nimbu-siteslist)
 
 ## `nimbu sites`
 
@@ -48,7 +49,7 @@ DESCRIPTION
   copy a complete site from one to another
 ```
 
-_See code: [lib/commands/sites/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/sites/copy.js)_
+_See code: [lib/commands/sites/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/sites/copy.js)_
 
 ## `nimbu sites:list`
 
@@ -68,4 +69,4 @@ ALIASES
   $ nimbu sites
 ```
 
-_See code: [lib/commands/sites/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/sites/list.js)_
+_See code: [lib/commands/sites/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/sites/list.js)_

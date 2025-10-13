@@ -1,11 +1,12 @@
-# `nimbu channels`
+`nimbu channels`
+================
 
 working with channels
 
-- [`nimbu channels:copy`](#nimbu-channelscopy)
-- [`nimbu channels:diff`](#nimbu-channelsdiff)
-- [`nimbu channels:entries:copy`](#nimbu-channelsentriescopy)
-- [`nimbu channels:info CHANNEL`](#nimbu-channelsinfo-channel)
+* [`nimbu channels:copy`](#nimbu-channelscopy)
+* [`nimbu channels:diff`](#nimbu-channelsdiff)
+* [`nimbu channels:entries:copy`](#nimbu-channelsentriescopy)
+* [`nimbu channels:info CHANNEL`](#nimbu-channelsinfo-channel)
 
 ## `nimbu channels:copy`
 
@@ -25,7 +26,7 @@ DESCRIPTION
   copy channel configuration from one to another
 ```
 
-_See code: [lib/commands/channels/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/channels/copy.js)_
+_See code: [lib/commands/channels/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/channels/copy.js)_
 
 ## `nimbu channels:diff`
 
@@ -43,7 +44,7 @@ DESCRIPTION
   check differences between channel settings from one to another
 ```
 
-_See code: [lib/commands/channels/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/channels/diff.js)_
+_See code: [lib/commands/channels/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/channels/diff.js)_
 
 ## `nimbu channels:entries:copy`
 
@@ -71,7 +72,7 @@ DESCRIPTION
   copy channel entries from one to another
 ```
 
-_See code: [lib/commands/channels/entries/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/channels/entries/copy.js)_
+_See code: [lib/commands/channels/entries/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/channels/entries/copy.js)_
 
 ## `nimbu channels:info CHANNEL`
 
@@ -79,8 +80,8 @@ list info about this channel
 
 ```
 USAGE
-  $ nimbu channels:info CHANNEL [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output
-    csv|json|yaml|ts |  | [--csv | --no-truncate]] [--no-header | ]
+  $ nimbu channels:info CHANNEL [--columns <value> | -x] [--filter <value>] [--no-header | [--csv | --no-truncate]]
+    [--output csv|json|yaml|ts |  | ] [--sort <value>]
 
 ARGUMENTS
   CHANNEL  slug of your channel (optionally with the site, i.e. site/channel)
@@ -100,4 +101,4 @@ DESCRIPTION
   list info about this channel
 ```
 
-_See code: [lib/commands/channels/info.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/channels/info.js)_
+_See code: [lib/commands/channels/info.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/channels/info.js)_

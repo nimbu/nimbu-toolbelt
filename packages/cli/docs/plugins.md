@@ -1,17 +1,18 @@
-# `nimbu plugins`
+`nimbu plugins`
+===============
 
 List installed plugins.
 
-- [`nimbu plugins`](#nimbu-plugins)
-- [`nimbu plugins:add PLUGIN`](#nimbu-pluginsadd-plugin)
-- [`nimbu plugins:inspect PLUGIN...`](#nimbu-pluginsinspect-plugin)
-- [`nimbu plugins:install PLUGIN`](#nimbu-pluginsinstall-plugin)
-- [`nimbu plugins:link PATH`](#nimbu-pluginslink-path)
-- [`nimbu plugins:remove [PLUGIN]`](#nimbu-pluginsremove-plugin)
-- [`nimbu plugins:reset`](#nimbu-pluginsreset)
-- [`nimbu plugins:uninstall [PLUGIN]`](#nimbu-pluginsuninstall-plugin)
-- [`nimbu plugins:unlink [PLUGIN]`](#nimbu-pluginsunlink-plugin)
-- [`nimbu plugins:update`](#nimbu-pluginsupdate)
+* [`nimbu plugins`](#nimbu-plugins)
+* [`nimbu plugins:add PLUGIN`](#nimbu-pluginsadd-plugin)
+* [`nimbu plugins:inspect PLUGIN...`](#nimbu-pluginsinspect-plugin)
+* [`nimbu plugins:install PLUGIN`](#nimbu-pluginsinstall-plugin)
+* [`nimbu plugins:link PATH`](#nimbu-pluginslink-path)
+* [`nimbu plugins:remove [PLUGIN]`](#nimbu-pluginsremove-plugin)
+* [`nimbu plugins:reset`](#nimbu-pluginsreset)
+* [`nimbu plugins:uninstall [PLUGIN]`](#nimbu-pluginsuninstall-plugin)
+* [`nimbu plugins:unlink [PLUGIN]`](#nimbu-pluginsunlink-plugin)
+* [`nimbu plugins:update`](#nimbu-pluginsupdate)
 
 ## `nimbu plugins`
 
@@ -34,7 +35,7 @@ EXAMPLES
   $ nimbu plugins
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.47/src/commands/plugins/index.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.49/src/commands/plugins/index.ts)_
 
 ## `nimbu plugins:add PLUGIN`
 
@@ -42,10 +43,10 @@ Installs a plugin into nimbu.
 
 ```
 USAGE
-  $ nimbu plugins:add PLUGIN [--json] [-f] [-h] [-s | -v]
+  $ nimbu plugins:add PLUGIN... [--json] [-f] [-h] [-s | -v]
 
 ARGUMENTS
-  PLUGIN  Plugin to install.
+  PLUGIN...  Plugin to install.
 
 FLAGS
   -f, --force    Force npm to fetch remote resources even if a local copy exists on disk.
@@ -92,7 +93,7 @@ USAGE
   $ nimbu plugins:inspect PLUGIN...
 
 ARGUMENTS
-  PLUGIN  [default: .] Plugin to inspect.
+  PLUGIN...  [default: .] Plugin to inspect.
 
 FLAGS
   -h, --help     Show CLI help.
@@ -108,7 +109,7 @@ EXAMPLES
   $ nimbu plugins:inspect myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.47/src/commands/plugins/inspect.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.49/src/commands/plugins/inspect.ts)_
 
 ## `nimbu plugins:install PLUGIN`
 
@@ -116,10 +117,10 @@ Installs a plugin into nimbu.
 
 ```
 USAGE
-  $ nimbu plugins:install PLUGIN [--json] [-f] [-h] [-s | -v]
+  $ nimbu plugins:install PLUGIN... [--json] [-f] [-h] [-s | -v]
 
 ARGUMENTS
-  PLUGIN  Plugin to install.
+  PLUGIN...  Plugin to install.
 
 FLAGS
   -f, --force    Force npm to fetch remote resources even if a local copy exists on disk.
@@ -157,7 +158,7 @@ EXAMPLES
     $ nimbu plugins:install someuser/someplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.47/src/commands/plugins/install.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.49/src/commands/plugins/install.ts)_
 
 ## `nimbu plugins:link PATH`
 
@@ -188,7 +189,7 @@ EXAMPLES
   $ nimbu plugins:link myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.47/src/commands/plugins/link.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.49/src/commands/plugins/link.ts)_
 
 ## `nimbu plugins:remove [PLUGIN]`
 
@@ -196,10 +197,10 @@ Removes a plugin from the CLI.
 
 ```
 USAGE
-  $ nimbu plugins:remove [PLUGIN] [-h] [-v]
+  $ nimbu plugins:remove [PLUGIN...] [-h] [-v]
 
 ARGUMENTS
-  PLUGIN  plugin to uninstall
+  PLUGIN...  plugin to uninstall
 
 FLAGS
   -h, --help     Show CLI help.
@@ -229,7 +230,7 @@ FLAGS
   --reinstall  Reinstall all plugins after uninstalling.
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.47/src/commands/plugins/reset.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.49/src/commands/plugins/reset.ts)_
 
 ## `nimbu plugins:uninstall [PLUGIN]`
 
@@ -237,10 +238,10 @@ Removes a plugin from the CLI.
 
 ```
 USAGE
-  $ nimbu plugins:uninstall [PLUGIN] [-h] [-v]
+  $ nimbu plugins:uninstall [PLUGIN...] [-h] [-v]
 
 ARGUMENTS
-  PLUGIN  plugin to uninstall
+  PLUGIN...  plugin to uninstall
 
 FLAGS
   -h, --help     Show CLI help.
@@ -257,7 +258,7 @@ EXAMPLES
   $ nimbu plugins:uninstall myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.47/src/commands/plugins/uninstall.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.49/src/commands/plugins/uninstall.ts)_
 
 ## `nimbu plugins:unlink [PLUGIN]`
 
@@ -265,10 +266,10 @@ Removes a plugin from the CLI.
 
 ```
 USAGE
-  $ nimbu plugins:unlink [PLUGIN] [-h] [-v]
+  $ nimbu plugins:unlink [PLUGIN...] [-h] [-v]
 
 ARGUMENTS
-  PLUGIN  plugin to uninstall
+  PLUGIN...  plugin to uninstall
 
 FLAGS
   -h, --help     Show CLI help.
@@ -301,4 +302,4 @@ DESCRIPTION
   Update installed plugins.
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.47/src/commands/plugins/update.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.49/src/commands/plugins/update.ts)_

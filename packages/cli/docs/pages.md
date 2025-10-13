@@ -1,8 +1,9 @@
-# `nimbu pages`
+`nimbu pages`
+=============
 
 copy page from one site to another
 
-- [`nimbu pages:copy [FULLPATH]`](#nimbu-pagescopy-fullpath)
+* [`nimbu pages:copy [FULLPATH]`](#nimbu-pagescopy-fullpath)
 
 ## `nimbu pages:copy [FULLPATH]`
 
@@ -25,4 +26,4 @@ DESCRIPTION
   copy page from one site to another
 ```
 
-_See code: [lib/commands/pages/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/pages/copy.js)_
+_See code: [lib/commands/pages/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/pages/copy.js)_

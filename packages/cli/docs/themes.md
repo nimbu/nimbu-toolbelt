@@ -1,12 +1,13 @@
-# `nimbu themes`
+`nimbu themes`
+==============
 
 working with themes (upload / download)
 
-- [`nimbu themes:copy`](#nimbu-themescopy)
-- [`nimbu themes:diff [THEME]`](#nimbu-themesdiff-theme)
-- [`nimbu themes:list [THEME]`](#nimbu-themeslist-theme)
-- [`nimbu themes:pull`](#nimbu-themespull)
-- [`nimbu themes:push`](#nimbu-themespush)
+* [`nimbu themes:copy`](#nimbu-themescopy)
+* [`nimbu themes:diff [THEME]`](#nimbu-themesdiff-theme)
+* [`nimbu themes:list [THEME]`](#nimbu-themeslist-theme)
+* [`nimbu themes:pull`](#nimbu-themespull)
+* [`nimbu themes:push`](#nimbu-themespush)
 
 ## `nimbu themes:copy`
 
@@ -27,7 +28,7 @@ DESCRIPTION
   copy themes from one site to another
 ```
 
-_See code: [lib/commands/themes/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/themes/copy.js)_
+_See code: [lib/commands/themes/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/themes/copy.js)_
 
 ## `nimbu themes:diff [THEME]`
 
@@ -47,7 +48,7 @@ DESCRIPTION
   show differences between local and server theme files
 ```
 
-_See code: [lib/commands/themes/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/themes/diff.js)_
+_See code: [lib/commands/themes/diff.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/themes/diff.js)_
 
 ## `nimbu themes:list [THEME]`
 
@@ -67,7 +68,7 @@ DESCRIPTION
   list all layouts, templates, snippets and assets
 ```
 
-_See code: [lib/commands/themes/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/themes/list.js)_
+_See code: [lib/commands/themes/list.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/themes/list.js)_
 
 ## `nimbu themes:pull`
 
@@ -86,7 +87,7 @@ DESCRIPTION
   download all code and assets for a theme
 ```
 
-_See code: [lib/commands/themes/pull.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/themes/pull.js)_
+_See code: [lib/commands/themes/pull.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/themes/pull.js)_
 
 ## `nimbu themes:push`
 
@@ -110,4 +111,4 @@ DESCRIPTION
   push the theme code online
 ```
 
-_See code: [lib/commands/themes/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/themes/push.js)_
+_See code: [lib/commands/themes/push.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/themes/push.js)_

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.0](https://github.com/zenjoy/nimbu-toolbelt/compare/v5.5.0...v6.0.0-alpha.0) (2025-10-13)
+
+### Code Quality
+
+- Improve code formatting in webpack config ([03095b8](https://github.com/zenjoy/nimbu-toolbelt/commit/03095b8))
+- Migrate to ESLint flat config ([5f884ec](https://github.com/zenjoy/nimbu-toolbelt/commit/5f884ec))
+
+
+
+
+
 # [6.0.0](https://github.com/zenjoy/nimbu-toolbelt/compare/v5.5.0...v6.0.0) (2025-10-13)
 
 ### Bug Fixes

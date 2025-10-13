@@ -1,8 +1,9 @@
-# `nimbu menus`
+`nimbu menus`
+=============
 
 copy menus from one site to another
 
-- [`nimbu menus:copy [SLUG]`](#nimbu-menuscopy-slug)
+* [`nimbu menus:copy [SLUG]`](#nimbu-menuscopy-slug)
 
 ## `nimbu menus:copy [SLUG]`
 
@@ -23,4 +24,4 @@ DESCRIPTION
   copy menus from one site to another
 ```
 
-_See code: [lib/commands/menus/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0/lib/commands/menus/copy.js)_
+_See code: [lib/commands/menus/copy.js](https://github.com/zenjoy/nimbu-toolbelt/blob/v6.0.0-alpha.0/lib/commands/menus/copy.js)_

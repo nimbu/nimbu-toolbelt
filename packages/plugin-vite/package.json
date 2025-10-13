@@ -1,13 +1,13 @@
 {
   "name": "@nimbu-cli/plugin-vite",
-  "version": "6.0.0",
+  "version": "6.0.0-alpha.0",
   "author": "Zenjoy Engineering",
   "bugs": "https://github.com/zenjoy/nimbu-toolbelt/issues",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "dependencies": {
-    "@nimbu-cli/command": "workspace:^6.0.0",
-    "@nimbu-cli/proxy-server": "workspace:^6.0.0",
+    "@nimbu-cli/command": "workspace:^6.0.0-alpha.0",
+    "@nimbu-cli/proxy-server": "workspace:^6.0.0-alpha.0",
     "@oclif/core": "^4.5.4",
     "chalk": "^4.1.2",
     "debug": "^4.4.3",

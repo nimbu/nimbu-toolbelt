@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.0](https://github.com/zenjoy/nimbu-toolbelt/compare/v5.5.0...v6.0.0-alpha.0) (2025-10-13)
+
+### ⚠ BREAKING CHANGES
+
+- **Node.js:** Minimum required version is now Node.js 18
+
+### Bug Fixes
+
+- Replace deprecated cli-ux with native oclif implementations ([6dbfd0c](https://github.com/zenjoy/nimbu-toolbelt/commit/6dbfd0cacfcece17c6b2f0167125c8126b99f0bf))
+
+### Features
+
+- Migrate to oclif v4 ([656195f](https://github.com/zenjoy/nimbu-toolbelt/commit/656195f138eb4942b5a1ae80d38c3a231b3fda8e))
+- Update commands to use listr2 for better progress feedback ([8f29da2](https://github.com/zenjoy/nimbu-toolbelt/commit/8f29da22485702247dda40f234b0b7d167b4fa08))
+
+
+
+
+
 # [6.0.0](https://github.com/zenjoy/nimbu-toolbelt/compare/v5.5.0...v6.0.0) (2025-10-13)
 
 ### Bug Fixes
