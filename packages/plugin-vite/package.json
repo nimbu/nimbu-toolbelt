@@ -46,6 +46,9 @@
   "oclif": {
     "commands": "./lib/commands"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "zenjoy/nimbu-toolbelt",
   "scripts": {
     "build": "rm -rf lib node_modules/.cache && rm -f tsconfig.tsbuildinfo && tsc -b",
@@ -56,5 +59,6 @@
     "test": "mocha --forbid-only 'test/**/*.test.ts' --timeout 60000",
     "posttest": "pnpm run lint",
     "yalc:publish": "pnpm run build && pnpm dlx yalc publish --push --no-script"
-  }
+  },
+  "gitHead": "a2f1ff0a3c6f51da4b5a910649d5b0b7f6af7d41"
 }

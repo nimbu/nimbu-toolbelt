@@ -60,5 +60,5 @@
     "yalc:publish": "pnpm run build && pnpm dlx yalc publish --push --no-script"
   },
   "types": "./lib/index.d.ts",
-  "gitHead": "f9d5b8f084e75a4aa8a29f9930f8da36a6ad258f"
+  "gitHead": "a2f1ff0a3c6f51da4b5a910649d5b0b7f6af7d41"
 }
