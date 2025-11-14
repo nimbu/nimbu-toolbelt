@@ -10,7 +10,7 @@
     "debug": "^4.4.3",
     "fs-extra": "^7.0.1",
     "inquirer": "^8.2.7",
-    "js-yaml": "^3.14.1",
+    "js-yaml": "^4.1.1",
     "lolcatjs": "^2.4.3",
     "netrc-parser": "^3.1.6",
     "nimbu-client": "^3.1.1",
